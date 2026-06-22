@@ -1,0 +1,18 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "dependencies": {
+        "@vitejs/plugin-react": "latest",
+        "axios": "latest",
+        "vite": "latest",
+        "laravel-vite-plugin": "latest",
+        "react": "latest",
+        "react-dom": "latest",
+        "chart.js": "latest"
+    },
+    "devDependencies": {}
+}

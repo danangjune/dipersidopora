@@ -1,0 +1,99 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('tb_counter', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('counts')->default(0);
+            $table->timestamps();
+        });
+
+        Schema::create('kuesioner', function (Blueprint $table) {
+            $table->id('id_kuesioner');
+            $table->string('nama', 100);
+            $table->string('domisili', 150);
+            for ($i = 1; $i <= 9; $i++) {
+                $table->unsignedTinyInteger("U{$i}");
+            }
+            $table->timestamps();
+        });
+
+        Schema::create('kuesioner_hasil', function (Blueprint $table) {
+            $table->id();
+            for ($i = 1; $i <= 9; $i++) {
+                $table->unsignedInteger("total_U{$i}")->default(0);
+            }
+            for ($i = 1; $i <= 9; $i++) {
+                $table->decimal("rata_U{$i}", 8, 4)->default(0);
+            }
+            $table->unsignedInteger('total_semua')->default(0);
+            $table->decimal('nilai_interval', 8, 4)->default(0);
+            $table->timestamps();
+        });
+
+        foreach (['data_barang_bandar', 'data_barang_pahing', 'data_barang_setonobetek'] as $tableName) {
+            Schema::create($tableName, function (Blueprint $table) {
+                $table->id('id_barang');
+                $table->date('tanggal')->index();
+                $table->string('lokasi', 80)->index();
+                $table->string('nama_barang', 100)->index();
+                $table->unsignedInteger('harga_sekarang')->default(0);
+                $table->unsignedInteger('harga_kemarin')->default(0);
+                $table->string('satuan', 30)->nullable();
+                $table->integer('selisih')->default(0);
+                $table->string('gambar')->nullable();
+                $table->enum('status_validasi', ['pending', 'true', 'false'])->default('pending')->index();
+                $table->timestamps();
+            });
+        }
+
+        Schema::create('pedagang', function (Blueprint $table) {
+            $table->id();
+            $table->string('no_registrasi', 30)->nullable()->index();
+            $table->string('nik', 16)->nullable()->index();
+            $table->string('nama_pemilik', 100)->nullable()->index();
+            $table->text('alamat_ktp')->nullable();
+            $table->string('kecamatan', 50)->nullable()->index();
+            $table->string('nama_kelurahan', 50)->nullable()->index();
+            $table->text('alamat_usaha')->nullable();
+            $table->text('deskripsi_alamat')->nullable();
+            $table->string('jenis_jualan', 80)->nullable()->index();
+            $table->string('jam_operasional', 80)->nullable();
+            $table->string('no_hp', 20)->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->string('foto_ktp')->nullable();
+            $table->string('foto_nib')->nullable();
+            $table->string('foto_lapak')->nullable();
+            $table->enum('status_validasi', ['pending', 'true', 'false'])->default('pending')->index();
+            $table->string('nama_usaha', 100)->nullable()->index();
+            $table->timestamps();
+        });
+
+        Schema::create('login_pkl', function (Blueprint $table) {
+            $table->id();
+            $table->string('username')->unique();
+            $table->string('password');
+            $table->string('role')->default('surveyor');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('login_pkl');
+        Schema::dropIfExists('pedagang');
+        Schema::dropIfExists('data_barang_setonobetek');
+        Schema::dropIfExists('data_barang_pahing');
+        Schema::dropIfExists('data_barang_bandar');
+        Schema::dropIfExists('kuesioner_hasil');
+        Schema::dropIfExists('kuesioner');
+        Schema::dropIfExists('tb_counter');
+    }
+};
