@@ -37,21 +37,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        foreach (['data_barang_bandar', 'data_barang_pahing', 'data_barang_setonobetek'] as $tableName) {
-            Schema::create($tableName, function (Blueprint $table) {
-                $table->id('id_barang');
-                $table->date('tanggal')->index();
-                $table->string('lokasi', 80)->index();
-                $table->string('nama_barang', 100)->index();
-                $table->unsignedInteger('harga_sekarang')->default(0);
-                $table->unsignedInteger('harga_kemarin')->default(0);
-                $table->string('satuan', 30)->nullable();
-                $table->integer('selisih')->default(0);
-                $table->string('gambar')->nullable();
-                $table->enum('status_validasi', ['pending', 'true', 'false'])->default('pending')->index();
-                $table->timestamps();
-            });
-        }
 
         Schema::create('pedagang', function (Blueprint $table) {
             $table->id();
@@ -89,9 +74,6 @@ return new class extends Migration
     {
         Schema::dropIfExists('login_pkl');
         Schema::dropIfExists('pedagang');
-        Schema::dropIfExists('data_barang_setonobetek');
-        Schema::dropIfExists('data_barang_pahing');
-        Schema::dropIfExists('data_barang_bandar');
         Schema::dropIfExists('kuesioner_hasil');
         Schema::dropIfExists('kuesioner');
         Schema::dropIfExists('tb_counter');

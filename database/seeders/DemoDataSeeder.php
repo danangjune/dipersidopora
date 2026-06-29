@@ -58,13 +58,7 @@ class DemoDataSeeder extends Seeder
             DB::table('het_hap_settings')->updateOrInsert(['komoditas_id' => $commodity->id, 'pasar_id' => null, 'type' => 'HAP'], ['price' => (int) (DB::table('commodity_price_records')->where('komoditas_id', $commodity->id)->avg('price') ?: 0), 'effective_date' => now()->toDateString(), 'is_active' => true, 'notes' => 'Sementara disamakan dengan konsep ESDEGAN; rumus indikator dapat dikaji ulang.', 'created_at' => now(), 'updated_at' => now()]);
         }
 
-        // Keep legacy per-market tables populated for backward compatibility.
-        $legacyTables = ['data_barang_bandar' => 'Pasar Bandar', 'data_barang_pahing' => 'Pasar Pahing', 'data_barang_setonobetek' => 'Pasar Setono Betek'];
-        foreach ($legacyTables as $table => $location) {
-            foreach (array_slice($commodities, 0, 10) as [$name, $image, $today, $yesterday, $unit]) {
-                DB::table($table)->updateOrInsert(['tanggal' => now()->toDateString(), 'lokasi' => $location, 'nama_barang' => $name], ['harga_sekarang' => $today, 'harga_kemarin' => $yesterday, 'satuan' => $unit, 'selisih' => $today - $yesterday, 'gambar' => $image, 'status_validasi' => 'true', 'created_at' => now(), 'updated_at' => now()]);
-            }
-        }
+        
 
         $pages = [
             ['Profil Dinas','tentang','Tentang DISPERDAGIN','Profil','images/office.png','Profil Dinas Perdagangan dan Perindustrian Kota Kediri.'],

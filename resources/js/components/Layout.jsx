@@ -8,7 +8,7 @@ export function Header() {
 
   return <>
     <div className="top-hero">
-      <a className="brand" href="/"><img src={asset('images/dp1.png')} alt="DISPERDAGIN" /><span>Harmoni Kediri</span></a>
+      <a className="brand" href="/"><img src={asset('images/dp1.png')} alt="DISPERDAGIN" /></a>
       <div className="searchBox">
         <input value={keyword} onChange={e => setKeyword(e.target.value)} placeholder="Cari informasi..." />
         {results.length > 0 && <div className="searchResults">{results.map(([label, href]) => <a key={href} href={href}>{label}</a>)}</div>}
