@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\SurveyController;
 use App\Http\Controllers\Api\VisitorController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/health', fn () => ['status' => 'ok', 'app' => config('app.name')]);
+Route::get('/health', fn() => ['status' => 'ok', 'app' => config('app.name')]);
 Route::post('/visitors/increment', [VisitorController::class, 'increment']);
 
 // Public dynamic content.
@@ -40,34 +40,33 @@ Route::apiResource('/pedagang', PedagangController::class);
 Route::patch('/pedagang/{pedagang}/validate', [PedagangController::class, 'validateStatus']);
 
 // Admin scaffold. In production, wrap this group with Sanctum/auth middleware.
-Route::prefix('admin')->group(function () {
-    Route::get('/dashboard', [AdminCrudController::class, 'dashboard']);
-    Route::match(['get', 'post'], '/markets', [AdminCrudController::class, 'markets']);
-    Route::patch('/markets/{market}', [AdminCrudController::class, 'updateMarket']);
-    Route::delete('/markets/{market}', [AdminCrudController::class, 'destroyMarket']);
 
-    Route::match(['get', 'post'], '/commodities', [AdminCrudController::class, 'commodities']);
-    Route::patch('/commodities/{commodity}', [AdminCrudController::class, 'updateCommodity']);
-    Route::delete('/commodities/{commodity}', [AdminCrudController::class, 'destroyCommodity']);
+Route::get('/dashboard', [AdminCrudController::class, 'dashboard']);
+Route::match(['get', 'post'], '/markets', [AdminCrudController::class, 'markets']);
+Route::patch('/markets/{market}', [AdminCrudController::class, 'updateMarket']);
+Route::delete('/markets/{market}', [AdminCrudController::class, 'destroyMarket']);
 
-    Route::match(['get', 'post'], '/prices', [AdminCrudController::class, 'prices']);
-    Route::patch('/prices/{price}', [AdminCrudController::class, 'updatePrice']);
-    Route::delete('/prices/{price}', [AdminCrudController::class, 'destroyPrice']);
-    Route::get('/prices/export', [AdminCrudController::class, 'exportPrices']);
+Route::match(['get', 'post'], '/commodities', [AdminCrudController::class, 'commodities']);
+Route::patch('/commodities/{commodity}', [AdminCrudController::class, 'updateCommodity']);
+Route::delete('/commodities/{commodity}', [AdminCrudController::class, 'destroyCommodity']);
 
-    Route::match(['get', 'post'], '/het-hap', [AdminCrudController::class, 'hetHap']);
-    Route::patch('/het-hap/{setting}', [AdminCrudController::class, 'updateHetHap']);
-    Route::delete('/het-hap/{setting}', [AdminCrudController::class, 'destroyHetHap']);
+Route::match(['get', 'post'], '/prices', [AdminCrudController::class, 'prices']);
+Route::patch('/prices/{price}', [AdminCrudController::class, 'updatePrice']);
+Route::delete('/prices/{price}', [AdminCrudController::class, 'destroyPrice']);
+Route::get('/prices/export', [AdminCrudController::class, 'exportPrices']);
 
-    Route::match(['get', 'post'], '/pages', [AdminCrudController::class, 'pages']);
-    Route::patch('/pages/{page}', [AdminCrudController::class, 'updatePage']);
-    Route::delete('/pages/{page}', [AdminCrudController::class, 'destroyPage']);
+Route::match(['get', 'post'], '/het-hap', [AdminCrudController::class, 'hetHap']);
+Route::patch('/het-hap/{setting}', [AdminCrudController::class, 'updateHetHap']);
+Route::delete('/het-hap/{setting}', [AdminCrudController::class, 'destroyHetHap']);
 
-    Route::match(['get', 'post'], '/downloads', [AdminCrudController::class, 'downloads']);
-    Route::patch('/downloads/{download}', [AdminCrudController::class, 'updateDownload']);
-    Route::delete('/downloads/{download}', [AdminCrudController::class, 'destroyDownload']);
+Route::match(['get', 'post'], '/pages', [AdminCrudController::class, 'pages']);
+Route::patch('/pages/{page}', [AdminCrudController::class, 'updatePage']);
+Route::delete('/pages/{page}', [AdminCrudController::class, 'destroyPage']);
 
-    Route::match(['get', 'post'], '/survey-settings', [AdminCrudController::class, 'surveySettings']);
-    Route::patch('/survey-settings/{surveySetting}', [AdminCrudController::class, 'updateSurveySetting']);
-    Route::delete('/survey-settings/{surveySetting}', [AdminCrudController::class, 'destroySurveySetting']);
-});
+Route::match(['get', 'post'], '/downloads', [AdminCrudController::class, 'downloads']);
+Route::patch('/downloads/{download}', [AdminCrudController::class, 'updateDownload']);
+Route::delete('/downloads/{download}', [AdminCrudController::class, 'destroyDownload']);
+
+Route::match(['get', 'post'], '/survey-settings', [AdminCrudController::class, 'surveySettings']);
+Route::patch('/survey-settings/{surveySetting}', [AdminCrudController::class, 'updateSurveySetting']);
+Route::delete('/survey-settings/{surveySetting}', [AdminCrudController::class, 'destroySurveySetting']);

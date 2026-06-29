@@ -7,7 +7,7 @@
     <title>{{ config('app.name', 'DISPERDAGIN Kota Kediri') }}</title>
     <link rel="icon" href="/assets/images/lpicon2.png">
     @viteReactRefresh
-    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    @vite(['resources/css/public.css', 'resources/js/app.jsx'])
 </head>
 <body>
     <div id="root"></div>

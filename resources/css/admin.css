@@ -1,0 +1,275 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.admin-shell {
+  min-height: 100vh;
+  display: flex;
+  background: #f4f7fb;
+  color: #172033;
+}
+
+.admin-sidebar {
+  width: 270px;
+  background: #0f2d52;
+  color: #fff;
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.admin-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.admin-brand strong {
+  font-size: 20px;
+  letter-spacing: 0.5px;
+}
+
+.admin-brand span {
+  color: #ffd166;
+  font-size: 13px;
+}
+
+.admin-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-menu a {
+  color: rgba(255, 255, 255, 0.82);
+  text-decoration: none;
+  padding: 12px 14px;
+  border-radius: 12px;
+  transition: 0.2s;
+}
+
+.admin-menu a:hover,
+.admin-menu a.active {
+  background: #ffd166;
+  color: #0f2d52;
+}
+
+.admin-logout {
+  margin-top: auto;
+}
+
+.admin-logout button {
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 32px;
+  overflow-x: hidden;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.admin-header p {
+  margin: 0 0 4px;
+  color: #e2a200;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.admin-header h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #10233f;
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 18px;
+}
+
+.admin-stat-card,
+.admin-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(15, 45, 82, 0.08);
+  border: 1px solid rgba(15, 45, 82, 0.06);
+}
+
+.admin-stat-card span {
+  display: block;
+  color: #667085;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.admin-stat-card strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 32px;
+  color: #0f2d52;
+}
+
+.admin-card {
+  margin-bottom: 22px;
+}
+
+.admin-form h2,
+.admin-card h2 {
+  margin: 0 0 18px;
+  color: #10233f;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-weight: 600;
+  color: #344054;
+}
+
+.admin-form-grid label.wide {
+  grid-column: 1 / -1;
+}
+
+.admin-form-grid input,
+.admin-form-grid textarea {
+  border: 1px solid #d0d5dd;
+  border-radius: 12px;
+  padding: 11px 12px;
+  font: inherit;
+  background: #fff;
+}
+
+.admin-form-grid textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.admin-form-grid input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.admin-actions button,
+.table-actions button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #0f2d52;
+  color: #fff;
+  cursor: pointer;
+}
+
+.admin-actions button.secondary {
+  background: #e4e7ec;
+  color: #344054;
+}
+
+.admin-message {
+  margin-top: 12px;
+  color: #027a48;
+  font-weight: 600;
+}
+
+.admin-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  text-align: left;
+  padding: 13px 12px;
+  border-bottom: 1px solid #eaecf0;
+  vertical-align: top;
+}
+
+.admin-table th {
+  font-size: 13px;
+  color: #475467;
+  text-transform: capitalize;
+  background: #f9fafb;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.table-actions button {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.table-actions button.danger {
+  background: #b42318;
+}
+
+@media (max-width: 900px) {
+  .admin-shell {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: auto;
+    height: auto;
+    position: static;
+  }
+
+  .admin-main {
+    padding: 20px;
+  }
+
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+commodityGridTen {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.barRow {
+  grid-template-columns: 1fr;
+}
