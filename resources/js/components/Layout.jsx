@@ -24,8 +24,6 @@ export function Header() {
         </div>)}
         <a href="/zona-integritas">Zona Integritas</a>
         <a href="/survey">Survey</a>
-        <a href="/pkl/dashboard">PKL</a>
-        <a href="/admin">Admin</a>
       </div>
     </nav>
   </>;

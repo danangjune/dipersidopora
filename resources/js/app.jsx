@@ -17,15 +17,20 @@ function App() {
 
   let page = null;
   if (path === '/') page = <Home />;
-  else if (['/informasi-pasar', '/informasi-pasar.php', '/hargaKom', '/hargaKom.php', '/harga-komoditas'].includes(path)) page = <MarketPage />;
+  else if (['/informasi-pasar'].includes(path)) page = <MarketPage />;
   else if (path === '/internal/harga') page = <MarketPage internal />;
-  else if (['/survey', '/kuesioner', '/kuesioner.php', '/survey_pasar', '/survey-pasar'].includes(path)) page = <SurveyPage />;
-  else if (path === '/admin') page = <AdminPage />;
-  else if (path === '/pkl/dashboard') page = <PklDashboard />;
-  else if (path === '/pkl/input') page = <PklInput />;
+  else if (['/survey'].includes(path)) page = <SurveyPage />;
   else page = pageForPath(path);
 
-  return <Layout>{page}</Layout>;
+  return <Layout>{page}</Layout>
 }
 
-createRoot(document.getElementById('root')).render(<App />);
+const container = document.getElementById('root');
+
+if (container) {
+    const root = window.__DISPERDAGIN_ROOT__ ?? createRoot(container);
+
+    window.__DISPERDAGIN_ROOT__ = root;
+
+    root.render(<App />);
+}

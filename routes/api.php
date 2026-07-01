@@ -13,8 +13,11 @@ Route::get('/health', fn() => ['status' => 'ok', 'app' => config('app.name')]);
 Route::post('/visitors/increment', [VisitorController::class, 'increment']);
 
 // Public dynamic content.
-Route::get('/site/page/{slug}', [SiteContentController::class, 'page'])->where('slug', '.*');
+Route::get('/site/page/{slug}', [SiteContentController::class, 'page'])
+    ->where('slug', '.*');
+
 Route::get('/site/downloads/{category}', [SiteContentController::class, 'downloads']);
+
 Route::get('/site/survey-setting', [SiteContentController::class, 'surveySetting']);
 
 // New normalized, dynamic commodity price API.
@@ -39,7 +42,6 @@ Route::get('/pedagang/export', [PedagangController::class, 'export']);
 Route::apiResource('/pedagang', PedagangController::class);
 Route::patch('/pedagang/{pedagang}/validate', [PedagangController::class, 'validateStatus']);
 
-// Admin scaffold. In production, wrap this group with Sanctum/auth middleware.
 
 Route::get('/dashboard', [AdminCrudController::class, 'dashboard']);
 Route::match(['get', 'post'], '/markets', [AdminCrudController::class, 'markets']);
