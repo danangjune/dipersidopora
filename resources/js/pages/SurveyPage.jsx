@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 import { asset } from "../data/siteContent";
+import ClipboardDocumentCheckIcon from "@heroicons/react/24/outline/ClipboardDocumentCheckIcon";
+import ChartBarIcon from "@heroicons/react/24/outline/ChartBarIcon";
+import QrCodeIcon from "@heroicons/react/24/outline/QrCodeIcon";
+import ArrowTopRightOnSquareIcon from "@heroicons/react/24/outline/ArrowTopRightOnSquareIcon";
+import UserGroupIcon from "@heroicons/react/24/outline/UserGroupIcon";
 
 const questions = [
   "Kesesuaian persyaratan pelayanan",
@@ -12,6 +17,22 @@ const questions = [
   "Kualitas sarana prasarana",
   "Penanganan pengaduan layanan",
 ];
+
+const questionGroups = [
+  { title: "Persyaratan & Prosedur", indices: [0, 1] },
+  { title: "Waktu & Biaya", indices: [2, 3] },
+  { title: "Produk & Kompetensi", indices: [4, 5] },
+  { title: "Perilaku & Sarana", indices: [6, 7] },
+  { title: "Pengaduan", indices: [8] },
+];
+
+const scoreLabels = ["Tidak Baik", "Kurang Baik", "Baik", "Sangat Baik"];
+const scoreColors = {
+  A: "#166534",
+  B: "#854d0e",
+  C: "#991b1b",
+  D: "#475569",
+};
 
 export default function SurveyPage() {
   const [summary, setSummary] = useState(null);
@@ -66,80 +87,158 @@ export default function SurveyPage() {
     }
   };
 
+  const scoreClass =
+    summary?.mutu === "A"
+      ? "scoreA"
+      : summary?.mutu === "B"
+        ? "scoreB"
+        : summary?.mutu === "C"
+          ? "scoreC"
+          : "scoreD";
+
   return (
-    <section className="section surveyPage">
+    <section className="section">
       <div className="sectionTitle">
-        <span>Survey</span>
+        <span>
+          <ClipboardDocumentCheckIcon
+            style={{ width: 16, height: 16, verticalAlign: -2 }}
+          />{" "}
+          Survey
+        </span>
         <h1>{setting?.title || "Survey Kepuasan Masyarakat"}</h1>
         <p>
           {setting?.description ||
-            "Survey mengacu pada SKM KemenPANRB. Link survey dan barcode bisa diganti dari Admin Page."}
+            "Survey mengacu pada SKM KemenPANRB. Hasil digunakan untuk perbaikan layanan secara berkelanjutan."}
         </p>
       </div>
+
       <div className="surveyGrid">
-        <form className="cardForm" onSubmit={submit}>
-          <h2>Form SKM Internal</h2>
-          <label>
-            Nama
-            <input
-              value={form.nama}
-              onChange={(e) => setForm({ ...form, nama: e.target.value })}
-              required
+        <form className="surveyForm" onSubmit={submit}>
+          <div className="surveyFormHeader">
+            <ClipboardDocumentCheckIcon
+              style={{ width: 22, height: 22 }}
             />
-          </label>
-          <label>
-            Domisili
-            <input
-              value={form.domisili}
-              onChange={(e) => setForm({ ...form, domisili: e.target.value })}
-              required
-            />
-          </label>
-          {questions.map((q, i) => (
-            <label key={q}>
-              {i + 1}. {q}
-              <select
-                value={form[`U${i + 1}`]}
+            <span>Form SKM Internal</span>
+          </div>
+
+          <div className="surveyFormRow">
+            <label className="surveyField">
+              <span>Nama</span>
+              <input
+                value={form.nama}
                 onChange={(e) =>
-                  setForm({ ...form, [`U${i + 1}`]: e.target.value })
+                  setForm({ ...form, nama: e.target.value })
                 }
-              >
-                <option value="4">Sangat Baik</option>
-                <option value="3">Baik</option>
-                <option value="2">Kurang Baik</option>
-                <option value="1">Tidak Baik</option>
-              </select>
+                required
+                placeholder="Nama lengkap"
+              />
             </label>
+            <label className="surveyField">
+              <span>Domisili</span>
+              <input
+                value={form.domisili}
+                onChange={(e) =>
+                  setForm({ ...form, domisili: e.target.value })
+                }
+                required
+                placeholder="Kecamatan / Kota"
+              />
+            </label>
+          </div>
+
+          {questionGroups.map((group) => (
+            <div key={group.title} className="surveyQuestionGroup">
+              <h4>{group.title}</h4>
+              {group.indices.map((i) => (
+                <label key={questions[i]} className="surveyQuestion">
+                  <span>
+                    {i + 1}. {questions[i]}
+                  </span>
+                  <div className="surveyOptions">
+                    {scoreLabels.map((label, si) => {
+                      const val = String(4 - si);
+                      return (
+                        <button
+                          key={val}
+                          type="button"
+                          className={
+                            form[`U${i + 1}`] === val
+                              ? "optBtn active"
+                              : "optBtn"
+                          }
+                          onClick={() =>
+                            setForm({ ...form, [`U${i + 1}`]: val })
+                          }
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </label>
+              ))}
+            </div>
           ))}
-          <button className="btn" type="submit">
-            Kirim Survey
-          </button>
-          {message && <p>{message}</p>}
+
+          <div className="surveySubmitRow">
+            <button className="btn" type="submit">
+              <ClipboardDocumentCheckIcon
+                style={{ width: 18, height: 18 }}
+              />
+              Kirim Survey
+            </button>
+            {message && (
+              <p className="surveyMessage">{message}</p>
+            )}
+          </div>
         </form>
-        <aside className="summaryCard surveyAside">
-          <h2>Survey KemenPANRB</h2>
+
+        <aside className="surveyAside">
+          <div className="surveyScoreCard">
+            <div className="surveyScoreHeader">
+              <ChartBarIcon style={{ width: 20, height: 20 }} />
+              <span>Hasil Terbaru</span>
+            </div>
+            <div className={`surveyScore ${scoreClass}`}>
+              <strong>{summary?.nilai_interval ?? 0}</strong>
+              <span>{summary?.mutu || "-"}</span>
+            </div>
+            <p>{summary?.kategori || "Belum ada data"}</p>
+            <div className="surveyMeta">
+              <UserGroupIcon style={{ width: 16, height: 16 }} />
+              <span>
+                Total responden: {summary?.total_votes ?? 0}
+              </span>
+            </div>
+          </div>
+
           {setting?.qr_image && (
-            <img
-              className="qrImage"
-              src={asset(setting.qr_image)}
-              alt="Barcode SKM"
-            />
+            <div className="surveyCard">
+              <div className="surveyCardTitle">
+                <QrCodeIcon style={{ width: 18, height: 18 }} />
+                <span>Scan Barcode</span>
+              </div>
+              <img
+                className="qrImage"
+                src={asset(setting.qr_image)}
+                alt="Barcode SKM"
+              />
+            </div>
           )}
+
           {setting?.external_url && (
             <a
-              className="btn"
+              className="btn surveyExternalBtn"
               href={setting.external_url}
               target="_blank"
               rel="noreferrer"
             >
+              <ArrowTopRightOnSquareIcon
+                style={{ width: 18, height: 18 }}
+              />
               Buka Link Survey
             </a>
           )}
-          <hr />
-          <h2>Hasil Terbaru</h2>
-          <strong>{summary?.nilai_interval ?? 0}</strong>
-          <p>{summary?.kategori || "Belum ada data"}</p>
-          <small>Total responden: {summary?.total_votes ?? 0}</small>
         </aside>
       </div>
     </section>

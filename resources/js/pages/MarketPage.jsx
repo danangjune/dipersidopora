@@ -1,40 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Chart,
-  LineController,
-  LineElement,
-  PointElement,
-  LinearScale,
-  CategoryScale,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
+  Chart, LineController, LineElement, PointElement,
+  LinearScale, CategoryScale, Title, Tooltip, Legend, Filler,
 } from "chart.js";
 
-Chart.register(
-  LineController,
-  LineElement,
-  PointElement,
-  LinearScale,
-  CategoryScale,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-);
+Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Legend, Filler);
 
 const rupiah = (value) =>
-  new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  }).format(value || 0);
+  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(value || 0);
 
-const COLORS = [
-  "#076797", "#108879", "#e2a200", "#dc2626", "#7c3aed",
-  "#0891b2", "#84cc16", "#f97316", "#ec4899", "#6366f1",
-];
+const COLORS = ["#076797", "#108879", "#e2a200", "#dc2626", "#7c3aed", "#0891b2", "#84cc16", "#f97316", "#ec4899", "#6366f1"];
 
 export default function MarketPage() {
   const canvasRef = useRef(null);
@@ -53,18 +28,13 @@ export default function MarketPage() {
       .then((d) => {
         const data = d.data || { markets: [], commodities: [] };
         setFilters(data);
-        if (data.commodities.length > 0) {
-          setSelectedCommodities([data.commodities[0].id]);
-        }
+        if (data.commodities.length > 0) setSelectedCommodities([data.commodities[0].id]);
       });
   }, []);
 
   const toggleCommodity = (id) => {
     setSelectedCommodities((prev) =>
-      prev.includes(id)
-        ? prev.filter((c) => c !== id)
-        : [...prev, id],
-    );
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]);
   };
 
   const query = useMemo(() => {
@@ -87,16 +57,11 @@ export default function MarketPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => {
-    load();
-  }, [query]);
+  useEffect(() => { load(); }, [query]);
 
   useEffect(() => {
     if (!canvasRef.current || chartData.dates.length === 0) return;
-
-    if (chartRef.current) {
-      chartRef.current.destroy();
-    }
+    if (chartRef.current) chartRef.current.destroy();
 
     const ctx = canvasRef.current.getContext("2d");
     chartRef.current = new Chart(ctx, {
@@ -118,61 +83,40 @@ export default function MarketPage() {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: {
-          intersect: false,
-          mode: "index",
-        },
+        interaction: { intersect: false, mode: "index" },
         plugins: {
-          legend: {
-            position: "bottom",
-            labels: {
-              padding: 20,
-              usePointStyle: true,
-              font: { size: 12, family: "Inter, sans-serif" },
-            },
-          },
+          legend: { position: "bottom", labels: { padding: 20, usePointStyle: true, font: { size: 12, family: "Inter, sans-serif" } } },
           tooltip: {
             backgroundColor: "#0f2d52",
             titleFont: { size: 13, family: "Inter, sans-serif" },
             bodyFont: { size: 12, family: "Inter, sans-serif" },
             padding: 12,
             cornerRadius: 12,
-            callbacks: {
-              label: (ctx) => ` ${ctx.dataset.label}: ${rupiah(ctx.parsed.y)}`,
-            },
+            callbacks: { label: (ctx) => ` ${ctx.dataset.label}: ${rupiah(ctx.parsed.y)}` },
           },
         },
         scales: {
-          x: {
-            grid: { display: false },
-            ticks: { font: { size: 11, family: "Inter, sans-serif" } },
-          },
+          x: { grid: { display: false }, ticks: { font: { size: 11, family: "Inter, sans-serif" } } },
           y: {
             grid: { color: "#eef2f7" },
-            ticks: {
-              font: { size: 11, family: "Inter, sans-serif" },
-              callback: (v) => rupiah(v).replace(",00", ""),
-            },
+            ticks: { font: { size: 11, family: "Inter, sans-serif" }, callback: (v) => rupiah(v).replace(",00", "") },
           },
         },
       },
     });
 
-    return () => {
-      if (chartRef.current) {
-        chartRef.current.destroy();
-      }
-    };
+    return () => { if (chartRef.current) chartRef.current.destroy(); };
   }, [chartData]);
 
   return (
     <section className="section marketPage">
-      <div
-        className="marketHero"
-        style={{
-          backgroundImage: "url(/assets/images/komoditas/SIKAD.png)",
-        }}
-      />
+      <div className="marketHero" style={{ backgroundImage: "url(/assets/images/komoditas/SIKAD.png)" }}>
+        <div className="marketHeroOverlay">
+          <span>Informasi Pasar</span>
+          <h1>Pemantauan Harga Komoditas</h1>
+          <p>Data harga komoditas dari berbagai pasar di Kota Kediri diperbarui setiap hari.</p>
+        </div>
+      </div>
 
       <div className="filterPanel">
         <label>
@@ -209,10 +153,8 @@ export default function MarketPage() {
         <p>Line chart perbandingan harga komoditas 7 hari terakhir.</p>
       </div>
       <div className="chartContainer">
-        {loading && <p className="emptyState">Memuat grafik...</p>}
-        {!loading && chartData.dates.length === 0 && (
-          <p className="emptyState">Belum ada data grafik.</p>
-        )}
+        {loading && <p className="blank">Memuat grafik...</p>}
+        {!loading && chartData.dates.length === 0 && <p className="blank">Belum ada data grafik.</p>}
         {!loading && chartData.dates.length > 0 && (
           <div className="chartWrapper">
             <canvas ref={canvasRef} />
@@ -225,31 +167,27 @@ export default function MarketPage() {
         <p>Semua komoditas aktif ditampilkan.</p>
       </div>
       <div className="commodityGridTen">
-        {loading && <div className="emptyState">Memuat data harga...</div>}
-        {!loading && rows.length === 0 && (
-          <div className="emptyState">Belum ada data untuk filter ini.</div>
-        )}
+        {loading && <div className="blank">Memuat data harga...</div>}
+        {!loading && rows.length === 0 && <div className="blank">Belum ada data untuk filter ini.</div>}
         {!loading &&
           rows.map((item) => (
             <article className="commodityMini" key={item.commodity_id}>
               <img
                 src={item.url_gambar}
                 alt={item.nama_komoditas}
-                onError={(e) => {
-                  e.currentTarget.src = "/assets/images/komoditas/default.png";
-                }}
+                onError={(e) => { e.currentTarget.src = "/assets/images/komoditas/default.png"; }}
               />
               <h3>{item.nama_komoditas}</h3>
               <strong>{rupiah(item.average_price)}</strong>
               <small>
-                /{item.unit || "satuan"} ·{" "}
-                <span className={item.tren}>{item.tren}</span>
+                /{item.unit || "satuan"} ·
+                <span className={item.tren}> {item.tren}</span>
               </small>
             </article>
           ))}
       </div>
 
-      <div className="sectionSubhead">
+      <div className="sectionSubhead" style={{marginTop:40}}>
         <h2>Tabel Harga Komoditas</h2>
         <p>Tabel harga rata-rata komoditas 7 hari terakhir.</p>
       </div>
@@ -279,9 +217,7 @@ export default function MarketPage() {
               </tr>
             ))}
             {rows.length === 0 && !loading && (
-              <tr>
-                <td colSpan={7}>Tidak ada data.</td>
-              </tr>
+              <tr><td colSpan={7}>Tidak ada data.</td></tr>
             )}
           </tbody>
         </table>

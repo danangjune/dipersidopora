@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { apiGet, asset, normalizePath } from "../data/siteContent";
+import ArrowDownTrayIcon from "@heroicons/react/24/outline/ArrowDownTrayIcon";
+import DocumentTextIcon from "@heroicons/react/24/outline/DocumentTextIcon";
+import DocumentArrowDownIcon from "@heroicons/react/24/outline/DocumentArrowDownIcon";
 
 const downloadMap = {
   "/unduhan/renstra": {
@@ -19,7 +22,10 @@ const downloadMap = {
 function Loading() {
   return (
     <section className="section">
-      <p>Memuat halaman...</p>
+      <div className="loadingState">
+        <div className="loadingSpinner" />
+        <p>Memuat halaman...</p>
+      </div>
     </section>
   );
 }
@@ -43,14 +49,22 @@ function DownloadPage({ title, items }) {
   return (
     <section className="section">
       <div className="sectionTitle">
-        <span>Unduhan</span>
+        <span>
+          <ArrowDownTrayIcon
+            style={{ width: 16, height: 16, verticalAlign: -2 }}
+          />{" "}
+          Unduhan
+        </span>
         <h1>{title}</h1>
         <p>Dokumen ini diambil dari database melalui CMS admin.</p>
       </div>
 
       <div className="downloadList">
         {items.length === 0 ? (
-          <p>Belum ada dokumen.</p>
+          <div className="emptyState">
+            <DocumentTextIcon style={{ width: 48, height: 48 }} />
+            <p>Belum ada dokumen tersedia.</p>
+          </div>
         ) : (
           items.map((item) => (
             <a
@@ -58,9 +72,20 @@ function DownloadPage({ title, items }) {
               href={asset(item.file_path)}
               target="_blank"
               rel="noreferrer"
+              className="downloadCard"
             >
-              <strong>{item.title}</strong>
-              <span>Download PDF</span>
+              <div className="downloadCardInfo">
+                <DocumentTextIcon
+                  style={{ width: 24, height: 24, flexShrink: 0 }}
+                />
+                <strong>{item.title}</strong>
+              </div>
+              <span className="downloadCardAction">
+                <DocumentArrowDownIcon
+                  style={{ width: 18, height: 18 }}
+                />
+                PDF
+              </span>
             </a>
           ))
         )}
@@ -81,8 +106,6 @@ function CmsNormalPage({ page }) {
         <span>{page.eyebrow || page.group || "DISPERDAGIN"}</span>
         <h1>{page.title}</h1>
 
-        {/* {page.excerpt && <p>{page.excerpt}</p>} */}
-
         {paragraphs.map((paragraph, index) => (
           <p key={index}>{paragraph}</p>
         ))}
@@ -92,6 +115,7 @@ function CmsNormalPage({ page }) {
         <img
           src={asset(page.image)}
           alt={page.title}
+          className="pageImage"
           onError={(event) => {
             event.currentTarget.style.display = "none";
           }}
