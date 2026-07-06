@@ -3,6 +3,9 @@ import {
   Chart, LineController, LineElement, PointElement,
   LinearScale, CategoryScale, Title, Tooltip, Legend, Filler,
 } from "chart.js";
+import ChartBarIcon from "@heroicons/react/24/outline/ChartBarIcon";
+import AdjustmentsHorizontalIcon from "@heroicons/react/24/outline/AdjustmentsHorizontalIcon";
+import TableCellsIcon from "@heroicons/react/24/outline/TableCellsIcon";
 
 Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Legend, Filler);
 
@@ -108,49 +111,66 @@ export default function MarketPage() {
     return () => { if (chartRef.current) chartRef.current.destroy(); };
   }, [chartData]);
 
+  const trenIcon = (t) => {
+    if (t === "naik") return "▲";
+    if (t === "turun") return "▼";
+    return "—";
+  };
+
   return (
     <section className="section marketPage">
       <div className="marketHero" style={{ backgroundImage: "url(/assets/images/komoditas/SIKAD.png)" }}>
-        <div className="marketHeroOverlay">
-          <span>Informasi Pasar</span>
+        <div className="marketHeroOverlay" />
+      </div>
+
+      <div className="marketPageHeader">
+        <ChartBarIcon style={{ width: 32, height: 32 }} />
+        <div>
           <h1>Pemantauan Harga Komoditas</h1>
           <p>Data harga komoditas dari berbagai pasar di Kota Kediri diperbarui setiap hari.</p>
         </div>
       </div>
 
-      <div className="filterPanel">
-        <label>
-          Pasar
-          <select value={marketId} onChange={(e) => setMarketId(e.target.value)}>
-            <option value="">Semua Pasar</option>
-            {filters.markets.map((m) => (
-              <option value={m.id} key={m.id}>{m.name}</option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      <div className="sectionSubhead">
-        <h2>Pilih Komoditas</h2>
-        <p>Centang komoditas yang ingin dibandingkan harganya.</p>
-      </div>
-      <div className="checkboxGroup">
-        {filters.commodities.map((c, i) => (
-          <label key={c.id} className="checkboxLabel">
-            <input
-              type="checkbox"
-              checked={selectedCommodities.includes(c.id)}
-              onChange={() => toggleCommodity(c.id)}
-              style={{ accentColor: COLORS[i % COLORS.length] }}
-            />
-            <span>{c.name}</span>
-          </label>
-        ))}
+      <div className="filterCard">
+        <div className="filterCardHeader">
+          <AdjustmentsHorizontalIcon style={{ width: 20, height: 20 }} />
+          <span>Filter Data</span>
+        </div>
+        <div className="filterCardBody">
+          <div className="filterCardRow">
+            <label>
+              Pasar
+              <select value={marketId} onChange={(e) => setMarketId(e.target.value)}>
+                <option value="">Semua Pasar</option>
+                {filters.markets.map((m) => (
+                  <option value={m.id} key={m.id}>{m.name}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="filterCardDivider" />
+          <div>
+            <p className="filterCardLabel">Komoditas</p>
+            <div className="checkboxGroup">
+              {filters.commodities.map((c, i) => (
+                <label key={c.id} className="checkboxLabel">
+                  <input
+                    type="checkbox"
+                    checked={selectedCommodities.includes(c.id)}
+                    onChange={() => toggleCommodity(c.id)}
+                    style={{ accentColor: COLORS[i % COLORS.length] }}
+                  />
+                  <span>{c.name}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="sectionSubhead">
         <h2>Grafik Harga</h2>
-        <p>Line chart perbandingan harga komoditas 7 hari terakhir.</p>
+        <p>Perbandingan harga komoditas 7 hari terakhir.</p>
       </div>
       <div className="chartContainer">
         {loading && <p className="blank">Memuat grafik...</p>}
@@ -163,33 +183,39 @@ export default function MarketPage() {
       </div>
 
       <div className="sectionSubhead">
-        <h2>Komoditas Utama</h2>
-        <p>Semua komoditas aktif ditampilkan.</p>
+        <h2>Harga Komoditas</h2>
+        <p>Rata-rata harga komoditas 7 hari terakhir.</p>
       </div>
-      <div className="commodityGridTen">
+      <div className="marketCardGrid">
         {loading && <div className="blank">Memuat data harga...</div>}
         {!loading && rows.length === 0 && <div className="blank">Belum ada data untuk filter ini.</div>}
         {!loading &&
-          rows.map((item) => (
-            <article className="commodityMini" key={item.commodity_id}>
-              <img
-                src={item.url_gambar}
-                alt={item.nama_komoditas}
-                onError={(e) => { e.currentTarget.src = "/assets/images/komoditas/default.png"; }}
-              />
-              <h3>{item.nama_komoditas}</h3>
-              <strong>{rupiah(item.average_price)}</strong>
-              <small>
-                /{item.unit || "satuan"} ·
-                <span className={item.tren}> {item.tren}</span>
-              </small>
-            </article>
-          ))}
+          rows.map((item) => {
+            const tren = item.tren || "tetap";
+            return (
+              <article className="commodityCard" key={item.commodity_id}>
+                <div className="commodityCardTop">
+                  <img
+                    src={item.url_gambar}
+                    alt={item.nama_komoditas}
+                    onError={(e) => { e.currentTarget.src = "/assets/images/komoditas/default.png"; }}
+                  />
+                  <h3>{item.nama_komoditas}</h3>
+                </div>
+                <div className="commodityCardBody">
+                  <strong>{rupiah(item.average_price)}</strong>
+                  <span className={`commodityTrend ${tren}`}>
+                    <i>{trenIcon(tren)}</i> {rupiah(Math.abs(item.selisih || 0))}
+                  </span>
+                </div>
+              </article>
+            );
+          })}
       </div>
 
       <div className="sectionSubhead" style={{marginTop:40}}>
         <h2>Tabel Harga Komoditas</h2>
-        <p>Tabel harga rata-rata komoditas 7 hari terakhir.</p>
+        <p>Tabel lengkap rata-rata harga komoditas 7 hari terakhir.</p>
       </div>
       <div className="tableWrap">
         <table>
@@ -208,16 +234,16 @@ export default function MarketPage() {
             {rows.map((r, i) => (
               <tr key={r.commodity_id}>
                 <td>{i + 1}</td>
-                <td>{r.nama_komoditas}</td>
+                <td><strong>{r.nama_komoditas}</strong></td>
                 <td>{rupiah(r.average_price)}</td>
                 <td>{rupiah(r.previous_average_price)}</td>
-                <td className={r.tren}>{rupiah(Math.abs(r.selisih))}</td>
+                <td><span className={`indicator ${r.tren}`}>{trenIcon(r.tren)} {rupiah(Math.abs(r.selisih))}</span></td>
                 <td>{r.market_count}</td>
                 <td>{r.latest_date || "-"}</td>
               </tr>
             ))}
             {rows.length === 0 && !loading && (
-              <tr><td colSpan={7}>Tidak ada data.</td></tr>
+              <tr><td colSpan={7}><div className="emptyState"><TableCellsIcon style={{width:36,height:36}} /><p>Tidak ada data.</p></div></td></tr>
             )}
           </tbody>
         </table>

@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import MarketPage from './pages/MarketPage';
 import SurveyPage from './pages/SurveyPage';
 import AdminPage from './pages/AdminPage';
+import TentangPage from './pages/TentangPage';
 import { PklDashboard, PklInput } from './pages/PklPages';
 import { pageForPath } from './pages/StaticPage';
 
@@ -19,6 +20,7 @@ function App() {
   if (path === '/') page = <Home />;
   else if (['/informasi-pasar'].includes(path)) page = <MarketPage />;
   else if (['/survey'].includes(path)) page = <SurveyPage />;
+  else if (['/tentang'].includes(path)) page = <TentangPage />;
   else page = pageForPath(path);
 
   return <Layout>{page}</Layout>

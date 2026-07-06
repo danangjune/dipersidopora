@@ -163,11 +163,22 @@ tr:last-child td{border-bottom:0}
 tr:hover td{background:#f8fafc}
 
 /* ─── MARKET HERO ─── */
-.marketHero{max-width:var(--max-w);margin:0 auto 28px;position:relative;background-size:cover;background-position:center;border-radius:var(--radius-lg);overflow:hidden;min-height:280px;display:flex;align-items:flex-end}
-.marketHeroOverlay{width:100%;padding:40px clamp(24px,4vw,48px);background:linear-gradient(transparent,rgba(0,0,0,.75));color:#fff}
-.marketHeroOverlay span{color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:12px}
-.marketHeroOverlay h1{color:#fff;font-size:clamp(24px,3.5vw,38px);margin:6px 0;text-shadow:0 2px 12px rgba(0,0,0,.3)}
-.marketHeroOverlay p{color:rgba(255,255,255,.85);max-width:600px;font-size:14px}
+.marketHero{max-width:var(--max-w);margin:0 auto 28px;position:relative;background-size:cover;background-position:center;border-radius:var(--radius-lg);overflow:hidden;min-height:200px;display:flex;align-items:flex-end;box-shadow:var(--shadow)}
+.marketHeroOverlay{width:100%;height:200px;background:linear-gradient(135deg,rgba(7,103,151,.4),rgba(16,136,121,.3))}
+.marketPageHeader{max-width:var(--max-w);margin:0 auto 28px;display:flex;align-items:flex-start;gap:16px}
+.marketPageHeader svg{color:var(--primary);flex-shrink:0;margin-top:2px}
+.marketPageHeader h1{font-size:clamp(22px,3vw,32px);margin:0 0 4px}
+.marketPageHeader p{margin:0;font-size:14px}
+.filterCard{max-width:var(--max-w);margin:0 auto 28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden}
+.filterCardHeader{display:flex;align-items:center;gap:10px;padding:16px 20px;font-size:15px;font-weight:700;color:var(--primary);background:var(--soft);border-bottom:1px solid var(--border)}
+.filterCardBody{padding:20px;display:grid;gap:16px}
+.filterCardRow{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.filterCardRow label{display:grid;gap:6px;font-weight:700;font-size:13px;color:var(--text)}
+.filterCardRow input,.filterCardRow select{width:100%;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font:inherit;background:var(--surface);transition:var(--transition)}
+.filterCardRow input:focus,.filterCardRow select:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px rgba(8,145,178,.12)}
+.filterCardDivider{height:1px;background:var(--border)}
+.filterCardLabel{font-size:13px;font-weight:700;color:var(--text);margin:0 0 10px}
+.marketCardGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;max-width:var(--max-w);margin:0 auto}
 
 /* ─── SURVEY PAGE ─── */
 .surveyGrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;align-items:start;max-width:var(--max-w);margin:0 auto}
@@ -273,7 +284,42 @@ tr:hover td{background:#f8fafc}
 .priceCard strong{font-size:20px;color:var(--primary)}
 .naik{color:#dc2626}.turun{color:#16a34a}.tetap{color:#64748b}
 
-/* ─── FOOTER ─── */
+/* ─── TENTANG PAGE ─── */
+.tentangHero{background:linear-gradient(135deg,var(--primary),var(--accent));padding:60px clamp(16px,4vw,40px);text-align:center}
+.tentangHeroContent span{color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:13px}
+.tentangHeroContent h1{color:#fff;font-size:clamp(28px,4vw,44px);margin:8px 0 0;font-weight:800;letter-spacing:-.02em}
+.tentangLogo{text-align:center;margin-bottom:48px}
+.tentangLogo img{height:200px;width:auto;object-fit:contain;margin:auto}
+.tentangKadin{display:grid;grid-template-columns:280px 1fr;gap:40px;align-items:start;max-width:var(--max-w);margin:0 auto}
+.tentangKadinFoto{width:280px;height:340px;border-radius:var(--radius-lg);background:var(--soft);overflow:hidden;border:1px solid var(--border)}
+.tentangKadinFoto img{width:100%;height:100%;object-fit:cover}
+.tentangKadinInfo h3{font-size:14px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin:0 0 4px}
+.tentangKadinInfo h2{font-size:clamp(20px,2.5vw,28px);color:var(--primary);margin:0 0 16px;font-weight:800;letter-spacing:-.01em}
+.tentangDivider{width:60px;height:4px;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:2px;margin-bottom:20px}
+.tentangDesc h4{font-size:16px;color:var(--text);margin:0 0 8px;font-weight:700}
+.tentangDesc p{font-size:15px;line-height:1.8;margin:0 0 12px}
+.tentangBidangGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:var(--max-w);margin:0 auto}
+.tentangBidangCard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px 28px;box-shadow:var(--shadow-sm);transition:all var(--transition)}
+.tentangBidangCard:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+.tentangBidangIcon{width:56px;height:56px;border-radius:var(--radius);background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;display:grid;place-items:center;margin-bottom:18px;box-shadow:0 4px 16px rgba(7,103,151,.2)}
+.tentangBidangIcon svg{width:26px;height:26px;stroke-width:1.5}
+.tentangBidangCard h3{font-size:18px;margin-bottom:10px;color:var(--text)}
+.tentangBidangCard p{font-size:14px;margin:0;line-height:1.7}
+.tentangAlamatGrid{display:grid;grid-template-columns:1fr 1fr;gap:40px;max-width:var(--max-w);margin:0 auto;align-items:start}
+.tentangAlamatList{display:grid;gap:20px}
+.tentangAlamatItem{display:flex;gap:14px;align-items:flex-start}
+.tentangAlamatItem svg{width:22px;height:22px;color:var(--primary);flex-shrink:0;margin-top:2px}
+.tentangAlamatItem strong{display:block;font-size:15px;color:var(--text);margin-bottom:4px}
+.tentangAlamatItem p{margin:0;font-size:14px;line-height:1.6}
+.tentangMap{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);position:sticky;top:80px}
+.tentangMap iframe{width:100%;height:360px;border:0;display:block}
+.tentangKontakGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;max-width:var(--max-w);margin:0 auto}
+.tentangKontakCard{display:flex;align-items:center;gap:16px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);transition:all var(--transition)}
+.tentangKontakCard:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--accent)}
+.tentangKontakIcon{width:48px;height:48px;border-radius:var(--radius);background:var(--soft);display:grid;place-items:center;flex-shrink:0}
+.tentangKontakIcon svg{width:22px;height:22px;color:var(--primary);stroke-width:1.5}
+.tentangKontakCard strong{display:block;font-size:13px;color:var(--text-muted);margin-bottom:2px}
+.tentangKontakCard span{font-size:14px;font-weight:600;color:var(--text);word-break:break-all}
 .footer{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;padding:48px clamp(16px,4vw,40px) 24px}
 .footerGrid{max-width:var(--max-w);margin:0 auto;display:grid;grid-template-columns:1.2fr 1.4fr 1fr 1fr;gap:32px;align-items:start}
 .footer img{height:60px;width:auto;filter:brightness(0) invert(1)}
@@ -339,4 +385,10 @@ tr:hover td{background:#f8fafc}
   .serviceGrid{grid-template-columns:1fr}
   .marketHero{min-height:200px}
   .heroSlider{height:clamp(200px,55vw,320px)}
+  .tentangKadin{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .tentangKadinFoto{width:200px;height:260px}
+  .tentangDivider{margin:0 auto 20px}
+  .tentangBidangGrid{grid-template-columns:1fr}
+  .tentangAlamatGrid{grid-template-columns:1fr}
+  .tentangMap{position:static}
 }
