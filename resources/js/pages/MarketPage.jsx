@@ -10,21 +10,8 @@ const today = new Date();
 const iso = (date) => date.toISOString().slice(0, 10);
 const weekAgo = new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000);
 
-function IndicatorBadge({ status }) {
-  if (!status) return null;
-  const label =
-    {
-      aman: "Aman",
-      waspada: "Waspada",
-      intervensi: "Intervensi",
-      belum_dikaji: "Belum Dikaji",
-    }[status] || status;
-  return <span className={`indicator ${status}`}>{label}</span>;
-}
-
-export default function MarketPage({ internal = false }) {
+export default function MarketPage() {
   const params = new URLSearchParams(window.location.search);
-  const isInternal = internal || params.get("internal") === "1";
   const [filters, setFilters] = useState({ markets: [], commodities: [] });
   const [marketId, setMarketId] = useState(params.get("market_id") || "");
   const [commodityId, setCommodityId] = useState(
@@ -36,7 +23,6 @@ export default function MarketPage({ internal = false }) {
   const [endDate, setEndDate] = useState(params.get("end_date") || iso(today));
   const [rows, setRows] = useState([]);
   const [chart, setChart] = useState([]);
-  const [adminAverages, setAdminAverages] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -45,8 +31,6 @@ export default function MarketPage({ internal = false }) {
       .then((d) => {
         const data = d.data || { markets: [], commodities: [] };
         setFilters(data);
-        if (!marketId && data.markets?.[0])
-          setMarketId(String(data.markets[0].id));
       });
   }, []);
 
@@ -56,24 +40,18 @@ export default function MarketPage({ internal = false }) {
     if (commodityId) q.set("commodity_id", commodityId);
     if (startDate) q.set("start_date", startDate);
     if (endDate) q.set("end_date", endDate);
-    if (isInternal) q.set("internal", "1");
     return q.toString();
-  }, [marketId, commodityId, startDate, endDate, isInternal]);
+  }, [marketId, commodityId, startDate, endDate]);
 
   const load = () => {
-    if (!marketId) return;
     setLoading(true);
     Promise.all([
       fetch(`/api/market/summary?${query}`).then((r) => r.json()),
       fetch(`/api/market/chart?${query}`).then((r) => r.json()),
-      isInternal
-        ? fetch(`/api/market/admin-averages?${query}`).then((r) => r.json())
-        : Promise.resolve(null),
     ])
-      .then(([summary, chartData, avg]) => {
+      .then(([summary, chartData]) => {
         setRows(summary?.data?.rows || []);
         setChart(chartData?.data || []);
-        setAdminAverages(avg?.data || null);
       })
       .finally(() => setLoading(false));
   };
@@ -90,11 +68,11 @@ export default function MarketPage({ internal = false }) {
   return (
     <section className="section marketPage">
       <div className="sectionTitle">
-        <span>{isInternal ? "Internal / Admin" : "Informasi Pasar"}</span>
+        <span>Informasi Pasar</span>
         <h1>Harga Rata-rata Komoditas</h1>
         <p>
-          Filter utama dimulai dari pasar, lalu tanggal dan komoditas. Default
-          grafik dan tabel memakai periode satu minggu sesuai hasil rapat.
+          Filter berdasarkan pasar, tanggal, atau komoditas. Default
+          menampilkan rata-rata semua pasar periode satu minggu.
         </p>
       </div>
 
@@ -105,7 +83,7 @@ export default function MarketPage({ internal = false }) {
             value={marketId}
             onChange={(e) => setMarketId(e.target.value)}
           >
-            <option value="">Pilih pasar...</option>
+            <option value="">Semua Pasar</option>
             {filters.markets.map((m) => (
               <option value={m.id} key={m.id}>
                 {m.name}
@@ -143,23 +121,12 @@ export default function MarketPage({ internal = false }) {
             ))}
           </select>
         </label>
-        <a
-          className="btn outline"
-          href={isInternal ? "/informasi-pasar" : "/internal/harga"}
-        >
-          {isInternal ? "Mode Masyarakat" : "Mode Internal"}
-        </a>
-        {isInternal && (
-          <a className="btn" href={`/api/admin/prices/export?${query}`}>
-            Download Excel
-          </a>
-        )}
       </div>
 
       <div className="sectionSubhead">
         <h2>Komoditas Utama</h2>
         <p>
-          Gambar diperkecil dalam formasi 5 x 2. Harga yang tampil adalah
+          Semua komoditas aktif ditampilkan. Harga yang tampil adalah
           rata-rata periode filter.
         </p>
       </div>
@@ -169,7 +136,7 @@ export default function MarketPage({ internal = false }) {
           <div className="emptyState">Belum ada data untuk filter ini.</div>
         )}
         {!loading &&
-          rows.slice(0, 10).map((item) => (
+          rows.map((item) => (
             <article className="commodityMini" key={item.commodity_id}>
               <img
                 src={item.url_gambar}
@@ -191,9 +158,7 @@ export default function MarketPage({ internal = false }) {
       <div className="sectionSubhead">
         <h2>Tabel Harga Komoditas</h2>
         <p>
-          {isInternal
-            ? "Tabel internal menampilkan HET/HAP dan indikator."
-            : "Tabel masyarakat umum tidak menampilkan kolom indikator."}
+          Tabel harga rata-rata komoditas per periode filter.
         </p>
       </div>
       <div className="tableWrap">
@@ -207,13 +172,6 @@ export default function MarketPage({ internal = false }) {
               <th>Selisih</th>
               <th>Pasar Terisi</th>
               <th>Tanggal Update</th>
-              {isInternal && (
-                <>
-                  <th>HET</th>
-                  <th>HAP</th>
-                  <th>Indikator</th>
-                </>
-              )}
             </tr>
           </thead>
           <tbody>
@@ -226,20 +184,11 @@ export default function MarketPage({ internal = false }) {
                 <td className={r.tren}>{rupiah(Math.abs(r.selisih))}</td>
                 <td>{r.market_count}</td>
                 <td>{r.latest_date || "-"}</td>
-                {isInternal && (
-                  <>
-                    <td>{r.het_price ? rupiah(r.het_price) : "-"}</td>
-                    <td>{r.hap_price ? rupiah(r.hap_price) : "-"}</td>
-                    <td>
-                      <IndicatorBadge status={r.indicator_status} />
-                    </td>
-                  </>
-                )}
               </tr>
             ))}
             {rows.length === 0 && !loading && (
               <tr>
-                <td colSpan={isInternal ? 10 : 7}>Tidak ada data.</td>
+                <td colSpan={7}>Tidak ada data.</td>
               </tr>
             )}
           </tbody>
@@ -274,34 +223,6 @@ export default function MarketPage({ internal = false }) {
           </div>
         ))}
       </div>
-
-      {isInternal && adminAverages && (
-        <div className="sectionSubhead">
-          <h2>Rata-rata Internal</h2>
-          <p>Ringkasan mingguan, bulanan, dan tahunan per komoditas.</p>
-        </div>
-      )}
-      {isInternal && adminAverages && (
-        <div className="avgGrid">
-          {Object.entries(adminAverages).map(([period, data]) => (
-            <div className="summaryCard" key={period}>
-              <h3>
-                {period === "weekly"
-                  ? "Mingguan"
-                  : period === "monthly"
-                    ? "Bulanan"
-                    : "Tahunan"}
-              </h3>
-              {data.slice(0, 8).map((row) => (
-                <p key={`${period}-${row.id}`}>
-                  <strong className="inlineStrong">{row.name}</strong>{" "}
-                  {rupiah(row.average_price)}
-                </p>
-              ))}
-            </div>
-          ))}
-        </div>
-      )}
     </section>
   );
 }

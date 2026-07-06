@@ -86,6 +86,39 @@ class DemoDataSeeder extends Seeder
             DB::table('site_pages')->updateOrInsert(['slug' => $slug], ['title' => $title, 'eyebrow' => $eyebrow, 'group' => $group, 'image' => $image, 'excerpt' => $excerpt, 'content' => $excerpt."\nKonten ini dapat diubah dari Admin Page tanpa mengedit file kode.", 'is_published' => true, 'sort_order' => $idx + 1, 'created_at' => now(), 'updated_at' => now()]);
         }
 
+        DB::table('site_pages')->updateOrInsert(['slug' => 'bantuan-modal'], ['title' => 'Bantuan Modal', 'eyebrow' => 'Layanan', 'group' => 'Layanan', 'external_url' => 'https://sultan.kedirikota.go.id/', 'excerpt' => 'Informasi bantuan modal dan penguatan usaha masyarakat.', 'is_published' => true, 'sort_order' => 0, 'created_at' => now(), 'updated_at' => now()]);
+
+        $servicePages = [
+            ['Sertifikasi Halal','layanan/halal','Layanan','Layanan','images/flowchart_sidangtera.png','Informasi prosedur sertifikasi halal.'],
+            ['Legalitas Merk','layanan/merk','Layanan','Layanan','images/flowchart_sidangtera.png','Informasi prosedur legalitas merk.'],
+            ['SIINas','layanan/sinas','Layanan','Layanan','images/flowchart_sidangtera.png','Informasi prosedur SIINas.'],
+            ['Tera / Tera Ulang','layanan/tera','Layanan','Layanan','images/flowchart_sidangtera.png','Informasi prosedur tera dan tera ulang.'],
+            ['Tanda Daftar Gudang','layanan/td-gudang','Layanan','Layanan','images/flowchart_sidangtera.png','Informasi prosedur tanda daftar gudang.'],
+            ['Perpanjangan Minuman Beralkohol','layanan/minhol','Layanan','Layanan','images/flowchart_sidangtera.png','Informasi perpanjangan minuman beralkohol.'],
+        ];
+        foreach ($servicePages as $idx => [$title, $slug, $eyebrow, $group, $image, $excerpt]) {
+            DB::table('site_pages')->updateOrInsert(['slug' => $slug], ['title' => $title, 'eyebrow' => $eyebrow, 'group' => $group, 'image' => $image, 'excerpt' => $excerpt, 'content' => $excerpt."\nKonten ini dapat diubah dari Admin Page tanpa mengedit file kode.", 'is_published' => true, 'sort_order' => $idx + 1, 'created_at' => now(), 'updated_at' => now()]);
+        }
+
+        $defaultSettings = [
+            ['address', 'Jl. Penanggungan No. 7, Bandar Lor, Kec. Mojoroto, Kota Kediri, Jawa Timur'],
+            ['phone', '0354-771908'],
+            ['email', 'disperdagin@kedirikota.go.id'],
+        ];
+        foreach ($defaultSettings as [$key, $value]) {
+            DB::table('site_settings')->updateOrInsert(['key' => $key], ['value' => $value, 'created_at' => now(), 'updated_at' => now()]);
+        }
+
+        $banners = [
+            ['images/project/banner 6.png', 0],
+            ['images/project/Banner 1.png', 1],
+            ['images/project/Banner 2.png', 2],
+            ['images/project/Banner 3.png', 3],
+        ];
+        foreach ($banners as $idx => [$image, $order]) {
+            DB::table('site_banners')->updateOrInsert(['image' => $image], ['title' => 'Banner '.($idx + 1), 'image' => $image, 'sort_order' => $order, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()]);
+        }
+
         $downloads = [
             ['RENSTRA DISPERDAGIN Tahun 2025-2026','renstra','aset_download/RENSTRA DISPERDAGIN TAHUN 2025-2026.pdf'], ['Dokumen RENSTRA DISPERDAGIN 2024','renstra','aset_download/Dokumen RENSTRA DISPERDAGIN 2024.pdf'],
             ['Dokumen Renja Disperdagin 2023','renja','aset_download/Dokumen Renja Disperdagin 2023.pdf'], ['Dokumen Renja Disperdagin 2024','renja','aset_download/Dokumen Renja Disperdagin 2024.pdf'], ['Dokumen Renja Disperdagin 2025','renja','aset_download/20240911 Dokumen Renja Disperdagin 2025.pdf'],

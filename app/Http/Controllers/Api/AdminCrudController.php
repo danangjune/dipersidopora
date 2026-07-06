@@ -8,6 +8,7 @@ use App\Models\DownloadDocument;
 use App\Models\HetHapSetting;
 use App\Models\Komoditas;
 use App\Models\Pasar;
+use App\Models\SiteBanner;
 use App\Models\SitePage;
 use App\Models\SurveySetting;
 use Illuminate\Http\Request;
@@ -27,6 +28,7 @@ class AdminCrudController extends Controller
                 'prices' => CommodityPriceRecord::count(),
                 'pages' => SitePage::count(),
                 'pending_prices' => CommodityPriceRecord::where('status_validasi', 'pending')->count(),
+                'het_hap' => HetHapSetting::count(),
             ],
         ]);
     }
@@ -220,6 +222,26 @@ class AdminCrudController extends Controller
         return response()->json(['status' => 'success']);
     }
 
+    public function banners(Request $request)
+    {
+        if ($request->isMethod('get')) {
+            return response()->json(['status' => 'success', 'data' => SiteBanner::query()->orderBy('sort_order')->get()]);
+        }
+        return response()->json(['status' => 'success', 'data' => SiteBanner::create($request->validate($this->bannerRules()))], 201);
+    }
+
+    public function updateBanner(Request $request, SiteBanner $banner)
+    {
+        $banner->update($request->validate($this->bannerRules(true)));
+        return response()->json(['status' => 'success', 'data' => $banner->fresh()]);
+    }
+
+    public function destroyBanner(SiteBanner $banner)
+    {
+        $banner->delete();
+        return response()->json(['status' => 'success']);
+    }
+
     public function exportPrices(Request $request)
     {
         $rows = CommodityPriceRecord::query()
@@ -308,6 +330,7 @@ class AdminCrudController extends Controller
             'group' => ['nullable', 'string', 'max:80'],
             'eyebrow' => ['nullable', 'string', 'max:120'],
             'image' => ['nullable', 'string', 'max:255'],
+            'external_url' => ['nullable', 'string', 'max:255'],
             'excerpt' => ['nullable', 'string'],
             'content' => ['nullable', 'string'],
             'cards' => ['nullable', 'array'],
@@ -336,6 +359,18 @@ class AdminCrudController extends Controller
             'external_url' => ['nullable', 'url', 'max:255'],
             'qr_image' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'is_active' => ['nullable', 'boolean'],
+        ];
+    }
+
+    private function bannerRules(bool $partial = false): array
+    {
+        $req = $partial ? 'sometimes' : 'required';
+        return [
+            'title' => ['nullable', 'string', 'max:180'],
+            'image' => [$req, 'string', 'max:255'],
+            'link_url' => ['nullable', 'string', 'max:255'],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
         ];
     }

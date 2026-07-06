@@ -81,6 +81,7 @@ const resources = {
       { name: "group", label: "Grup" },
       { name: "eyebrow", label: "Eyebrow" },
       { name: "image", label: "Gambar" },
+      { name: "external_url", label: "Link Eksternal" },
       { name: "excerpt", label: "Ringkasan", type: "textarea" },
       { name: "content", label: "Konten", type: "textarea" },
       { name: "sort_order", label: "Urutan", type: "number" },
@@ -93,6 +94,7 @@ const resources = {
       group: "Profil",
       eyebrow: "",
       image: "",
+      external_url: "",
       excerpt: "",
       content: "",
       sort_order: 0,
@@ -118,6 +120,42 @@ const resources = {
       is_published: true,
     },
   },
+  "het-hap": {
+    title: "HET / HAP",
+    endpoint: "/api/admin/het-hap",
+    fields: [
+      { name: "type", label: "Tipe", type: "select", required: true, options: [["HET", "HET (Harga Eceran Tertinggi)"], ["HAP", "HAP (Harga Acuan Pasar)"]] },
+      { name: "komoditas_id", label: "Komoditas", type: "select", required: true, optionsUrl: "/api/admin/commodities" },
+      { name: "pasar_id", label: "Pasar (Opsional)", type: "select", optionsUrl: "/api/admin/markets" },
+      { name: "price", label: "Harga", type: "number", required: true },
+      { name: "effective_date", label: "Tanggal Berlaku", type: "date" },
+      { name: "is_active", label: "Aktif", type: "checkbox" },
+      { name: "notes", label: "Catatan", type: "textarea" },
+    ],
+    columns: ["type", "komoditas_name", "pasar_name", "price", "effective_date", "is_active"],
+    defaults: {
+      type: "HAP",
+      komoditas_id: "",
+      pasar_id: "",
+      price: 0,
+      effective_date: "",
+      is_active: true,
+      notes: "",
+    },
+  },
+  banners: {
+    title: "Banner Slider",
+    endpoint: "/api/admin/banners",
+    fields: [
+      { name: "title", label: "Judul" },
+      { name: "image", label: "Path Gambar", required: true },
+      { name: "link_url", label: "Link URL" },
+      { name: "sort_order", label: "Urutan", type: "number" },
+      { name: "is_active", label: "Aktif", type: "checkbox" },
+    ],
+    columns: ["title", "image", "is_active"],
+    defaults: { title: "", image: "", link_url: "", sort_order: 0, is_active: true },
+  },
   "survey-settings": {
     title: "Master Survey / SKM",
     endpoint: "/api/admin/survey-settings",
@@ -141,10 +179,17 @@ const resources = {
 
 const menus = [
   { key: "dashboard", label: "Dashboard", href: "/admin" },
+  { key: "prices-monitor", label: "Pemantauan Harga", href: "/admin/prices-monitor" },
   { key: "markets", label: "Master Pasar", href: "/admin/markets" },
   { key: "commodities", label: "Master Komoditas", href: "/admin/commodities" },
   { key: "pages", label: "Master Halaman", href: "/admin/pages" },
   { key: "downloads", label: "Master Dokumen", href: "/admin/downloads" },
+  { key: "banners", label: "Banner Slider", href: "/admin/banners" },
+  {
+    key: "het-hap",
+    label: "HET / HAP",
+    href: "/admin/het-hap",
+  },
   {
     key: "survey-settings",
     label: "Master Survey",
@@ -172,6 +217,8 @@ function normalizePayload(form, fields) {
     } else if (field.type === "number") {
       payload[field.name] =
         value === "" || value === null ? null : Number(value);
+    } else if (field.type === "select") {
+      payload[field.name] = value === "" ? null : Number(value) || value;
     } else {
       payload[field.name] = value ?? "";
     }
@@ -254,6 +301,7 @@ function CrudPage({ config }) {
   const [editing, setEditing] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fieldOptions, setFieldOptions] = useState({});
 
   const fields = config.fields;
 
@@ -269,6 +317,29 @@ function CrudPage({ config }) {
 
   useEffect(() => {
     loadRows();
+  }, [config.endpoint]);
+
+  useEffect(() => {
+    const urls = fields
+      .filter((f) => f.type === "select" && f.optionsUrl)
+      .map((f) => f.optionsUrl);
+    if (urls.length === 0) return;
+    Promise.all(
+      urls.map(async (url) => {
+        try {
+          const res = await api(url);
+          return { url, data: res.data || [] };
+        } catch {
+          return { url, data: [] };
+        }
+      }),
+    ).then((results) => {
+      const map = {};
+      results.forEach(({ url, data }) => {
+        map[url] = data;
+      });
+      setFieldOptions(map);
+    });
   }, [config.endpoint]);
 
   const resetForm = () => {
@@ -321,6 +392,65 @@ function CrudPage({ config }) {
     await loadRows();
   };
 
+  const renderField = (field) => {
+    const value = form[field.name] ?? "";
+
+    if (field.type === "textarea") {
+      return (
+        <textarea
+          required={field.required}
+          value={value}
+          onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
+        />
+      );
+    }
+
+    if (field.type === "checkbox") {
+      return (
+        <input
+          type="checkbox"
+          checked={Boolean(value)}
+          onChange={(e) =>
+            setForm({ ...form, [field.name]: e.target.checked })
+          }
+        />
+      );
+    }
+
+    if (field.type === "select") {
+      const options = field.options || [];
+      const loaded = fieldOptions[field.optionsUrl] || [];
+      const allOptions =
+        options.length > 0
+          ? options
+          : loaded.map((item) => [item.id, item.name]);
+
+      return (
+        <select
+          required={field.required}
+          value={value}
+          onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
+        >
+          <option value="">{field.required ? "Pilih..." : "Semua"}</option>
+          {allOptions.map((opt) => (
+            <option key={opt[0]} value={opt[0]}>
+              {opt[1]}
+            </option>
+          ))}
+        </select>
+      );
+    }
+
+    return (
+      <input
+        type={field.type || "text"}
+        required={field.required}
+        value={value}
+        onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
+      />
+    );
+  };
+
   return (
     <>
       <div className="admin-header">
@@ -338,36 +468,14 @@ function CrudPage({ config }) {
             {fields.map((field) => (
               <label
                 key={field.name}
-                className={field.type === "textarea" ? "wide" : ""}
+                className={
+                  field.type === "textarea" || field.type === "select"
+                    ? "wide"
+                    : ""
+                }
               >
                 <span>{field.label}</span>
-
-                {field.type === "textarea" ? (
-                  <textarea
-                    required={field.required}
-                    value={form[field.name] ?? ""}
-                    onChange={(e) =>
-                      setForm({ ...form, [field.name]: e.target.value })
-                    }
-                  />
-                ) : field.type === "checkbox" ? (
-                  <input
-                    type="checkbox"
-                    checked={Boolean(form[field.name])}
-                    onChange={(e) =>
-                      setForm({ ...form, [field.name]: e.target.checked })
-                    }
-                  />
-                ) : (
-                  <input
-                    type={field.type || "text"}
-                    required={field.required}
-                    value={form[field.name] ?? ""}
-                    onChange={(e) =>
-                      setForm({ ...form, [field.name]: e.target.value })
-                    }
-                  />
-                )}
+                {renderField(field)}
               </label>
             ))}
           </div>
@@ -446,6 +554,184 @@ function CrudPage({ config }) {
   );
 }
 
+const rupiah = (value) =>
+  new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(value || 0);
+
+function IndicatorBadge({ status }) {
+  if (!status) return null;
+  const label = ({ aman: "Aman", waspada: "Waspada", intervensi: "Intervensi", belum_dikaji: "Belum Dikaji" }[status]) || status;
+  return <span className={`indicator ${status}`}>{label}</span>;
+}
+
+function PriceMonitoring() {
+  const today = new Date();
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const weekAgo = new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000);
+  const [filters, setFilters] = useState({ markets: [], commodities: [] });
+  const [marketId, setMarketId] = useState("");
+  const [commodityId, setCommodityId] = useState("");
+  const [startDate, setStartDate] = useState(iso(weekAgo));
+  const [endDate, setEndDate] = useState(iso(today));
+  const [rows, setRows] = useState([]);
+  const [chart, setChart] = useState([]);
+  const [adminAverages, setAdminAverages] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/market/filters")
+      .then((r) => r.json())
+      .then((d) => setFilters(d.data || { markets: [], commodities: [] }));
+  }, []);
+
+  const query = useMemo(() => {
+    const q = new URLSearchParams();
+    if (marketId) q.set("market_id", marketId);
+    if (commodityId) q.set("commodity_id", commodityId);
+    if (startDate) q.set("start_date", startDate);
+    if (endDate) q.set("end_date", endDate);
+    q.set("internal", "1");
+    return q.toString();
+  }, [marketId, commodityId, startDate, endDate]);
+
+  const load = () => {
+    setLoading(true);
+    Promise.all([
+      fetch(`/api/market/summary?${query}`).then((r) => r.json()),
+      fetch(`/api/market/chart?${query}`).then((r) => r.json()),
+      fetch(`/api/market/admin-averages?${query}`).then((r) => r.json()),
+    ])
+      .then(([summary, chartData, avg]) => {
+        setRows(summary?.data?.rows || []);
+        setChart(chartData?.data || []);
+        setAdminAverages(avg?.data || null);
+      })
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => { load(); }, [query]);
+
+  const maxChart = Math.max(...chart.map((item) => Number(item.average_price) || 0), 1);
+
+  return (
+    <div>
+      <div className="admin-header">
+        <div>
+          <p>Admin</p>
+          <h1>Pemantauan Harga Komoditas</h1>
+        </div>
+        <a className="btn" href={`/api/admin/prices/export?${query}`}>Download Excel</a>
+      </div>
+
+      <div className="filterPanel" style={{ background: "#fff", border: "1px solid #d0d5dd", borderRadius: 12, padding: 18, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 22 }}>
+        <label style={{ display: "grid", gap: 6, fontWeight: 600, color: "#344054", fontSize: 13 }}>
+          Pasar
+          <select value={marketId} onChange={(e) => setMarketId(e.target.value)} style={{ border: "1px solid #d0d5dd", borderRadius: 10, padding: "10px 12px", font: "inherit", background: "#fff" }}>
+            <option value="">Semua Pasar</option>
+            {filters.markets.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+          </select>
+        </label>
+        <label style={{ display: "grid", gap: 6, fontWeight: 600, color: "#344054", fontSize: 13 }}>
+          Dari Tanggal
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ border: "1px solid #d0d5dd", borderRadius: 10, padding: "10px 12px", font: "inherit" }} />
+        </label>
+        <label style={{ display: "grid", gap: 6, fontWeight: 600, color: "#344054", fontSize: 13 }}>
+          Sampai Tanggal
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} style={{ border: "1px solid #d0d5dd", borderRadius: 10, padding: "10px 12px", font: "inherit" }} />
+        </label>
+        <label style={{ display: "grid", gap: 6, fontWeight: 600, color: "#344054", fontSize: 13 }}>
+          Komoditas
+          <select value={commodityId} onChange={(e) => setCommodityId(e.target.value)} style={{ border: "1px solid #d0d5dd", borderRadius: 10, padding: "10px 12px", font: "inherit", background: "#fff" }}>
+            <option value="">Semua</option>
+            {filters.commodities.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </label>
+      </div>
+
+      <div className="admin-card">
+        <h2>Tabel Harga Komoditas</h2>
+        {loading && <p>Memuat data...</p>}
+        {!loading && rows.length === 0 && <p>Belum ada data.</p>}
+        {!loading && rows.length > 0 && (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Komoditas</th>
+                  <th>Rata-rata</th>
+                  <th>Sebelumnya</th>
+                  <th>Selisih</th>
+                  <th>Pasar</th>
+                  <th>HET</th>
+                  <th>HAP</th>
+                  <th>Indikator</th>
+                  <th>Update</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r, i) => (
+                  <tr key={r.commodity_id}>
+                    <td>{i + 1}</td>
+                    <td>{r.nama_komoditas}</td>
+                    <td>{rupiah(r.average_price)}</td>
+                    <td>{rupiah(r.previous_average_price)}</td>
+                    <td style={{ color: r.tren === "naik" ? "#dc2626" : r.tren === "turun" ? "#16a34a" : "#64748b" }}>{rupiah(Math.abs(r.selisih))}</td>
+                    <td>{r.market_count}</td>
+                    <td>{r.het_price ? rupiah(r.het_price) : "-"}</td>
+                    <td>{r.hap_price ? rupiah(r.hap_price) : "-"}</td>
+                    <td><IndicatorBadge status={r.indicator_status} /></td>
+                    <td>{r.latest_date || "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <div className="admin-card">
+        <h2>Ringkasan Rata-rata</h2>
+        {adminAverages && (
+          <div className="avgGrid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 16, marginTop: 12 }}>
+            {Object.entries(adminAverages).map(([period, data]) => (
+              <div key={period} style={{ background: "#f9fafb", borderRadius: 12, padding: 16 }}>
+                <h3 style={{ margin: "0 0 10px", fontSize: 16, color: "#0f2d52" }}>
+                  {period === "weekly" ? "Mingguan" : period === "monthly" ? "Bulanan" : "Tahunan"}
+                </h3>
+                {data.slice(0, 10).map((row) => (
+                  <p key={`${period}-${row.id}`} style={{ margin: "4px 0", fontSize: 13, display: "flex", justifyContent: "space-between" }}>
+                    <strong>{row.name}</strong> <span>{rupiah(row.average_price)}</span>
+                  </p>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="admin-card">
+        <h2>Grafik Harga</h2>
+        <div className="chartBox" style={{ background: "#fff", border: "1px solid #eaecf0", borderRadius: 12, padding: 16 }}>
+          {chart.length === 0 && <p>Belum ada data grafik.</p>}
+          {chart.map((item, index) => (
+            <div key={`${item.price_date}-${item.commodity_name}-${index}`} className="barRow" style={{ display: "grid", gridTemplateColumns: "minmax(140px,1.2fr) minmax(100px,2fr) minmax(90px,0.8fr)", gap: 10, alignItems: "center", fontSize: 12, marginBottom: 6 }}>
+              <span>{item.price_date} · {item.commodity_name}</span>
+              <div style={{ height: 12, background: "#eef2f7", borderRadius: 999, overflow: "hidden" }}>
+                <i style={{ display: "block", height: "100%", width: `${Math.max(6, (Number(item.average_price) / maxChart) * 100)}%`, background: "linear-gradient(90deg,#0f2d52,#2563eb)", borderRadius: 999 }} />
+              </div>
+              <strong>{rupiah(item.average_price)}</strong>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AdminApp() {
   const activeKey = getActiveKey();
   const config = resources[activeKey];
@@ -454,6 +740,8 @@ function AdminApp() {
     <AdminLayout>
       {activeKey === "dashboard" ? (
         <Dashboard />
+      ) : activeKey === "prices-monitor" ? (
+        <PriceMonitoring />
       ) : config ? (
         <CrudPage config={config} />
       ) : (

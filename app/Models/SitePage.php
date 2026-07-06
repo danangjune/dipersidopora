@@ -10,7 +10,7 @@ class SitePage extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'slug', 'group', 'eyebrow', 'image', 'excerpt', 'content', 'cards', 'is_published', 'sort_order'];
+    protected $fillable = ['title', 'slug', 'group', 'eyebrow', 'image', 'external_url', 'excerpt', 'content', 'cards', 'is_published', 'sort_order'];
     protected $casts = ['is_published' => 'boolean', 'cards' => 'array'];
 
     protected static function booted(): void

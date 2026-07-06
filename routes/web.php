@@ -60,6 +60,10 @@ Route::middleware(['auth'])->group(function () {
         Route::match(['get', 'post'], '/survey-settings', [AdminCrudController::class, 'surveySettings']);
         Route::patch('/survey-settings/{surveySetting}', [AdminCrudController::class, 'updateSurveySetting']);
         Route::delete('/survey-settings/{surveySetting}', [AdminCrudController::class, 'destroySurveySetting']);
+
+        Route::match(['get', 'post'], '/banners', [AdminCrudController::class, 'banners']);
+        Route::patch('/banners/{banner}', [AdminCrudController::class, 'updateBanner']);
+        Route::delete('/banners/{banner}', [AdminCrudController::class, 'destroyBanner']);
     });
 });
 

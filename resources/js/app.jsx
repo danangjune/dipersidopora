@@ -18,7 +18,6 @@ function App() {
   let page = null;
   if (path === '/') page = <Home />;
   else if (['/informasi-pasar'].includes(path)) page = <MarketPage />;
-  else if (path === '/internal/harga') page = <MarketPage internal />;
   else if (['/survey'].includes(path)) page = <SurveyPage />;
   else page = pageForPath(path);
 

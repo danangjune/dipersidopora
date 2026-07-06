@@ -24,8 +24,8 @@ export default function PriceWidget() {
         <span>Harga Komoditas</span>
         <h2>Rata-rata Harga Komoditas Mingguan</h2>
         <p>
-          Menampilkan 10 komoditas utama dalam tampilan ringkas 5 x 2 dan bisa
-          dibuka detail tabelnya.
+          Semua komoditas ditampilkan. Klik tombol di bawah untuk
+          lihat detail tabel dan grafik.
         </p>
       </div>
       {loading ? (
@@ -38,7 +38,7 @@ export default function PriceWidget() {
               produksi.
             </div>
           )}
-          {items.slice(0, 10).map((item) => (
+          {items.map((item) => (
             <article className="commodityMini" key={item.nama_komoditas}>
               <img
                 src={item.url_gambar}

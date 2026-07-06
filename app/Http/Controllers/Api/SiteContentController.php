@@ -7,9 +7,10 @@ use App\Models\DownloadDocument;
 use App\Models\Komoditas;
 use App\Models\Pasar;
 use App\Models\Pedagang;
+use App\Models\SiteBanner;
 use App\Models\SitePage;
+use App\Models\SiteSetting;
 use App\Models\SurveySetting;
-// 
 
 class SiteContentController extends Controller
 {
@@ -160,5 +161,31 @@ class SiteContentController extends Controller
     {
         $setting = SurveySetting::query()->where('is_active', true)->latest()->first();
         return response()->json(['status' => 'success', 'data' => $setting]);
+    }
+
+    public function banners()
+    {
+        $items = SiteBanner::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+        return response()->json(['status' => 'success', 'data' => $items]);
+    }
+
+    public function services()
+    {
+        $items = SitePage::query()
+            ->where('group', 'Layanan')
+            ->where('is_published', true)
+            ->orderBy('sort_order')
+            ->orderBy('title')
+            ->get(['id', 'title', 'slug', 'excerpt', 'content', 'image', 'external_url']);
+        return response()->json(['status' => 'success', 'data' => $items]);
+    }
+
+    public function settings()
+    {
+        $items = SiteSetting::query()->pluck('value', 'key');
+        return response()->json(['status' => 'success', 'data' => $items]);
     }
 }

@@ -20,6 +20,10 @@ Route::get('/site/downloads/{category}', [SiteContentController::class, 'downloa
 
 Route::get('/site/survey-setting', [SiteContentController::class, 'surveySetting']);
 
+Route::get('/site/banners', [SiteContentController::class, 'banners']);
+Route::get('/site/services', [SiteContentController::class, 'services']);
+Route::get('/site/settings', [SiteContentController::class, 'settings']);
+
 // New normalized, dynamic commodity price API.
 Route::get('/market/filters', [MarketDataController::class, 'filters']);
 Route::get('/market/summary', [MarketDataController::class, 'publicSummary']);

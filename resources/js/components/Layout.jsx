@@ -31,19 +31,25 @@ export function Header() {
 
 export function Footer() {
   const [visitors, setVisitors] = useState(null);
+  const [settings, setSettings] = useState({});
   useEffect(() => {
     fetch('/api/visitors/increment', {method:'POST', headers:{'Accept':'application/json'}})
       .then(r => r.json()).then(d => setVisitors(d.count)).catch(() => null);
+    fetch('/api/site/settings')
+      .then(r => r.json()).then(d => setSettings(d.data || {})).catch(() => ({}));
   }, []);
+  const address = settings.address || 'Jl. Penanggungan No. 7, Bandar Lor, Kec. Mojoroto, Kota Kediri, Jawa Timur';
+  const phone = settings.phone || '0354-771908';
+  const email = settings.email || 'disperdagin@kedirikota.go.id';
   return <footer className="footer">
     <div className="footerGrid">
       <img src={asset('images/dp1.png')} alt="DISPERDAGIN" />
-      <div><h3>Alamat</h3><p>Jl. Penanggungan No. 7, Bandar Lor, Kec. Mojoroto, Kota Kediri, Jawa Timur</p></div>
-      <div><h3>Hubungi Kami</h3><p>0354-771908</p><p>disperdagin@kedirikota.go.id</p></div>
+      <div><h3>Alamat</h3><p>{address}</p></div>
+      <div><h3>Hubungi Kami</h3><p>{phone}</p><p>{email}</p></div>
       <div><h3>Statistik Pengunjung</h3><p className="visitorCount">{visitors ?? '—'} / Hari</p></div>
     </div>
-    <p className="copyright">Copyright © 2026 DISPERDAGIN</p>
-    <a className="floatingMail" href="mailto:disperdagin@kedirikota.go.id?subject=Chat&body=Halo DISPERDAGIN!">Hubungi Kami 👋</a>
+    <p className="copyright">Copyright © {new Date().getFullYear()} DISPERDAGIN</p>
+    <a className="floatingMail" href={`mailto:${email}?subject=Chat&body=Halo DISPERDAGIN!`}>Hubungi Kami 👋</a>
   </footer>;
 }
 
