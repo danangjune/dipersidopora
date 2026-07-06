@@ -13,8 +13,10 @@ use App\Models\SitePage;
 use App\Models\SurveySetting;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -261,6 +263,23 @@ class AdminCrudController extends Controller
     {
         $banner->delete();
         return response()->json(['status' => 'success']);
+    }
+
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'max:5120'],
+        ]);
+
+        $file = $request->file('file');
+        $ext = $file->getClientOriginalExtension();
+        $name = Str::random(20) . '.' . $ext;
+        $path = $file->storeAs('uploads', $name, 'public_assets');
+
+        return response()->json([
+            'status' => 'success',
+            'data' => ['path' => str_replace('\\', '/', $path)],
+        ]);
     }
 
     public function users(Request $request)

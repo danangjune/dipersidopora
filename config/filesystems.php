@@ -16,6 +16,13 @@ return [
             'visibility' => 'public',
             'throw' => false,
         ],
+        'public_assets' => [
+            'driver' => 'local',
+            'root' => public_path('assets'),
+            'url' => '/assets',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
     ],
     'links' => [
         public_path('storage') => storage_path('app/public'),

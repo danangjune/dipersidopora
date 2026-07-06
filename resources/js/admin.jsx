@@ -35,7 +35,7 @@ const resources = {
       { name: "name", label: "Nama Pasar", required: true },
       { name: "category", label: "Kategori" },
       { name: "address", label: "Alamat", type: "textarea" },
-      { name: "image", label: "Path Gambar" },
+      { name: "image", label: "Gambar", type: "file" },
       { name: "latitude", label: "Latitude", type: "number" },
       { name: "longitude", label: "Longitude", type: "number" },
       { name: "sort_order", label: "Urutan", type: "number" },
@@ -59,7 +59,7 @@ const resources = {
     fields: [
       { name: "name", label: "Nama Komoditas", required: true },
       { name: "unit", label: "Satuan" },
-      { name: "image", label: "Gambar" },
+      { name: "image", label: "Gambar", type: "file" },
       { name: "sort_order", label: "Urutan", type: "number" },
       { name: "is_active", label: "Aktif", type: "checkbox" },
     ],
@@ -80,7 +80,7 @@ const resources = {
       { name: "slug", label: "Slug" },
       { name: "group", label: "Grup" },
       { name: "eyebrow", label: "Eyebrow" },
-      { name: "image", label: "Gambar" },
+      { name: "image", label: "Gambar", type: "file" },
       { name: "external_url", label: "Link Eksternal" },
       { name: "excerpt", label: "Ringkasan", type: "textarea" },
       { name: "content", label: "Konten", type: "textarea" },
@@ -107,7 +107,7 @@ const resources = {
     fields: [
       { name: "title", label: "Judul", required: true },
       { name: "category", label: "Kategori", required: true },
-      { name: "file_path", label: "Path File", required: true },
+      { name: "file_path", label: "File", type: "file", accept: ".pdf,.doc,.docx,.xls,.xlsx", required: true },
       { name: "sort_order", label: "Urutan", type: "number" },
       { name: "is_published", label: "Publish", type: "checkbox" },
     ],
@@ -165,7 +165,7 @@ const resources = {
     endpoint: "/api/admin/banners",
     fields: [
       { name: "title", label: "Judul" },
-      { name: "image", label: "Path Gambar", required: true },
+      { name: "image", label: "Gambar", type: "file", required: true },
       { name: "link_url", label: "Link URL" },
       { name: "sort_order", label: "Urutan", type: "number" },
       { name: "is_active", label: "Aktif", type: "checkbox" },
@@ -198,7 +198,7 @@ const resources = {
     fields: [
       { name: "title", label: "Judul", required: true },
       { name: "external_url", label: "Link Survey" },
-      { name: "qr_image", label: "Path QR Image" },
+      { name: "qr_image", label: "QR Image", type: "file" },
       { name: "description", label: "Deskripsi", type: "textarea" },
       { name: "is_active", label: "Aktif", type: "checkbox" },
     ],
@@ -346,6 +346,7 @@ function CrudPage({ config }) {
   const [editing, setEditing] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState({});
   const [fieldOptions, setFieldOptions] = useState({});
 
   const fields = config.fields;
@@ -437,6 +438,29 @@ function CrudPage({ config }) {
     await loadRows();
   };
 
+  const uploadFile = async (fieldName, file) => {
+    if (!file) return;
+    setUploading((prev) => ({ ...prev, [fieldName]: true }));
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const result = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf },
+        credentials: "same-origin",
+        body,
+      });
+      const data = await result.json();
+      if (data?.data?.path) {
+        setForm((prev) => ({ ...prev, [fieldName]: data.data.path }));
+      }
+    } catch {
+      /* ignore */
+    } finally {
+      setUploading((prev) => ({ ...prev, [fieldName]: false }));
+    }
+  };
+
   const renderField = (field) => {
     const value = form[field.name] ?? "";
 
@@ -459,6 +483,35 @@ function CrudPage({ config }) {
             setForm({ ...form, [field.name]: e.target.checked })
           }
         />
+      );
+    }
+
+    if (field.type === "file") {
+      const isImage = value && /\.(png|jpe?g|gif|webp|svg)$/i.test(value);
+      return (
+        <div style={{ display: "grid", gap: 8 }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <input
+              type="file"
+              accept={field.accept || "image/*,.pdf"}
+              onChange={(e) => uploadFile(field.name, e.target.files[0])}
+            />
+            {uploading[field.name] && <span>Uploading...</span>}
+          </div>
+          {value && (
+            <div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: "#344054" }}>
+              <span>{value}</span>
+              {isImage && (
+                <img
+                  src={`/assets/${value}`}
+                  alt="preview"
+                  style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 8, border: "1px solid #d0d5dd" }}
+                  onError={(e) => { e.currentTarget.style.display = "none"; }}
+                />
+              )}
+            </div>
+          )}
+        </div>
       );
     }
 
