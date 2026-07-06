@@ -8,6 +8,9 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    const ROLE_ADMIN = 'admin';
+    const ROLE_SURVEYOR = 'surveyor';
+
     use HasFactory, Notifiable;
 
     protected $primaryKey = 'user_id';
@@ -24,5 +27,20 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->user_role === self::ROLE_ADMIN;
+    }
+
+    public function isSurveyor(): bool
+    {
+        return $this->user_role === self::ROLE_SURVEYOR;
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return $this->user_role === $role;
     }
 }

@@ -11,13 +11,30 @@ use App\Models\Pasar;
 use App\Models\SiteBanner;
 use App\Models\SitePage;
 use App\Models\SurveySetting;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class AdminCrudController extends Controller
 {
+    public function me(Request $request)
+    {
+        $user = $request->user();
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'id' => $user->user_id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'email' => $user->email,
+                'role' => $user->user_role,
+            ],
+        ]);
+    }
+
     public function dashboard()
     {
         return response()->json([
@@ -96,7 +113,11 @@ class AdminCrudController extends Controller
                 ->when($request->query('end_date'), fn ($q, $date) => $q->whereDate('price_date', '<=', $date))
                 ->orderByDesc('price_date')
                 ->limit((int) $request->query('limit', 200))
-                ->get();
+                ->get()
+                ->each(function ($row) {
+                    $row->pasar_name = $row->pasar?->name;
+                    $row->komoditas_name = $row->komoditas?->name;
+                });
             return response()->json(['status' => 'success', 'data' => $rows]);
         }
 
@@ -239,6 +260,78 @@ class AdminCrudController extends Controller
     public function destroyBanner(SiteBanner $banner)
     {
         $banner->delete();
+        return response()->json(['status' => 'success']);
+    }
+
+    public function users(Request $request)
+    {
+        if ($request->isMethod('get')) {
+            $rows = User::query()
+                ->select('user_id as id', 'name', 'username', 'email', 'user_role')
+                ->orderBy('name')
+                ->get();
+            return response()->json(['status' => 'success', 'data' => $rows]);
+        }
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', 'unique:users,username'],
+            'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:6'],
+            'user_role' => ['required', Rule::in([User::ROLE_ADMIN, User::ROLE_SURVEYOR])],
+        ]);
+
+        $data['password'] = Hash::make($data['password']);
+        $user = User::create($data);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'id' => $user->user_id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'email' => $user->email,
+                'user_role' => $user->user_role,
+            ],
+        ], 201);
+    }
+
+    public function updateUser(Request $request, User $user)
+    {
+        $data = $request->validate([
+            'name' => ['sometimes', 'string', 'max:255'],
+            'username' => ['sometimes', 'string', 'max:255', Rule::unique('users', 'username')->ignore($user->user_id, 'user_id')],
+            'email' => ['nullable', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->user_id, 'user_id')],
+            'password' => ['nullable', 'string', 'min:6'],
+            'user_role' => ['sometimes', Rule::in([User::ROLE_ADMIN, User::ROLE_SURVEYOR])],
+        ]);
+
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        $user->update($data);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'id' => $user->user_id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'email' => $user->email,
+                'user_role' => $user->user_role,
+            ],
+        ]);
+    }
+
+    public function destroyUser(User $user)
+    {
+        if ($user->user_id === request()->user()->user_id) {
+            return response()->json(['status' => 'error', 'message' => 'Tidak bisa menghapus akun sendiri.'], 422);
+        }
+        $user->delete();
         return response()->json(['status' => 'success']);
     }
 

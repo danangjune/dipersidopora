@@ -120,6 +120,23 @@ const resources = {
       is_published: true,
     },
   },
+  prices: {
+    title: "Input Harga Komoditas",
+    endpoint: "/api/admin/prices",
+    fields: [
+      { name: "pasar_id", label: "Pasar", type: "select", required: true, optionsUrl: "/api/admin/markets" },
+      { name: "komoditas_id", label: "Komoditas", type: "select", required: true, optionsUrl: "/api/admin/commodities" },
+      { name: "price_date", label: "Tanggal", type: "date", required: true },
+      { name: "price", label: "Harga", type: "number", required: true },
+    ],
+    columns: ["pasar_name", "komoditas_name", "price_date", "price"],
+    defaults: {
+      pasar_id: "",
+      komoditas_id: "",
+      price_date: new Date().toISOString().slice(0, 10),
+      price: "",
+    },
+  },
   "het-hap": {
     title: "HET / HAP",
     endpoint: "/api/admin/het-hap",
@@ -156,6 +173,25 @@ const resources = {
     columns: ["title", "image", "is_active"],
     defaults: { title: "", image: "", link_url: "", sort_order: 0, is_active: true },
   },
+  users: {
+    title: "Manajemen User",
+    endpoint: "/api/admin/users",
+    fields: [
+      { name: "name", label: "Nama", required: true },
+      { name: "username", label: "Username", required: true },
+      { name: "email", label: "Email" },
+      { name: "password", label: "Password", type: "password" },
+      { name: "user_role", label: "Role", type: "select", required: true, options: [["admin", "Admin"], ["surveyor", "Surveyor Pasar"]] },
+    ],
+    columns: ["name", "username", "email", "user_role"],
+    defaults: {
+      name: "",
+      username: "",
+      email: "",
+      password: "",
+      user_role: "surveyor",
+    },
+  },
   "survey-settings": {
     title: "Master Survey / SKM",
     endpoint: "/api/admin/survey-settings",
@@ -177,23 +213,32 @@ const resources = {
   },
 };
 
-const menus = [
-  { key: "dashboard", label: "Dashboard", href: "/admin" },
-  { key: "prices-monitor", label: "Pemantauan Harga", href: "/admin/prices-monitor" },
-  { key: "markets", label: "Master Pasar", href: "/admin/markets" },
-  { key: "commodities", label: "Master Komoditas", href: "/admin/commodities" },
-  { key: "pages", label: "Master Halaman", href: "/admin/pages" },
-  { key: "downloads", label: "Master Dokumen", href: "/admin/downloads" },
-  { key: "banners", label: "Banner Slider", href: "/admin/banners" },
+const allMenus = [
+  { key: "dashboard", label: "Dashboard", href: "/admin", roles: ["admin", "surveyor"] },
+  { key: "prices", label: "Input Harga", href: "/admin/prices", roles: ["admin", "surveyor"] },
+  { key: "prices-monitor", label: "Pemantauan Harga", href: "/admin/prices-monitor", roles: ["admin", "surveyor"] },
+  { key: "markets", label: "Master Pasar", href: "/admin/markets", roles: ["admin"] },
+  { key: "commodities", label: "Master Komoditas", href: "/admin/commodities", roles: ["admin"] },
+  { key: "pages", label: "Master Halaman", href: "/admin/pages", roles: ["admin"] },
+  { key: "downloads", label: "Master Dokumen", href: "/admin/downloads", roles: ["admin"] },
+  { key: "banners", label: "Banner Slider", href: "/admin/banners", roles: ["admin"] },
   {
     key: "het-hap",
     label: "HET / HAP",
     href: "/admin/het-hap",
+    roles: ["admin"],
   },
   {
     key: "survey-settings",
     label: "Master Survey",
     href: "/admin/survey-settings",
+    roles: ["admin"],
+  },
+  {
+    key: "users",
+    label: "Manajemen User",
+    href: "/admin/users",
+    roles: ["admin"],
   },
 ];
 
@@ -227,7 +272,7 @@ function normalizePayload(form, fields) {
   return payload;
 }
 
-function AdminLayout({ children }) {
+function AdminLayout({ children, menus }) {
   const activeKey = getActiveKey();
 
   return (
@@ -733,11 +778,49 @@ function PriceMonitoring() {
 }
 
 function AdminApp() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api("/api/admin/me")
+      .then((d) => {
+        setUser(d.data || null);
+      })
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+  }, []);
+
   const activeKey = getActiveKey();
+
+  if (loading) {
+    return (
+      <AdminLayout menus={[]}>
+        <div className="admin-header"><h1>Memuat...</h1></div>
+      </AdminLayout>
+    );
+  }
+
+  const role = user?.role || "surveyor";
+  const menus = allMenus.filter((m) => m.roles.includes(role));
+  const allowedKeys = menus.map((m) => m.key);
+  const currentMenu = allMenus.find((m) => m.key === activeKey);
+  const hasAccess = currentMenu ? currentMenu.roles.includes(role) : false;
+
+  if (!hasAccess) {
+    return (
+      <AdminLayout menus={menus}>
+        <div className="admin-header">
+          <h1>Akses Ditolak</h1>
+          <p>Anda tidak memiliki izin untuk mengakses halaman ini.</p>
+        </div>
+      </AdminLayout>
+    );
+  }
+
   const config = resources[activeKey];
 
   return (
-    <AdminLayout>
+    <AdminLayout menus={menus}>
       {activeKey === "dashboard" ? (
         <Dashboard />
       ) : activeKey === "prices-monitor" ? (
@@ -751,4 +834,10 @@ function AdminApp() {
   );
 }
 
-createRoot(document.getElementById("admin-root")).render(<AdminApp />);
+const adminContainer = document.getElementById("admin-root");
+
+if (adminContainer) {
+  const root = window.__DISPERDAGIN_ADMIN_ROOT__ ?? createRoot(adminContainer);
+  window.__DISPERDAGIN_ADMIN_ROOT__ = root;
+  root.render(<AdminApp />);
+}

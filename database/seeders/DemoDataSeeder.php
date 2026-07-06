@@ -18,6 +18,11 @@ class DemoDataSeeder extends Seeder
             'password' => Hash::make('Admin#12345'), 'user_password' => Hash::make('Admin#12345'), 'user_role' => 'admin', 'created_at' => now(), 'updated_at' => now(),
         ]);
 
+        DB::table('users')->updateOrInsert(['username' => 'surveyor'], [
+            'name' => 'Surveyor Pasar', 'user_firstname' => 'Surveyor', 'user_lastname' => 'Pasar', 'email' => 'surveyor@example.test',
+            'password' => Hash::make('Surveyor#12345'), 'user_password' => Hash::make('Surveyor#12345'), 'user_role' => 'surveyor', 'created_at' => now(), 'updated_at' => now(),
+        ]);
+
         DB::table('login_pkl')->updateOrInsert(['username' => 'admin'], ['password' => Hash::make('Admin#12345'), 'role' => 'admin', 'created_at' => now(), 'updated_at' => now()]);
 
         $marketSeeds = [
