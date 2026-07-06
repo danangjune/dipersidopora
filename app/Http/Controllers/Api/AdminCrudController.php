@@ -380,7 +380,7 @@ class AdminCrudController extends Controller
         return [
             'name' => [$req, 'string', 'max:120'],
             'slug' => ['nullable', 'string', 'max:150'],
-            'category' => ['nullable', 'string', 'max:80'],
+            'category' => ['nullable', 'string', 'max:80', Rule::in(Pasar::CATEGORIES)],
             'address' => ['nullable', 'string'],
             'image' => ['nullable', 'string', 'max:255'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
@@ -456,7 +456,7 @@ class AdminCrudController extends Controller
         $req = $partial ? 'sometimes' : 'required';
         return [
             'title' => [$req, 'string', 'max:220'],
-            'category' => [$req, 'string', 'max:80'],
+            'category' => [$req, 'string', 'max:80', Rule::in(DownloadDocument::CATEGORIES)],
             'file_path' => [$req, 'string', 'max:255'],
             'is_published' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],

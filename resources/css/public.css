@@ -120,4 +120,15 @@ th { background:#eef7fb; color:var(--primary-dark); }
 .surveyAside { display:grid; gap:14px; }
 .qrImage { width:220px; max-width:100%; margin:auto; border-radius:18px; border:1px solid #e5e7eb; }
 .lead { font-size:18px; color:#475569; font-weight:600; }
-@media (max-width: 640px) { .commodityGridTen { grid-template-columns:repeat(2,minmax(0,1fr)); } .barRow { grid-template-columns:1fr; } }
+.marketHero { position:relative; background-size:cover; background-position:center; border-radius:24px; overflow:hidden; margin-bottom:32px; min-height:300px; display:flex; align-items:flex-end; }
+.marketHeroOverlay { width:100%; padding:48px clamp(24px,5vw,56px); background:linear-gradient(transparent,rgba(0,0,0,.75)); color:#fff; }
+.marketHeroOverlay span { color:#ffd166; font-weight:800; text-transform:uppercase; letter-spacing:.08em; font-size:13px; }
+.marketHeroOverlay h1 { color:#fff; font-size:clamp(28px,4vw,44px); margin:8px 0 6px; text-shadow:0 2px 12px rgba(0,0,0,.3); }
+.marketHeroOverlay p { color:rgba(255,255,255,.88); max-width:640px; font-size:15px; }
+.checkboxGroup { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:28px; }
+.checkboxLabel { display:flex; align-items:center; gap:8px; padding:10px 16px; background:#fff; border:1px solid #e5eef7; border-radius:14px; cursor:pointer; transition:.2s; font-weight:600; font-size:14px; box-shadow:0 4px 12px rgba(7,103,151,.06); }
+.checkboxLabel:hover { border-color:var(--primary); background:#f6fafd; }
+.checkboxLabel input { width:18px; height:18px; cursor:pointer; }
+.chartContainer { background:#fff; border:1px solid #e5e7eb; border-radius:22px; padding:20px; box-shadow:0 16px 40px rgba(0,0,0,.05); margin-bottom:30px; }
+.chartWrapper { position:relative; width:100%; height:380px; }
+@media (max-width: 640px) { .commodityGridTen { grid-template-columns:repeat(2,minmax(0,1fr)); } .chartWrapper { height:280px; } }

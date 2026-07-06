@@ -33,7 +33,7 @@ const resources = {
     endpoint: "/api/admin/markets",
     fields: [
       { name: "name", label: "Nama Pasar", required: true },
-      { name: "category", label: "Kategori" },
+      { name: "category", label: "Kategori", type: "select", options: [["Pasar Rakyat", "Pasar Rakyat"], ["Pasar Modern", "Pasar Modern"], ["Minimarket", "Minimarket"], ["Pusat Perbelanjaan", "Pusat Perbelanjaan"]] },
       { name: "address", label: "Alamat", type: "textarea" },
       { name: "image", label: "Gambar", type: "file" },
       { name: "latitude", label: "Latitude", type: "number" },
@@ -106,7 +106,7 @@ const resources = {
     endpoint: "/api/admin/downloads",
     fields: [
       { name: "title", label: "Judul", required: true },
-      { name: "category", label: "Kategori", required: true },
+      { name: "category", label: "Kategori", type: "select", required: true, options: [["laporan", "laporan"], ["layanan", "layanan"], ["renja", "renja"], ["renstra", "renstra"]] },
       { name: "file_path", label: "File", type: "file", accept: ".pdf,.doc,.docx,.xls,.xlsx", required: true },
       { name: "sort_order", label: "Urutan", type: "number" },
       { name: "is_published", label: "Publish", type: "checkbox" },
@@ -675,7 +675,7 @@ function PriceMonitoring() {
   const [startDate, setStartDate] = useState(iso(weekAgo));
   const [endDate, setEndDate] = useState(iso(today));
   const [rows, setRows] = useState([]);
-  const [chart, setChart] = useState([]);
+  const [chart, setChart] = useState({ dates: [], series: [] });
   const [adminAverages, setAdminAverages] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -704,15 +704,13 @@ function PriceMonitoring() {
     ])
       .then(([summary, chartData, avg]) => {
         setRows(summary?.data?.rows || []);
-        setChart(chartData?.data || []);
+        setChart(chartData?.data || { dates: [], series: [] });
         setAdminAverages(avg?.data || null);
       })
       .finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, [query]);
-
-  const maxChart = Math.max(...chart.map((item) => Number(item.average_price) || 0), 1);
 
   return (
     <div>
@@ -814,16 +812,28 @@ function PriceMonitoring() {
       <div className="admin-card">
         <h2>Grafik Harga</h2>
         <div className="chartBox" style={{ background: "#fff", border: "1px solid #eaecf0", borderRadius: 12, padding: 16 }}>
-          {chart.length === 0 && <p>Belum ada data grafik.</p>}
-          {chart.map((item, index) => (
-            <div key={`${item.price_date}-${item.commodity_name}-${index}`} className="barRow" style={{ display: "grid", gridTemplateColumns: "minmax(140px,1.2fr) minmax(100px,2fr) minmax(90px,0.8fr)", gap: 10, alignItems: "center", fontSize: 12, marginBottom: 6 }}>
-              <span>{item.price_date} · {item.commodity_name}</span>
-              <div style={{ height: 12, background: "#eef2f7", borderRadius: 999, overflow: "hidden" }}>
-                <i style={{ display: "block", height: "100%", width: `${Math.max(6, (Number(item.average_price) / maxChart) * 100)}%`, background: "linear-gradient(90deg,#0f2d52,#2563eb)", borderRadius: 999 }} />
+          {(!chart.dates || chart.dates.length === 0) && <p>Belum ada data grafik.</p>}
+          {chart.dates && chart.dates.length > 0 && chart.series && chart.series.map((s) => {
+            const maxVal = Math.max(...s.data.filter(v => v !== null), 1);
+            return (
+              <div key={s.commodity_id} style={{ marginBottom: 14 }}>
+                <strong style={{ fontSize: 13, color: "#0f2d52", display: "block", marginBottom: 6 }}>{s.name}</strong>
+                {chart.dates.map((d, i) => {
+                  const val = s.data[i];
+                  if (val === null) return null;
+                  return (
+                    <div key={d} className="barRow" style={{ display: "grid", gridTemplateColumns: "minmax(100px,1fr) minmax(80px,1.8fr) minmax(80px,0.7fr)", gap: 8, alignItems: "center", fontSize: 11, marginBottom: 3 }}>
+                      <span>{d}</span>
+                      <div style={{ height: 10, background: "#eef2f7", borderRadius: 999, overflow: "hidden" }}>
+                        <i style={{ display: "block", height: "100%", width: `${Math.max(4, (val / maxVal) * 100)}%`, background: "linear-gradient(90deg,#0f2d52,#2563eb)", borderRadius: 999 }} />
+                      </div>
+                      <strong>{rupiah(val)}</strong>
+                    </div>
+                  );
+                })}
               </div>
-              <strong>{rupiah(item.average_price)}</strong>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

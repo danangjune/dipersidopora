@@ -1,4 +1,28 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Chart,
+  LineController,
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from "chart.js";
+
+Chart.register(
+  LineController,
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+);
 
 const rupiah = (value) =>
   new Intl.NumberFormat("id-ID", {
@@ -6,23 +30,21 @@ const rupiah = (value) =>
     currency: "IDR",
     maximumFractionDigits: 0,
   }).format(value || 0);
-const today = new Date();
-const iso = (date) => date.toISOString().slice(0, 10);
-const weekAgo = new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000);
+
+const COLORS = [
+  "#076797", "#108879", "#e2a200", "#dc2626", "#7c3aed",
+  "#0891b2", "#84cc16", "#f97316", "#ec4899", "#6366f1",
+];
 
 export default function MarketPage() {
-  const params = new URLSearchParams(window.location.search);
+  const canvasRef = useRef(null);
+  const chartRef = useRef(null);
+
   const [filters, setFilters] = useState({ markets: [], commodities: [] });
-  const [marketId, setMarketId] = useState(params.get("market_id") || "");
-  const [commodityId, setCommodityId] = useState(
-    params.get("commodity_id") || "",
-  );
-  const [startDate, setStartDate] = useState(
-    params.get("start_date") || iso(weekAgo),
-  );
-  const [endDate, setEndDate] = useState(params.get("end_date") || iso(today));
+  const [marketId, setMarketId] = useState("");
+  const [selectedCommodities, setSelectedCommodities] = useState([]);
   const [rows, setRows] = useState([]);
-  const [chart, setChart] = useState([]);
+  const [chartData, setChartData] = useState({ dates: [], series: [] });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -31,17 +53,26 @@ export default function MarketPage() {
       .then((d) => {
         const data = d.data || { markets: [], commodities: [] };
         setFilters(data);
+        if (data.commodities.length > 0) {
+          setSelectedCommodities([data.commodities[0].id]);
+        }
       });
   }, []);
+
+  const toggleCommodity = (id) => {
+    setSelectedCommodities((prev) =>
+      prev.includes(id)
+        ? prev.filter((c) => c !== id)
+        : [...prev, id],
+    );
+  };
 
   const query = useMemo(() => {
     const q = new URLSearchParams();
     if (marketId) q.set("market_id", marketId);
-    if (commodityId) q.set("commodity_id", commodityId);
-    if (startDate) q.set("start_date", startDate);
-    if (endDate) q.set("end_date", endDate);
+    if (selectedCommodities.length > 0) q.set("commodity_ids", selectedCommodities.join(","));
     return q.toString();
-  }, [marketId, commodityId, startDate, endDate]);
+  }, [marketId, selectedCommodities]);
 
   const load = () => {
     setLoading(true);
@@ -49,9 +80,9 @@ export default function MarketPage() {
       fetch(`/api/market/summary?${query}`).then((r) => r.json()),
       fetch(`/api/market/chart?${query}`).then((r) => r.json()),
     ])
-      .then(([summary, chartData]) => {
+      .then(([summary, chartResult]) => {
         setRows(summary?.data?.rows || []);
-        setChart(chartData?.data || []);
+        setChartData(chartResult?.data || { dates: [], series: [] });
       })
       .finally(() => setLoading(false));
   };
@@ -60,75 +91,138 @@ export default function MarketPage() {
     load();
   }, [query]);
 
-  const maxChart = Math.max(
-    ...chart.map((item) => Number(item.average_price) || 0),
-    1,
-  );
+  useEffect(() => {
+    if (!canvasRef.current || chartData.dates.length === 0) return;
+
+    if (chartRef.current) {
+      chartRef.current.destroy();
+    }
+
+    const ctx = canvasRef.current.getContext("2d");
+    chartRef.current = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: chartData.dates,
+        datasets: chartData.series.map((s, i) => ({
+          label: s.name,
+          data: s.data,
+          borderColor: COLORS[i % COLORS.length],
+          backgroundColor: COLORS[i % COLORS.length] + "15",
+          fill: true,
+          tension: 0.3,
+          pointRadius: 4,
+          pointHoverRadius: 7,
+          borderWidth: 2.5,
+        })),
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
+          mode: "index",
+        },
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              padding: 20,
+              usePointStyle: true,
+              font: { size: 12, family: "Inter, sans-serif" },
+            },
+          },
+          tooltip: {
+            backgroundColor: "#0f2d52",
+            titleFont: { size: 13, family: "Inter, sans-serif" },
+            bodyFont: { size: 12, family: "Inter, sans-serif" },
+            padding: 12,
+            cornerRadius: 12,
+            callbacks: {
+              label: (ctx) => ` ${ctx.dataset.label}: ${rupiah(ctx.parsed.y)}`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { font: { size: 11, family: "Inter, sans-serif" } },
+          },
+          y: {
+            grid: { color: "#eef2f7" },
+            ticks: {
+              font: { size: 11, family: "Inter, sans-serif" },
+              callback: (v) => rupiah(v).replace(",00", ""),
+            },
+          },
+        },
+      },
+    });
+
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.destroy();
+      }
+    };
+  }, [chartData]);
 
   return (
     <section className="section marketPage">
-      <div className="sectionTitle">
-        <span>Informasi Pasar</span>
-        <h1>Harga Rata-rata Komoditas</h1>
-        <p>
-          Filter berdasarkan pasar, tanggal, atau komoditas. Default
-          menampilkan rata-rata semua pasar periode satu minggu.
-        </p>
-      </div>
+      <div
+        className="marketHero"
+        style={{
+          backgroundImage: "url(/assets/images/komoditas/SIKAD.png)",
+        }}
+      />
 
       <div className="filterPanel">
         <label>
           Pasar
-          <select
-            value={marketId}
-            onChange={(e) => setMarketId(e.target.value)}
-          >
+          <select value={marketId} onChange={(e) => setMarketId(e.target.value)}>
             <option value="">Semua Pasar</option>
             {filters.markets.map((m) => (
-              <option value={m.id} key={m.id}>
-                {m.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Dari Tanggal
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </label>
-        <label>
-          Sampai Tanggal
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </label>
-        <label>
-          Komoditas
-          <select
-            value={commodityId}
-            onChange={(e) => setCommodityId(e.target.value)}
-          >
-            <option value="">Semua komoditas</option>
-            {filters.commodities.map((c) => (
-              <option value={c.id} key={c.id}>
-                {c.name}
-              </option>
+              <option value={m.id} key={m.id}>{m.name}</option>
             ))}
           </select>
         </label>
       </div>
 
       <div className="sectionSubhead">
+        <h2>Pilih Komoditas</h2>
+        <p>Centang komoditas yang ingin dibandingkan harganya.</p>
+      </div>
+      <div className="checkboxGroup">
+        {filters.commodities.map((c, i) => (
+          <label key={c.id} className="checkboxLabel">
+            <input
+              type="checkbox"
+              checked={selectedCommodities.includes(c.id)}
+              onChange={() => toggleCommodity(c.id)}
+              style={{ accentColor: COLORS[i % COLORS.length] }}
+            />
+            <span>{c.name}</span>
+          </label>
+        ))}
+      </div>
+
+      <div className="sectionSubhead">
+        <h2>Grafik Harga</h2>
+        <p>Line chart perbandingan harga komoditas 7 hari terakhir.</p>
+      </div>
+      <div className="chartContainer">
+        {loading && <p className="emptyState">Memuat grafik...</p>}
+        {!loading && chartData.dates.length === 0 && (
+          <p className="emptyState">Belum ada data grafik.</p>
+        )}
+        {!loading && chartData.dates.length > 0 && (
+          <div className="chartWrapper">
+            <canvas ref={canvasRef} />
+          </div>
+        )}
+      </div>
+
+      <div className="sectionSubhead">
         <h2>Komoditas Utama</h2>
-        <p>
-          Semua komoditas aktif ditampilkan. Harga yang tampil adalah
-          rata-rata periode filter.
-        </p>
+        <p>Semua komoditas aktif ditampilkan.</p>
       </div>
       <div className="commodityGridTen">
         {loading && <div className="emptyState">Memuat data harga...</div>}
@@ -157,9 +251,7 @@ export default function MarketPage() {
 
       <div className="sectionSubhead">
         <h2>Tabel Harga Komoditas</h2>
-        <p>
-          Tabel harga rata-rata komoditas per periode filter.
-        </p>
+        <p>Tabel harga rata-rata komoditas 7 hari terakhir.</p>
       </div>
       <div className="tableWrap">
         <table>
@@ -193,35 +285,6 @@ export default function MarketPage() {
             )}
           </tbody>
         </table>
-      </div>
-
-      <div className="sectionSubhead">
-        <h2>Grafik Harga</h2>
-        <p>
-          Grafik sederhana berdasarkan tanggal dan komoditas dari filter yang
-          sama.
-        </p>
-      </div>
-      <div className="chartBox">
-        {chart.length === 0 && <p>Belum ada data grafik.</p>}
-        {chart.map((item, index) => (
-          <div
-            className="barRow"
-            key={`${item.price_date}-${item.commodity_name}-${index}`}
-          >
-            <span>
-              {item.price_date} · {item.commodity_name}
-            </span>
-            <div>
-              <i
-                style={{
-                  width: `${Math.max(8, (Number(item.average_price) / maxChart) * 100)}%`,
-                }}
-              />
-            </div>
-            <strong>{rupiah(item.average_price)}</strong>
-          </div>
-        ))}
       </div>
     </section>
   );

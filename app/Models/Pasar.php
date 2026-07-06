@@ -10,6 +10,13 @@ class Pasar extends Model
 {
     use HasFactory;
 
+    public const CATEGORIES = [
+        'Pasar Rakyat',
+        'Pasar Modern',
+        'Minimarket',
+        'Pusat Perbelanjaan',
+    ];
+
     protected $table = 'pasars';
     protected $fillable = ['name', 'slug', 'category', 'address', 'image', 'latitude', 'longitude', 'is_active', 'sort_order'];
     protected $casts = ['is_active' => 'boolean', 'latitude' => 'decimal:8', 'longitude' => 'decimal:8'];

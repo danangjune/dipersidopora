@@ -72,21 +72,44 @@ class MarketDataController extends Controller
     {
         [$start, $end] = $this->dateRange($request);
         $marketId = $request->integer('market_id') ?: null;
-        $commodityId = $request->integer('commodity_id') ?: null;
+        $commodityIds = $request->query('commodity_ids');
 
-        $rows = CommodityPriceRecord::query()
+        if (is_string($commodityIds)) {
+            $commodityIds = array_filter(explode(',', $commodityIds));
+        } elseif (!is_array($commodityIds)) {
+            $commodityIds = [];
+        }
+
+        $query = CommodityPriceRecord::query()
             ->join('komoditas', 'komoditas.id', '=', 'commodity_price_records.komoditas_id')
             ->where('status_validasi', 'true')
             ->whereBetween('price_date', [$start->toDateString(), $end->toDateString()])
             ->when($marketId, fn ($q) => $q->where('pasar_id', $marketId))
-            ->when($commodityId, fn ($q) => $q->where('komoditas_id', $commodityId))
-            ->groupBy('price_date', 'komoditas.name')
-            ->selectRaw('price_date, komoditas.name AS commodity_name, FLOOR(AVG(price)) AS average_price')
+            ->when(!empty($commodityIds), fn ($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
+            ->groupBy('price_date', 'komoditas.id', 'komoditas.name')
+            ->selectRaw('price_date, komoditas.id AS commodity_id, komoditas.name AS commodity_name, FLOOR(AVG(price)) AS average_price')
             ->orderBy('price_date')
-            ->limit(120)
+            ->limit(500)
             ->get();
 
-        return response()->json(['status' => 'success', 'data' => $rows]);
+        $dates = $query->pluck('price_date')->unique()->sort()->values()
+            ->map(fn ($d) => $d instanceof \Carbon\Carbon ? $d->toDateString() : $d);
+        $series = $query->groupBy('commodity_id')->map(function ($items, $cid) use ($dates) {
+            $byDate = $items->keyBy(fn ($item) => $item->price_date instanceof \Carbon\Carbon ? $item->price_date->toDateString() : $item->price_date);
+            return [
+                'commodity_id' => (int) $cid,
+                'name' => $items->first()->commodity_name,
+                'data' => $dates->map(fn ($d) => isset($byDate[$d]) ? (int) $byDate[$d]->average_price : null),
+            ];
+        })->values();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'dates' => $dates,
+                'series' => $series,
+            ],
+        ]);
     }
 
     public function adminAverages(Request $request)
@@ -163,11 +186,22 @@ class MarketDataController extends Controller
 
     private function dateRange(Request $request): array
     {
-        $end = $request->query('end_date') ? Carbon::parse($request->query('end_date')) : now();
-        $start = $request->query('start_date') ? Carbon::parse($request->query('start_date')) : $end->copy()->subDays(6);
+        $end = $request->query('end_date') ? Carbon::parse($request->query('end_date')) : null;
+        $start = $request->query('start_date') ? Carbon::parse($request->query('start_date')) : null;
+
+        if (!$end) {
+            $latest = CommodityPriceRecord::max('price_date');
+            $end = $latest ? Carbon::parse($latest) : now();
+        }
+
+        if (!$start) {
+            $start = $end->copy()->subDays(6);
+        }
+
         if ($start->gt($end)) {
             [$start, $end] = [$end, $start];
         }
+
         return [$start->startOfDay(), $end->startOfDay()];
     }
 }
