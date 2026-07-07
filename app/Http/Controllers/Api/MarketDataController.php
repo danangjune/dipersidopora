@@ -52,8 +52,7 @@ class MarketDataController extends Controller
             ->selectRaw('FLOOR(AVG(commodity_price_records.previous_price)) AS previous_average_price')
             ->selectRaw('MAX(commodity_price_records.price_date) AS latest_date')
             ->selectRaw('COUNT(DISTINCT commodity_price_records.pasar_id) AS market_count')
-            ->selectRaw('MAX(CASE WHEN het_hap_settings.type = "HET" THEN het_hap_settings.price ELSE NULL END) AS het_price')
-            ->selectRaw('MAX(CASE WHEN het_hap_settings.type = "HAP" THEN het_hap_settings.price ELSE NULL END) AS hap_price')
+            ->selectRaw('MAX(het_hap_settings.price) AS reference_price')
             ->orderBy('komoditas.name')
             ->get()
             ->map(fn ($row) => $this->formatSummaryRow($row, $internal));
@@ -146,11 +145,12 @@ class MarketDataController extends Controller
         $average = (int) ($row->average_price ?? 0);
         $previous = (int) ($row->previous_average_price ?? 0);
         $diff = $average - $previous;
-        $het = $row->het_price ? (int) $row->het_price : null;
-        $hap = $row->hap_price ? (int) $row->hap_price : null;
-        $reference = $het ?: $hap;
+        $reference = $row->reference_price ? (int) $row->reference_price : null;
         $indicator = 'belum_dikaji';
 
+        // WASPADA <= RATA-RATA <= 110% RATA-RATA
+        // INTERVENSI > 110% RATA-RATA
+        
         if ($reference) {
             if ($average <= $reference) {
                 $indicator = 'aman';
@@ -176,8 +176,7 @@ class MarketDataController extends Controller
         ];
 
         if ($internal) {
-            $payload['het_price'] = $het;
-            $payload['hap_price'] = $hap;
+            $payload['reference_price'] = $reference;
             $payload['indicator_status'] = $indicator;
         }
 

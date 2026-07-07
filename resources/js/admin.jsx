@@ -141,7 +141,6 @@ const resources = {
     title: "HET / HAP",
     endpoint: "/api/admin/het-hap",
     fields: [
-      { name: "type", label: "Tipe", type: "select", required: true, options: [["HET", "HET (Harga Eceran Tertinggi)"], ["HAP", "HAP (Harga Acuan Pasar)"]] },
       { name: "komoditas_id", label: "Komoditas", type: "select", required: true, optionsUrl: "/api/admin/commodities" },
       { name: "pasar_id", label: "Pasar (Opsional)", type: "select", optionsUrl: "/api/admin/markets" },
       { name: "price", label: "Harga", type: "number", required: true },
@@ -149,9 +148,8 @@ const resources = {
       { name: "is_active", label: "Aktif", type: "checkbox" },
       { name: "notes", label: "Catatan", type: "textarea" },
     ],
-    columns: ["type", "komoditas_name", "pasar_name", "price", "effective_date", "is_active"],
+    columns: ["komoditas_name", "pasar_name", "price", "effective_date", "is_active"],
     defaults: {
-      type: "HAP",
       komoditas_id: "",
       pasar_id: "",
       price: 0,
@@ -350,6 +348,12 @@ function CrudPage({ config }) {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState({});
   const [fieldOptions, setFieldOptions] = useState({});
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState(null);
+  const [sortDir, setSortDir] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [page, setPage] = useState(1);
+  const perPage = 10;
 
   const fields = config.fields;
 
@@ -412,18 +416,22 @@ function CrudPage({ config }) {
       editing ? "Data berhasil diperbarui." : "Data berhasil ditambahkan.",
     );
     resetForm();
+    setShowForm(false);
     await loadRows();
   };
 
-  const editRow = (row) => {
-    const next = { ...config.defaults };
-
-    fields.forEach((field) => {
-      next[field.name] = row[field.name] ?? config.defaults[field.name] ?? "";
-    });
-
-    setForm(next);
-    setEditing(row);
+  const openForm = (row) => {
+    if (row) {
+      const next = { ...config.defaults };
+      fields.forEach((field) => {
+        next[field.name] = row[field.name] ?? config.defaults[field.name] ?? "";
+      });
+      setForm(next);
+      setEditing(row);
+    } else {
+      resetForm();
+    }
+    setShowForm(true);
     setMessage("");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -551,6 +559,45 @@ function CrudPage({ config }) {
     );
   };
 
+  const filtered = useMemo(() => {
+    let data = rows;
+    if (search) {
+      const q = search.toLowerCase();
+      data = rows.filter((row) =>
+        config.columns.some((col) => {
+          const v = row[col];
+          return v != null && String(v).toLowerCase().includes(q);
+        })
+      );
+    }
+    if (sortKey && sortDir) {
+      data = [...data].sort((a, b) => {
+        const va = a[sortKey];
+        const vb = b[sortKey];
+        if (va == null) return 1;
+        if (vb == null) return -1;
+        const cmp = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb));
+        return sortDir === "asc" ? cmp : -cmp;
+      });
+    }
+    return data;
+  }, [rows, search, sortKey, sortDir]);
+
+  const toggleSort = (col) => {
+    if (sortKey === col) {
+      if (sortDir === "asc") { setSortDir("desc"); }
+      else if (sortDir === "desc") { setSortKey(null); setSortDir(null); }
+      else { setSortDir("asc"); setSortKey(col); }
+    } else {
+      setSortKey(col);
+      setSortDir("asc");
+    }
+  };
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const safePage = Math.min(page, totalPages);
+  const paginated = filtered.slice((safePage - 1) * perPage, safePage * perPage);
+
   return (
     <>
       <div className="admin-header">
@@ -561,42 +608,54 @@ function CrudPage({ config }) {
       </div>
 
       <div className="admin-card">
-        <form onSubmit={submit} className="admin-form">
-          <h2>{editing ? "Edit Data" : "Tambah Data"}</h2>
-
-          <div className="admin-form-grid">
-            {fields.map((field) => (
-              <label
-                key={field.name}
-                className={
-                  field.type === "textarea" || field.type === "select"
-                    ? "wide"
-                    : ""
-                }
-              >
-                <span>{field.label}</span>
-                {renderField(field)}
-              </label>
-            ))}
-          </div>
-
-          <div className="admin-actions">
-            <button type="submit">{editing ? "Update" : "Simpan"}</button>
-            {editing && (
-              <button type="button" className="secondary" onClick={resetForm}>
-                Batal Edit
-              </button>
-            )}
-          </div>
-
-          {message && <p className="admin-message">{message}</p>}
-        </form>
-      </div>
-
-      <div className="admin-card">
         <div className="admin-table-header">
           <h2>Data</h2>
-          {loading && <span>Memuat...</span>}
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            {loading && <span>Memuat...</span>}
+            <button className="btn" onClick={() => openForm(null)}>+ Tambah</button>
+          </div>
+        </div>
+
+        {showForm && (
+          <form onSubmit={submit} className="admin-form" style={{ marginBottom: 20, paddingTop: 16, borderTop: "1px solid #eaecf0" }}>
+            <h2>{editing ? "Edit Data" : "Tambah Data"}</h2>
+
+            <div className="admin-form-grid">
+              {fields.map((field) => (
+                <label
+                  key={field.name}
+                  className={
+                    field.type === "textarea" || field.type === "select"
+                      ? "wide"
+                      : ""
+                  }
+                >
+                  <span>{field.label}</span>
+                  {renderField(field)}
+                </label>
+              ))}
+            </div>
+
+            <div className="admin-actions">
+              <button type="submit">{editing ? "Update" : "Simpan"}</button>
+              <button type="button" className="secondary" onClick={() => { resetForm(); setShowForm(false); }}>
+                Batal
+              </button>
+            </div>
+
+            {message && <p className="admin-message">{message}</p>}
+          </form>
+        )}
+
+        <div className="tableToolbar">
+          <input
+            className="searchInput"
+            type="text"
+            placeholder="Cari data..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <span className="recordCount">{filtered.length} / {rows.length} data</span>
         </div>
 
         <div className="admin-table-wrap">
@@ -605,21 +664,28 @@ function CrudPage({ config }) {
               <tr>
                 <th>No</th>
                 {config.columns.map((column) => (
-                  <th key={column}>{column.replaceAll("_", " ")}</th>
+                  <th
+                    key={column}
+                    className={sortKey === column ? sortDir : ""}
+                    onClick={() => toggleSort(column)}
+                  >
+                    {column.replaceAll("_", " ")}
+                    <span className="sortIcon">{sortKey === column ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span>
+                  </th>
                 ))}
                 <th>Aksi</th>
               </tr>
             </thead>
 
             <tbody>
-              {rows.length === 0 ? (
+              {paginated.length === 0 ? (
                 <tr>
                   <td colSpan={config.columns.length + 2}>Belum ada data.</td>
                 </tr>
               ) : (
-                rows.map((row, index) => (
+                paginated.map((row, index) => (
                   <tr key={row.id}>
-                    <td>{index + 1}</td>
+                    <td>{(safePage - 1) * perPage + index + 1}</td>
 
                     {config.columns.map((column) => (
                       <td key={column}>
@@ -631,7 +697,7 @@ function CrudPage({ config }) {
 
                     <td>
                       <div className="table-actions">
-                        <button type="button" onClick={() => editRow(row)}>
+                        <button type="button" onClick={() => openForm(row)}>
                           Edit
                         </button>
                         <button
@@ -649,6 +715,16 @@ function CrudPage({ config }) {
             </tbody>
           </table>
         </div>
+
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button disabled={safePage <= 1} onClick={() => setPage(safePage - 1)}>‹ Prev</button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <button key={p} className={safePage === p ? "active" : ""} onClick={() => setPage(p)}>{p}</button>
+            ))}
+            <button disabled={safePage >= totalPages} onClick={() => setPage(safePage + 1)}>Next ›</button>
+          </div>
+        )}
       </div>
     </>
   );
@@ -680,6 +756,11 @@ function PriceMonitoring() {
   const [chart, setChart] = useState({ dates: [], series: [] });
   const [adminAverages, setAdminAverages] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState(null);
+  const [sortDir, setSortDir] = useState(null);
+  const [page, setPage] = useState(1);
+  const perPage = 10;
 
   useEffect(() => {
     fetch("/api/market/filters")
@@ -713,6 +794,43 @@ function PriceMonitoring() {
   };
 
   useEffect(() => { load(); }, [query]);
+
+  const filteredRows = useMemo(() => {
+    let data = rows;
+    if (search) {
+      const q = search.toLowerCase();
+      data = rows.filter((r) =>
+        [r.nama_komoditas, r.average_price, r.previous_average_price, r.indicator_status, r.latest_date]
+          .some((v) => v != null && String(v).toLowerCase().includes(q))
+      );
+    }
+    if (sortKey && sortDir) {
+      data = [...data].sort((a, b) => {
+        const va = a[sortKey];
+        const vb = b[sortKey];
+        if (va == null) return 1;
+        if (vb == null) return -1;
+        const cmp = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb));
+        return sortDir === "asc" ? cmp : -cmp;
+      });
+    }
+    return data;
+  }, [rows, search, sortKey, sortDir]);
+
+  const toggleSort = (col) => {
+    if (sortKey === col) {
+      if (sortDir === "asc") { setSortDir("desc"); }
+      else if (sortDir === "desc") { setSortKey(null); setSortDir(null); }
+      else { setSortDir("asc"); setSortKey(col); }
+    } else {
+      setSortKey(col);
+      setSortDir("asc");
+    }
+  };
+
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / perPage));
+  const safePage = Math.min(page, totalPages);
+  const paginated = filteredRows.slice((safePage - 1) * perPage, safePage * perPage);
 
   return (
     <div>
@@ -751,42 +869,56 @@ function PriceMonitoring() {
 
       <div className="admin-card">
         <h2>Tabel Harga Komoditas</h2>
+
+        <div className="tableToolbar">
+          <input className="searchInput" type="text" placeholder="Cari komoditas..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <span className="recordCount">{filteredRows.length} / {rows.length} data</span>
+        </div>
+
         {loading && <p>Memuat data...</p>}
-        {!loading && rows.length === 0 && <p>Belum ada data.</p>}
-        {!loading && rows.length > 0 && (
+        {!loading && paginated.length === 0 && <p>Belum ada data.</p>}
+        {!loading && paginated.length > 0 && (
           <div className="admin-table-wrap">
             <table className="admin-table">
               <thead>
                 <tr>
                   <th>No</th>
-                  <th>Komoditas</th>
-                  <th>Rata-rata</th>
+                  <th className={sortKey === "nama_komoditas" ? sortDir : ""} onClick={() => toggleSort("nama_komoditas")}>Komoditas <span className="sortIcon">{sortKey === "nama_komoditas" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
+                  <th className={sortKey === "average_price" ? sortDir : ""} onClick={() => toggleSort("average_price")}>Rata-rata <span className="sortIcon">{sortKey === "average_price" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
                   <th>Sebelumnya</th>
                   <th>Selisih</th>
-                  <th>Pasar</th>
-                  <th>HET</th>
-                  <th>HAP</th>
-                  <th>Indikator</th>
+                  <th className={sortKey === "market_count" ? sortDir : ""} onClick={() => toggleSort("market_count")}>Pasar <span className="sortIcon">{sortKey === "market_count" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
+                  <th>Harga Acuan</th>
+                  <th className={sortKey === "indicator_status" ? sortDir : ""} onClick={() => toggleSort("indicator_status")}>Indikator <span className="sortIcon">{sortKey === "indicator_status" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
                   <th>Update</th>
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r, i) => (
+                {paginated.map((r, i) => (
                   <tr key={r.commodity_id}>
-                    <td>{i + 1}</td>
+                    <td>{(safePage - 1) * perPage + i + 1}</td>
                     <td>{r.nama_komoditas}</td>
                     <td>{rupiah(r.average_price)}</td>
                     <td>{rupiah(r.previous_average_price)}</td>
                     <td style={{ color: r.tren === "naik" ? "#dc2626" : r.tren === "turun" ? "#16a34a" : "#64748b" }}>{rupiah(Math.abs(r.selisih))}</td>
                     <td>{r.market_count}</td>
-                    <td>{r.het_price ? rupiah(r.het_price) : "-"}</td>
-                    <td>{r.hap_price ? rupiah(r.hap_price) : "-"}</td>
+                    <td>{r.reference_price ? rupiah(r.reference_price) : "-"}</td>
                     <td><IndicatorBadge status={r.indicator_status} /></td>
                     <td>{r.latest_date || "-"}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button disabled={safePage <= 1} onClick={() => setPage(safePage - 1)}>‹ Prev</button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <button key={p} className={safePage === p ? "active" : ""} onClick={() => setPage(p)}>{p}</button>
+            ))}
+            <button disabled={safePage >= totalPages} onClick={() => setPage(safePage + 1)}>Next ›</button>
           </div>
         )}
       </div>
