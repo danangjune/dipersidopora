@@ -284,6 +284,66 @@ tr:hover td{background:#f8fafc}
 .priceCard strong{font-size:20px;color:var(--primary)}
 .naik{color:#dc2626}.turun{color:#16a34a}.tetap{color:#64748b}
 
+/* ─── PROGRAM KEGIATAN PAGE ─── */
+.programKegiatan{max-width:var(--max-w);margin:0 auto}
+.programKegiatanIntro{text-align:center;margin-bottom:40px}
+.programKegiatanIntro p{font-size:17px;line-height:1.7;color:var(--text);max-width:720px;margin:0 auto}
+.programKegiatanList{display:grid;gap:20px}
+.programKegiatanItem{display:flex;gap:20px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm);transition:var(--transition)}
+.programKegiatanItem:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.programKegiatanNum{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;display:grid;place-items:center;font-size:20px;font-weight:800;flex-shrink:0}
+.programKegiatanContent h3{font-size:16px;color:var(--primary);margin:0 0 8px;font-weight:700}
+.programKegiatanContent p{font-size:14px;line-height:1.7;margin:0}
+
+/* ─── PASAR PAGE ─── */
+.pasarGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px;max-width:var(--max-w);margin:0 auto}
+.pasarCard{border-radius:var(--radius-lg);overflow:hidden;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-sm);cursor:pointer;transition:all var(--transition)}
+.pasarCard:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+.pasarCardImage{width:100%;height:200px;overflow:hidden;background:var(--soft)}
+.pasarCardImage img{width:100%;height:100%;object-fit:cover;transition:var(--transition)}
+.pasarCard:hover .pasarCardImage img{transform:scale(1.08)}
+.pasarCardPlaceholder{width:100%;height:100%;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--accent))}
+.pasarCardPlaceholder span{font-size:48px;font-weight:900;color:#fff;opacity:.6}
+.pasarCardInfo{padding:16px 18px 18px}
+.pasarCardInfo h3{font-size:16px;color:var(--text);margin:0 0 4px;font-weight:700}
+.pasarCardInfo p{font-size:13px;color:var(--text-muted);margin:0}
+.pasarModalOverlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:20px;animation:fadeIn .2s ease}
+.pasarModal{background:var(--surface);border-radius:var(--radius-lg);max-width:680px;width:100%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:var(--shadow-xl);animation:slideUp .25s ease}
+.pasarModalClose{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;border:none;background:var(--soft);cursor:pointer;display:grid;place-items:center;z-index:10;transition:var(--transition)}
+.pasarModalClose:hover{background:var(--border)}
+.pasarModalClose svg{width:18px;height:18px;color:var(--text-muted)}
+.pasarModalContent{padding:28px}
+.pasarModalContent h2{font-size:22px;color:var(--primary);margin:0 0 6px}
+.pasarModalAddress{font-size:14px;color:var(--text-muted);margin:0 0 20px;line-height:1.6}
+.pasarModalMap{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
+.pasarModalMap iframe{width:100%;height:360px;border:0;display:block}
+.pasarModalBadge{display:inline-block;padding:4px 12px;border-radius:999px;background:var(--primary);color:#fff;font-size:12px;font-weight:700;margin-bottom:16px}
+.pasarFilter{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:32px}
+.pasarFilter button{padding:10px 22px;border:2px solid var(--border);border-radius:999px;background:var(--surface);font-size:14px;font-weight:700;cursor:pointer;transition:var(--transition);color:var(--text)}
+.pasarFilter button:hover{border-color:var(--accent);color:var(--accent)}
+.pasarFilter button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pasarSubFilter{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:28px}
+.pasarSubFilter button{padding:6px 16px;border:1.5px solid var(--border);border-radius:999px;background:var(--surface);font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition);color:var(--text-muted)}
+.pasarSubFilter button:hover{border-color:var(--accent);color:var(--accent)}
+.pasarSubFilter button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* ─── MALL PAGE ─── */
+.mallGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:32px;max-width:820px;margin:0 auto}
+.mallCard{border-radius:var(--radius-lg);overflow:hidden;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-sm);cursor:pointer;transition:all var(--transition)}
+.mallCard:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+.mallCardImage{width:100%;height:340px;overflow:hidden;background:var(--soft)}
+.mallCardImage img{width:100%;height:100%;object-fit:cover;transition:var(--transition)}
+.mallCard:hover .mallCardImage img{transform:scale(1.08)}
+.mallCardPlaceholder{width:100%;height:100%;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--accent));padding:24px;text-align:center}
+.mallCardPlaceholder span{font-size:22px;font-weight:800;color:#fff;opacity:.8}
+.mallCardBody{padding:22px 24px 26px}
+.mallCardBody h3{font-size:20px;color:var(--text);margin:0 0 8px;font-weight:700}
+.mallCardBody p{font-size:15px;color:var(--text-muted);margin:0;line-height:1.6}
+
+/* ─── STRUKTUR PAGE ─── */
+.strukturBagan{max-width:var(--max-w);margin:0 auto;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-lg);background:var(--surface)}
+.strukturBagan img{width:100%;height:auto;display:block}
+
 /* ─── TENTANG PAGE ─── */
 .tentangHero{background:linear-gradient(135deg,var(--primary),var(--accent));padding:60px clamp(16px,4vw,40px);text-align:center}
 .tentangHeroContent span{color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:13px}

@@ -26,11 +26,30 @@ class DemoDataSeeder extends Seeder
         DB::table('login_pkl')->updateOrInsert(['username' => 'admin'], ['password' => Hash::make('Admin#12345'), 'role' => 'admin', 'created_at' => now(), 'updated_at' => now()]);
 
         $marketSeeds = [
-            ['Pasar Bandar', 'Pasar Rakyat', 'images/pasar/pasar bandar.jpg'], ['Pasar Pahing', 'Pasar Rakyat', 'images/pasar/pahing.jpg'], ['Pasar Setono Betek', 'Pasar Rakyat', 'images/pasar/pasar setonobetek.jpg'],
-            ['Pasar Banjaran', 'Pasar Rakyat', 'images/pasar/pasar banjaran.jpg'], ['Pasar Grosir Ngronggo', 'Pasar Rakyat', 'images/pasar/Pasar Grosir Ngronggo.jpg'], ['Pasar Mojoroto', 'Pasar Rakyat', 'images/pasar/Pasar Mojoroto.jpg'], ['Pasar Campurejo', 'Pasar Rakyat', 'images/pasar/Pasar Campurejo.jpg'],
+            // Pasar Rakyat
+            ['Pasar Bandar', 'Pasar Rakyat', 'images/pasar/pasar bandar.jpg', 'Jl. Dhoho, Bandar Lor, Kec. Mojoroto', -7.8173, 112.0169],
+            ['Pasar Pahing', 'Pasar Rakyat', 'images/pasar/pahing.jpg', 'Jl. Pahing, Setono Pande, Kec. Kediri', -7.8145, 112.0105],
+            ['Pasar Setono Betek', 'Pasar Rakyat', 'images/pasar/pasar setonobetek.jpg', 'Jl. Setono Betek, Kec. Kediri', -7.8189, 112.0142],
+            ['Pasar Banjaran', 'Pasar Rakyat', 'images/pasar/pasar banjaran.jpg', 'Jl. Banjaran, Kec. Kota Kediri', -7.8210, 112.0185],
+            ['Pasar Grosir Ngronggo', 'Pasar Rakyat', 'images/pasar/Pasar Grosir Ngronggo.jpg', 'Jl. Raya Ngronggo, Kec. Kediri', -7.8102, 112.0089],
+            ['Pasar Mojoroto', 'Pasar Rakyat', 'images/pasar/Pasar Mojoroto.jpg', 'Jl. Mojoroto, Kec. Mojoroto', -7.8255, 112.0210],
+            ['Pasar Campurejo', 'Pasar Rakyat', 'images/pasar/Pasar Campurejo.jpg', 'Jl. Campurejo, Kec. Mojoroto', -7.8230, 112.0195],
+            // Minimarket
+            ['Indomaret Bandar Lor', 'Minimarket', null, 'Jl. Penanggungan No. 10, Bandar Lor, Kec. Mojoroto', -7.8160, 112.0175],
+            ['Indomaret Mojoroto', 'Minimarket', null, 'Jl. Mojoroto No. 25, Mojoroto, Kec. Mojoroto', -7.8260, 112.0205],
+            ['Indomaret Ketami', 'Minimarket', null, 'Jl. Ketami, Kec. Kediri', -7.8120, 112.0110],
+            ['Alfamart Bandar Lor', 'Minimarket', null, 'Jl. Penanggungan No. 50, Bandar Lor, Kec. Mojoroto', -7.8165, 112.0180],
+            ['Alfamart Mojoroto', 'Minimarket', null, 'Jl. Mojoroto No. 80, Mojoroto, Kec. Mojoroto', -7.8250, 112.0215],
+            ['Alfamart Ngronggo', 'Minimarket', null, 'Jl. Raya Ngronggo No. 15, Kec. Kediri', -7.8108, 112.0085],
+            ['Alfamidi Kediri', 'Minimarket', null, 'Jl. Dhoho No. 88, Bandar Lor, Kec. Mojoroto', -7.8178, 112.0162],
+            ['Tsamania Supermarket', 'Minimarket', null, 'Jl. Panglima Sudirman, Kec. Kediri', -7.8135, 112.0130],
+            ['Mekarmart Kediri', 'Minimarket', null, 'Jl. Veteran No. 15, Kec. Mojoroto', -7.8200, 112.0155],
+            // Pusat Perbelanjaan
+            ['Pusat Perbelanjaan Dhoho Plaza', 'Pusat Perbelanjaan', null, 'Jl. Dhoho No. 1, Bandar Lor, Kec. Mojoroto', -7.8170, 112.0170],
+            ['Pusat Perbelanjaan Kediri Mall', 'Pusat Perbelanjaan', null, 'Jl. Veteran No. 100, Kec. Mojoroto', -7.8205, 112.0160],
         ];
-        foreach ($marketSeeds as $idx => [$name, $category, $image]) {
-            DB::table('pasars')->updateOrInsert(['slug' => Str::slug($name)], ['name' => $name, 'category' => $category, 'image' => $image, 'is_active' => true, 'sort_order' => $idx + 1, 'created_at' => now(), 'updated_at' => now()]);
+        foreach ($marketSeeds as $idx => [$name, $category, $image, $address, $lat, $lng]) {
+            DB::table('pasars')->updateOrInsert(['slug' => Str::slug($name)], ['name' => $name, 'category' => $category, 'image' => $image, 'address' => $address, 'latitude' => $lat, 'longitude' => $lng, 'is_active' => true, 'sort_order' => $idx + 1, 'created_at' => now(), 'updated_at' => now()]);
         }
 
         $commodities = [

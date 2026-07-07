@@ -23,6 +23,11 @@ Route::get('/site/survey-setting', [SiteContentController::class, 'surveySetting
 Route::get('/site/banners', [SiteContentController::class, 'banners']);
 Route::get('/site/services', [SiteContentController::class, 'services']);
 Route::get('/site/settings', [SiteContentController::class, 'settings']);
+Route::get('/site/tentang', [SiteContentController::class, 'tentang']);
+Route::get('/site/program-kegiatan', [SiteContentController::class, 'programKegiatan']);
+Route::get('/site/pasar', [SiteContentController::class, 'pasar']);
+Route::get('/site/pasar-modern', [SiteContentController::class, 'pasarModern']);
+Route::get('/site/mall', [SiteContentController::class, 'mall']);
 
 // New normalized, dynamic commodity price API.
 Route::get('/market/filters', [MarketDataController::class, 'filters']);

@@ -83,6 +83,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('api/admin')->group(function (
     Route::match(['get', 'post'], '/users', [AdminCrudController::class, 'users']);
     Route::patch('/users/{user}', [AdminCrudController::class, 'updateUser']);
     Route::delete('/users/{user}', [AdminCrudController::class, 'destroyUser']);
+
+    Route::get('/tentang', [AdminCrudController::class, 'tentang']);
+    Route::post('/tentang', [AdminCrudController::class, 'updateTentang']);
+
+    Route::get('/program-kegiatan', [AdminCrudController::class, 'programKegiatan']);
+    Route::post('/program-kegiatan', [AdminCrudController::class, 'updateProgramKegiatan']);
 });
 
 /*

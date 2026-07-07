@@ -220,6 +220,8 @@ const allMenus = [
   { key: "markets", label: "Master Pasar", href: "/admin/markets", roles: ["admin"] },
   { key: "commodities", label: "Master Komoditas", href: "/admin/commodities", roles: ["admin"] },
   { key: "pages", label: "Master Halaman", href: "/admin/pages", roles: ["admin"] },
+  { key: "tentang", label: "Halaman Tentang", href: "/admin/tentang", roles: ["admin"] },
+  { key: "program-kegiatan", label: "Program Kegiatan", href: "/admin/program-kegiatan", roles: ["admin"] },
   { key: "downloads", label: "Master Dokumen", href: "/admin/downloads", roles: ["admin"] },
   { key: "banners", label: "Banner Slider", href: "/admin/banners", roles: ["admin"] },
   {
@@ -840,6 +842,481 @@ function PriceMonitoring() {
   );
 }
 
+function ProgramKegiatanAdmin() {
+  const [data, setData] = useState(null);
+  const [form, setForm] = useState({
+    title: "",
+    eyebrow: "",
+    program_data: {
+      intro: "",
+      programs: [],
+    },
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const result = await api("/api/admin/program-kegiatan");
+      const d = result.data || {};
+      setData(d);
+      setForm({
+        title: d.title || "",
+        eyebrow: d.eyebrow || "",
+        program_data: d.program_data || { intro: "", programs: [] },
+      });
+    } catch {
+      setMessage("Gagal memuat data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const updateProgram = (index, field, value) => {
+    setForm((prev) => {
+      const programs = [...(prev.program_data.programs || [])];
+      programs[index] = { ...(programs[index] || {}), [field]: value };
+      return { ...prev, program_data: { ...prev.program_data, programs } };
+    });
+  };
+
+  const addProgram = () => {
+    setForm((prev) => {
+      const programs = [...(prev.program_data.programs || [])];
+      const nextNum = programs.length > 0 ? Math.max(...programs.map((p) => p.number || 0)) + 1 : 1;
+      programs.push({ number: nextNum, title: "", desc: "" });
+      return { ...prev, program_data: { ...prev.program_data, programs } };
+    });
+  };
+
+  const removeProgram = (index) => {
+    setForm((prev) => {
+      const programs = [...(prev.program_data.programs || [])];
+      programs.splice(index, 1);
+      return { ...prev, program_data: { ...prev.program_data, programs } };
+    });
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage("");
+    try {
+      await api("/api/admin/program-kegiatan", {
+        method: "POST",
+        body: JSON.stringify({
+          title: form.title,
+          eyebrow: form.eyebrow,
+          program_data: form.program_data,
+        }),
+      });
+      setMessage("Data berhasil disimpan.");
+    } catch (err) {
+      setMessage("Gagal menyimpan: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <>
+        <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman Program Kegiatan</h1></div></div>
+        <div className="admin-card"><p>Memuat data...</p></div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="admin-header">
+        <div>
+          <p>Pengaturan</p>
+          <h1>Halaman Program Kegiatan</h1>
+        </div>
+      </div>
+
+      <div className="admin-card">
+        <form onSubmit={submit} className="admin-form">
+          <h2>Hero Section</h2>
+          <div className="admin-form-grid">
+            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
+            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+          </div>
+
+          <h2 style={{ marginTop: 28 }}>Teks Intro</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Teks Pengantar</span><textarea value={form.program_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, program_data: { ...p.program_data, intro: e.target.value } }))} /></label>
+          </div>
+
+          <h2 style={{ marginTop: 28 }}>Daftar Program</h2>
+          {(form.program_data.programs || []).map((prog, i) => (
+            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
+              <button type="button" onClick={() => removeProgram(i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
+              <label><span>Nomor</span><input type="number" value={prog.number || ""} onChange={(e) => updateProgram(i, "number", Number(e.target.value))} /></label>
+              <label><span>Judul Program</span><input value={prog.title || ""} onChange={(e) => updateProgram(i, "title", e.target.value)} /></label>
+              <label className="wide"><span>Deskripsi</span><textarea value={prog.desc || ""} onChange={(e) => updateProgram(i, "desc", e.target.value)} /></label>
+            </div>
+          ))}
+          <button type="button" onClick={addProgram} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467" }}>
+            + Tambah Program
+          </button>
+
+          <div className="admin-actions" style={{ marginTop: 28 }}>
+            <button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button>
+          </div>
+
+          {message && <p className="admin-message">{message}</p>}
+        </form>
+      </div>
+    </>
+  );
+}
+
+function TentangAdmin() {
+  const [data, setData] = useState(null);
+  const [form, setForm] = useState({
+    title: "",
+    eyebrow: "",
+    tentang_data: {
+      logo: "",
+      kadin: { photo: "", name: "", title: "", description: "" },
+      bidang: [],
+      alamat: [],
+      kontak: [],
+      maps_embed: "",
+    },
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState({});
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const result = await api("/api/admin/tentang");
+      const d = result.data || {};
+      setData(d);
+      setForm({
+        title: d.title || "",
+        eyebrow: d.eyebrow || "",
+        tentang_data: d.tentang_data || {
+          logo: "",
+          kadin: { photo: "", name: "", title: "", description: "" },
+          bidang: [],
+          alamat: [],
+          kontak: [],
+          maps_embed: "",
+        },
+      });
+    } catch {
+      setMessage("Gagal memuat data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const uploadFile = async (fieldName, file) => {
+    if (!file) return;
+    setUploading((prev) => ({ ...prev, [fieldName]: true }));
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const result = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf },
+        credentials: "same-origin",
+        body,
+      });
+      const res = await result.json();
+      if (res?.data?.path) {
+        const path = res.data.path;
+        const parts = fieldName.split(".");
+        if (parts.length === 1) {
+          setForm((prev) => ({ ...prev, [parts[0]]: path }));
+        } else if (parts.length === 2) {
+          setForm((prev) => ({
+            ...prev,
+            tentang_data: {
+              ...prev.tentang_data,
+              [parts[1]]: path,
+            },
+          }));
+        } else if (parts.length === 3) {
+          setForm((prev) => ({
+            ...prev,
+            tentang_data: {
+              ...prev.tentang_data,
+              [parts[0]]: {
+                ...(prev.tentang_data[parts[0]] || {}),
+                [parts[1]]: path,
+              },
+            },
+          }));
+        }
+      }
+    } catch {
+      /* ignore */
+    } finally {
+      setUploading((prev) => ({ ...prev, [fieldName]: false }));
+    }
+  };
+
+  const updateTentangData = (path, value) => {
+    const parts = path.split(".");
+    if (parts.length === 1) {
+      setForm((prev) => ({
+        ...prev,
+        tentang_data: { ...prev.tentang_data, [parts[0]]: value },
+      }));
+    } else if (parts.length === 2) {
+      setForm((prev) => ({
+        ...prev,
+        tentang_data: {
+          ...prev.tentang_data,
+          [parts[0]]: {
+            ...(prev.tentang_data[parts[0]] || {}),
+            [parts[1]]: value,
+          },
+        },
+      }));
+    } else if (parts.length === 3) {
+      setForm((prev) => {
+        const arr = [...(prev.tentang_data[parts[0]] || [])];
+        arr[Number(parts[1])] = {
+          ...(arr[Number(parts[1])] || {}),
+          [parts[2]]: value,
+        };
+        return { ...prev, tentang_data: { ...prev.tentang_data, [parts[0]]: arr } };
+      });
+    }
+  };
+
+  const addArrayItem = (key) => {
+    setForm((prev) => {
+      const arr = [...(prev.tentang_data[key] || [])];
+      if (key === "bidang") arr.push({ title: "", desc: "" });
+      else if (key === "alamat") arr.push({ title: "", address: "" });
+      else if (key === "kontak") arr.push({ label: "", value: "", href: "", icon: "" });
+      return { ...prev, tentang_data: { ...prev.tentang_data, [key]: arr } };
+    });
+  };
+
+  const removeArrayItem = (key, index) => {
+    setForm((prev) => {
+      const arr = [...(prev.tentang_data[key] || [])];
+      arr.splice(index, 1);
+      return { ...prev, tentang_data: { ...prev.tentang_data, [key]: arr } };
+    });
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage("");
+    try {
+      await api("/api/admin/tentang", {
+        method: "POST",
+        body: JSON.stringify({
+          title: form.title,
+          eyebrow: form.eyebrow,
+          tentang_data: form.tentang_data,
+        }),
+      });
+      setMessage("Data berhasil disimpan.");
+    } catch (err) {
+      setMessage("Gagal menyimpan: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const fileInput = (fieldName, label) => {
+    const value = fieldName === "logo"
+      ? form.tentang_data.logo
+      : fieldName === "kadin.photo"
+        ? form.tentang_data.kadin?.photo || ""
+        : "";
+    const isImage = value && /\.(png|jpe?g|gif|webp|svg)$/i.test(value);
+
+    return (
+      <label>
+        <span>{label}</span>
+        <div style={{ display: "grid", gap: 8 }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => uploadFile(fieldName, e.target.files[0])}
+            />
+            {uploading[fieldName] && <span>Uploading...</span>}
+          </div>
+          {value && (
+            <div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: "#344054" }}>
+              <span>{value}</span>
+              {isImage && (
+                <img
+                  src={`/assets/${value}`}
+                  alt="preview"
+                  style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 8, border: "1px solid #d0d5dd" }}
+                  onError={(e) => { e.currentTarget.style.display = "none"; }}
+                />
+              )}
+            </div>
+          )}
+        </div>
+      </label>
+    );
+  };
+
+  const topFields = ["title", "eyebrow"];
+
+  const getValue = (fieldPath) => {
+    if (topFields.includes(fieldPath)) return form[fieldPath] ?? "";
+    const parts = fieldPath.split(".");
+    let obj = form.tentang_data;
+    for (const part of parts) {
+      if (obj == null) return "";
+      obj = obj[part];
+    }
+    return obj ?? "";
+  };
+
+  const setValue = (fieldPath, value) => {
+    if (topFields.includes(fieldPath)) {
+      setForm((p) => ({ ...p, [fieldPath]: value }));
+      return;
+    }
+    updateTentangData(fieldPath, value);
+  };
+
+  const textInput = (fieldPath, label, type = "text") => {
+    const value = getValue(fieldPath);
+    return (
+      <label>
+        <span>{label}</span>
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => setValue(fieldPath, e.target.value)}
+        />
+      </label>
+    );
+  };
+
+  const textareaInput = (fieldPath, label) => {
+    const value = getValue(fieldPath);
+
+    return (
+      <label className="wide">
+        <span>{label}</span>
+        <textarea
+          value={value}
+          onChange={(e) => setValue(fieldPath, e.target.value)}
+        />
+      </label>
+    );
+  };
+
+  if (loading) {
+    return (
+      <>
+        <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman Tentang</h1></div></div>
+        <div className="admin-card"><p>Memuat data...</p></div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="admin-header">
+        <div>
+          <p>Pengaturan</p>
+          <h1>Halaman Tentang</h1>
+        </div>
+      </div>
+
+      <div className="admin-card">
+        <form onSubmit={submit} className="admin-form">
+          <h2>Hero Section</h2>
+          <div className="admin-form-grid">
+            {textInput("title", "Judul Hero")}
+            {textInput("eyebrow", "Subtitle (Eyebrow)")}
+          </div>
+
+          <h2 style={{ marginTop: 28 }}>Logo</h2>
+          <div className="admin-form-grid">
+            {fileInput("logo", "Logo DISPERDAGIN")}
+          </div>
+
+          <h2 style={{ marginTop: 28 }}>Kepala Dinas</h2>
+          <div className="admin-form-grid">
+            {fileInput("kadin.photo", "Foto Kepala Dinas")}
+            {textInput("kadin.name", "Nama Kepala Dinas")}
+            {textInput("kadin.title", "Jabatan")}
+            {textareaInput("kadin.description", "Deskripsi Profil")}
+          </div>
+
+          <h2 style={{ marginTop: 28 }}>Bidang</h2>
+          {(form.tentang_data.bidang || []).map((item, i) => (
+            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
+              <button type="button" onClick={() => removeArrayItem("bidang", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
+              <label><span>Nama Bidang</span><input value={item.title || ""} onChange={(e) => updateTentangData(`bidang.${i}.title`, e.target.value)} /></label>
+              <label className="wide"><span>Deskripsi</span><textarea value={item.desc || ""} onChange={(e) => updateTentangData(`bidang.${i}.desc`, e.target.value)} /></label>
+            </div>
+          ))}
+          <button type="button" onClick={() => addArrayItem("bidang")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467" }}>
+            + Tambah Bidang
+          </button>
+
+          <h2 style={{ marginTop: 28 }}>Alamat</h2>
+          {(form.tentang_data.alamat || []).map((item, i) => (
+            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
+              <button type="button" onClick={() => removeArrayItem("alamat", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
+              <label><span>Nama Tempat</span><input value={item.title || ""} onChange={(e) => updateTentangData(`alamat.${i}.title`, e.target.value)} /></label>
+              <label className="wide"><span>Alamat</span><textarea value={item.address || ""} onChange={(e) => updateTentangData(`alamat.${i}.address`, e.target.value)} /></label>
+            </div>
+          ))}
+          <button type="button" onClick={() => addArrayItem("alamat")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467" }}>
+            + Tambah Alamat
+          </button>
+
+          <h2 style={{ marginTop: 28 }}>Kontak</h2>
+          {(form.tentang_data.kontak || []).map((item, i) => (
+            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
+              <button type="button" onClick={() => removeArrayItem("kontak", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
+              <label><span>Label</span><input value={item.label || ""} onChange={(e) => updateTentangData(`kontak.${i}.label`, e.target.value)} /></label>
+              <label><span>Nilai</span><input value={item.value || ""} onChange={(e) => updateTentangData(`kontak.${i}.value`, e.target.value)} /></label>
+              <label className="wide"><span>Link (href)</span><input value={item.href || ""} onChange={(e) => updateTentangData(`kontak.${i}.href`, e.target.value)} /></label>
+            </div>
+          ))}
+          <button type="button" onClick={() => addArrayItem("kontak")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467" }}>
+            + Tambah Kontak
+          </button>
+
+          <h2 style={{ marginTop: 28 }}>Google Maps</h2>
+          <div className="admin-form-grid">
+            {textareaInput("maps_embed", "URL Embed Google Maps")}
+          </div>
+
+          <div className="admin-actions" style={{ marginTop: 28 }}>
+            <button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button>
+          </div>
+
+          {message && <p className="admin-message">{message}</p>}
+        </form>
+      </div>
+    </>
+  );
+}
+
 function AdminApp() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -888,6 +1365,10 @@ function AdminApp() {
         <Dashboard />
       ) : activeKey === "prices-monitor" ? (
         <PriceMonitoring />
+      ) : activeKey === "tentang" ? (
+        <TentangAdmin />
+      ) : activeKey === "program-kegiatan" ? (
+        <ProgramKegiatanAdmin />
       ) : config ? (
         <CrudPage config={config} />
       ) : (
