@@ -36,32 +36,94 @@ function TextInput({
   );
 }
 
-function AdminTable({ columns, rows, empty = "Belum ada data." }) {
+function AdminTable({ columns, rows, empty = "Belum ada data.", searchable = true, sortable = true }) {
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState(null);
+  const [sortDir, setSortDir] = useState(null);
+
+  const filtered = useMemo(() => {
+    let data = rows;
+    if (search && searchable) {
+      const q = search.toLowerCase();
+      data = rows.filter((row) =>
+        columns.some((c) => {
+          const val = c.render ? c.render(row, 0) : row[c.key];
+          return val != null && String(val).toLowerCase().includes(q);
+        })
+      );
+    }
+    if (sortKey && sortDir) {
+      data = [...data].sort((a, b) => {
+        const va = sortKey.render ? sortKey.render(a, 0) : a[sortKey.key];
+        const vb = sortKey.render ? sortKey.render(b, 0) : b[sortKey.key];
+        if (va == null) return 1;
+        if (vb == null) return -1;
+        const cmp = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb));
+        return sortDir === "asc" ? cmp : -cmp;
+      });
+    }
+    return data;
+  }, [rows, search, sortKey, sortDir, columns, searchable]);
+
+  const toggleSort = (col) => {
+    if (!sortable) return;
+    if (sortKey?.key === col.key) {
+      if (sortDir === "asc") { setSortDir("desc"); }
+      else if (sortDir === "desc") { setSortKey(null); setSortDir(null); }
+      else { setSortDir("asc"); setSortKey(col); }
+    } else {
+      setSortKey(col);
+      setSortDir("asc");
+    }
+  };
+
   return (
-    <div className="tableWrap adminTable">
-      <table>
-        <thead>
-          <tr>
-            {columns.map((c) => (
-              <th key={c.key}>{c.label}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, i) => (
-            <tr key={row.id || i}>
+    <div>
+      {searchable && (
+        <div className="tableToolbar">
+          <input
+            className="searchInput"
+            type="text"
+            placeholder="Cari data..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <span className="recordCount">{filtered.length} / {rows.length} data</span>
+        </div>
+      )}
+      <div className="tableWrap adminTable">
+        <table>
+          <thead>
+            <tr>
               {columns.map((c) => (
-                <td key={c.key}>{c.render ? c.render(row, i) : row[c.key]}</td>
+                <th
+                  key={c.key}
+                  className={sortable ? (sortKey?.key === c.key ? sortDir : "") : ""}
+                  onClick={() => toggleSort(c)}
+                  style={sortable ? { cursor: "pointer" } : {}}
+                >
+                  {c.label}
+                  {sortable && <span className="sortIcon">{sortKey?.key === c.key ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span>}
+                </th>
               ))}
             </tr>
-          ))}
-          {rows.length === 0 && (
-            <tr>
-              <td colSpan={columns.length}>{empty}</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filtered.map((row, i) => (
+              <tr key={row.id || i}>
+                {columns.map((c) => (
+                  <td key={c.key}>{c.render ? c.render(row, i) : row[c.key]}</td>
+                ))}
+              </tr>
+            ))}
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={columns.length}>{empty}</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -125,54 +187,29 @@ function MasterData() {
   return (
     <div className="adminGrid">
       <form className="cardForm" onSubmit={saveMarket}>
-        <h2>Tambah Pasar</h2>
-        <TextInput
-          label="Nama Pasar"
-          value={marketForm.name}
-          onChange={(v) => setMarketForm({ ...marketForm, name: v })}
-        />
-        <TextInput
-          label="Kategori"
-          value={marketForm.category}
-          onChange={(v) => setMarketForm({ ...marketForm, category: v })}
-        />
-        <label>
-          Alamat
-          <textarea
-            value={marketForm.address}
-            onChange={(e) =>
-              setMarketForm({ ...marketForm, address: e.target.value })
-            }
-          />
-        </label>
-        <TextInput
-          label="Path Gambar"
-          value={marketForm.image}
-          placeholder="images/pasar/pasar bandar.jpg"
-          onChange={(v) => setMarketForm({ ...marketForm, image: v })}
-        />
-        <button className="btn">Simpan Pasar</button>
+        <div className="adminFormGrid">
+          <h2 className="fullRow">Tambah Pasar</h2>
+          <TextInput label="Nama Pasar" value={marketForm.name} onChange={(v) => setMarketForm({ ...marketForm, name: v })} />
+          <TextInput label="Kategori" value={marketForm.category} onChange={(v) => setMarketForm({ ...marketForm, category: v })} />
+          <label className="fullRow">
+            Alamat
+            <textarea value={marketForm.address} onChange={(e) => setMarketForm({ ...marketForm, address: e.target.value })} />
+          </label>
+          <TextInput label="Path Gambar" value={marketForm.image} placeholder="images/pasar/pasar bandar.jpg" onChange={(v) => setMarketForm({ ...marketForm, image: v })} />
+          <div className="fullRow" />
+          <button className="btn fullRow" style={{ justifySelf: "start" }}>Simpan Pasar</button>
+        </div>
       </form>
       <form className="cardForm" onSubmit={saveCommodity}>
-        <h2>Tambah Komoditas</h2>
-        <TextInput
-          label="Nama Komoditas"
-          value={commodityForm.name}
-          onChange={(v) => setCommodityForm({ ...commodityForm, name: v })}
-        />
-        <TextInput
-          label="Satuan"
-          value={commodityForm.unit}
-          onChange={(v) => setCommodityForm({ ...commodityForm, unit: v })}
-        />
-        <TextInput
-          label="Nama Gambar"
-          value={commodityForm.image}
-          placeholder="beras.webp"
-          onChange={(v) => setCommodityForm({ ...commodityForm, image: v })}
-        />
-        <button className="btn">Simpan Komoditas</button>
-        {message && <p>{message}</p>}
+        <div className="adminFormGrid">
+          <h2 className="fullRow">Tambah Komoditas</h2>
+          <TextInput label="Nama Komoditas" value={commodityForm.name} onChange={(v) => setCommodityForm({ ...commodityForm, name: v })} />
+          <TextInput label="Satuan" value={commodityForm.unit} onChange={(v) => setCommodityForm({ ...commodityForm, unit: v })} />
+          <TextInput label="Nama Gambar" value={commodityForm.image} placeholder="beras.webp" onChange={(v) => setCommodityForm({ ...commodityForm, image: v })} />
+          <div />
+          <button className="btn fullRow" style={{ justifySelf: "start" }}>Simpan Komoditas</button>
+          {message && <p className="fullRow" style={{ margin: 0, color: "#027a48", fontWeight: 600 }}>{message}</p>}
+        </div>
       </form>
       <div>
         <h2>Data Pasar</h2>
@@ -259,78 +296,46 @@ function PriceManager() {
   };
   return (
     <div>
-      <form className="cardForm wide" onSubmit={save}>
-        <h2>Input Harga Komoditas</h2>
-        <label>
-          Pasar
-          <select
-            value={form.pasar_id}
-            onChange={(e) => setForm({ ...form, pasar_id: e.target.value })}
-          >
-            {filters.markets.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Komoditas
-          <select
-            value={form.komoditas_id}
-            onChange={(e) => setForm({ ...form, komoditas_id: e.target.value })}
-          >
-            {filters.commodities.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <TextInput
-          type="date"
-          label="Tanggal"
-          value={form.price_date}
-          onChange={(v) => setForm({ ...form, price_date: v })}
-        />
-        <TextInput
-          type="number"
-          label="Harga"
-          value={form.price}
-          onChange={(v) => setForm({ ...form, price: v })}
-        />
-        <label>
-          Status Validasi
-          <select
-            value={form.status_validasi}
-            onChange={(e) =>
-              setForm({ ...form, status_validasi: e.target.value })
-            }
-          >
-            <option value="true">Valid</option>
-            <option value="pending">Pending</option>
-            <option value="false">Ditolak</option>
-          </select>
-        </label>
-        <label>
-          Indikator
-          <select
-            value={form.indicator_status}
-            onChange={(e) =>
-              setForm({ ...form, indicator_status: e.target.value })
-            }
-          >
-            <option value="belum_dikaji">Belum Dikaji</option>
-            <option value="aman">Aman</option>
-            <option value="waspada">Waspada</option>
-            <option value="intervensi">Intervensi</option>
-          </select>
-        </label>
-        <button className="btn">Simpan Harga</button>
-        <a className="btn outline" href="/api/admin/prices/export">
-          Download Excel
-        </a>
-        {message && <p>{message}</p>}
+      <form className="cardForm" onSubmit={save}>
+        <div className="adminFormGrid">
+          <h2 className="fullRow">Input Harga Komoditas</h2>
+          <label>
+            Pasar
+            <select value={form.pasar_id} onChange={(e) => setForm({ ...form, pasar_id: e.target.value })}>
+              {filters.markets.map((m) => (<option key={m.id} value={m.id}>{m.name}</option>))}
+            </select>
+          </label>
+          <label>
+            Komoditas
+            <select value={form.komoditas_id} onChange={(e) => setForm({ ...form, komoditas_id: e.target.value })}>
+              {filters.commodities.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
+            </select>
+          </label>
+          <TextInput type="date" label="Tanggal" value={form.price_date} onChange={(v) => setForm({ ...form, price_date: v })} />
+          <TextInput type="number" label="Harga" value={form.price} onChange={(v) => setForm({ ...form, price: v })} />
+          <label>
+            Status Validasi
+            <select value={form.status_validasi} onChange={(e) => setForm({ ...form, status_validasi: e.target.value })}>
+              <option value="true">Valid</option>
+              <option value="pending">Pending</option>
+              <option value="false">Ditolak</option>
+            </select>
+          </label>
+          <label>
+            Indikator
+            <select value={form.indicator_status} onChange={(e) => setForm({ ...form, indicator_status: e.target.value })}>
+              <option value="belum_dikaji">Belum Dikaji</option>
+              <option value="aman">Aman</option>
+              <option value="waspada">Waspada</option>
+              <option value="intervensi">Intervensi</option>
+            </select>
+          </label>
+          <div className="fullRow" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <button className="btn">Simpan Harga</button>
+            <a className="btn outline" href="/api/admin/prices/export">Download Excel</a>
+            {message && <span style={{ color: "#027a48", fontWeight: 600 }}>{message}</span>}
+          </div>
+        </div>
       </form>
       <h2>Data Harga Terbaru</h2>
       <AdminTable
@@ -362,7 +367,6 @@ function HetHapManager() {
   const [form, setForm] = useState({
     komoditas_id: "",
     pasar_id: "",
-    type: "HAP",
     price: "",
     effective_date: new Date().toISOString().slice(0, 10),
     is_active: true,
@@ -397,58 +401,26 @@ function HetHapManager() {
   };
   return (
     <div>
-      <form className="cardForm wide" onSubmit={save}>
-        <h2>Atur HET/HAP</h2>
-        <label>
-          Komoditas
-          <select
-            value={form.komoditas_id}
-            onChange={(e) => setForm({ ...form, komoditas_id: e.target.value })}
-          >
-            {filters.commodities.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Pasar Opsional
-          <select
-            value={form.pasar_id}
-            onChange={(e) => setForm({ ...form, pasar_id: e.target.value })}
-          >
-            <option value="">Semua Pasar</option>
-            {filters.markets.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Tipe
-          <select
-            value={form.type}
-            onChange={(e) => setForm({ ...form, type: e.target.value })}
-          >
-            <option value="HAP">HAP</option>
-            <option value="HET">HET</option>
-          </select>
-        </label>
-        <TextInput
-          type="number"
-          label="Nilai"
-          value={form.price}
-          onChange={(v) => setForm({ ...form, price: v })}
-        />
-        <TextInput
-          type="date"
-          label="Berlaku Mulai"
-          value={form.effective_date}
-          onChange={(v) => setForm({ ...form, effective_date: v })}
-        />
-        <button className="btn">Simpan HET/HAP</button>
+      <form className="cardForm" onSubmit={save}>
+        <div className="adminFormGrid">
+          <h2 className="fullRow">Atur HET/HAP</h2>
+          <label>
+            Komoditas
+            <select value={form.komoditas_id} onChange={(e) => setForm({ ...form, komoditas_id: e.target.value })}>
+              {filters.commodities.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
+            </select>
+          </label>
+          <label>
+            Pasar Opsional
+            <select value={form.pasar_id} onChange={(e) => setForm({ ...form, pasar_id: e.target.value })}>
+              <option value="">Semua Pasar</option>
+              {filters.markets.map((m) => (<option key={m.id} value={m.id}>{m.name}</option>))}
+            </select>
+          </label>
+          <TextInput type="number" label="Nilai" value={form.price} onChange={(v) => setForm({ ...form, price: v })} />
+          <TextInput type="date" label="Berlaku Mulai" value={form.effective_date} onChange={(v) => setForm({ ...form, effective_date: v })} />
+          <button className="btn fullRow" style={{ justifySelf: "start" }}>Simpan HET/HAP</button>
+        </div>
       </form>
       <AdminTable
         columns={[
@@ -458,7 +430,6 @@ function HetHapManager() {
             label: "Pasar",
             render: (r) => r.pasar_name || "Semua",
           },
-          { key: "type", label: "Tipe" },
           { key: "price", label: "Nilai", render: (r) => rupiah(r.price) },
           { key: "effective_date", label: "Berlaku" },
         ]}
@@ -537,129 +508,65 @@ function CmsManager() {
   return (
     <div className="adminGrid">
       <form className="cardForm" onSubmit={savePage}>
-        <h2>Web Profil Dinamis</h2>
-        <TextInput
-          label="Judul"
-          value={pageForm.title}
-          onChange={(v) => setPageForm({ ...pageForm, title: v })}
-        />
-        <TextInput
-          label="Slug"
-          value={pageForm.slug}
-          placeholder="contoh: profil-dinas"
-          onChange={(v) => setPageForm({ ...pageForm, slug: v })}
-        />
-        <TextInput
-          label="Grup"
-          value={pageForm.group}
-          onChange={(v) => setPageForm({ ...pageForm, group: v })}
-        />
-        <TextInput
-          label="Gambar"
-          value={pageForm.image}
-          placeholder="images/office.png"
-          onChange={(v) => setPageForm({ ...pageForm, image: v })}
-        />
-        <label>
-          Ringkasan
-          <textarea
-            value={pageForm.excerpt}
-            onChange={(e) =>
-              setPageForm({ ...pageForm, excerpt: e.target.value })
-            }
-          />
-        </label>
-        <label>
-          Konten
-          <textarea
-            value={pageForm.content}
-            onChange={(e) =>
-              setPageForm({ ...pageForm, content: e.target.value })
-            }
-          />
-        </label>
-        <button className="btn">Simpan Halaman</button>
+        <div className="adminFormGrid">
+          <h2 className="fullRow">Web Profil Dinamis</h2>
+          <TextInput label="Judul" value={pageForm.title} onChange={(v) => setPageForm({ ...pageForm, title: v })} />
+          <TextInput label="Slug" value={pageForm.slug} placeholder="contoh: profil-dinas" onChange={(v) => setPageForm({ ...pageForm, slug: v })} />
+          <TextInput label="Grup" value={pageForm.group} onChange={(v) => setPageForm({ ...pageForm, group: v })} />
+          <TextInput label="Gambar" value={pageForm.image} placeholder="images/office.png" onChange={(v) => setPageForm({ ...pageForm, image: v })} />
+          <label className="fullRow">
+            Ringkasan
+            <textarea value={pageForm.excerpt} onChange={(e) => setPageForm({ ...pageForm, excerpt: e.target.value })} />
+          </label>
+          <label className="fullRow">
+            Konten
+            <textarea value={pageForm.content} onChange={(e) => setPageForm({ ...pageForm, content: e.target.value })} />
+          </label>
+          <button className="btn fullRow" style={{ justifySelf: "start" }}>Simpan Halaman</button>
+        </div>
       </form>
       <div>
         <h2>Halaman Lama & Baru</h2>
-        <AdminTable
-          columns={[
-            { key: "title", label: "Judul" },
-            { key: "slug", label: "Slug" },
-            { key: "group", label: "Grup" },
-            {
-              key: "is_published",
-              label: "Publish",
-              render: (r) => (r.is_published ? "Ya" : "Tidak"),
-            },
-          ]}
-          rows={pages}
-        />
+        <AdminTable columns={[
+          { key: "title", label: "Judul" },
+          { key: "slug", label: "Slug" },
+          { key: "group", label: "Grup" },
+          { key: "is_published", label: "Publish", render: (r) => (r.is_published ? "Ya" : "Tidak") },
+        ]} rows={pages} />
       </div>
       <form className="cardForm" onSubmit={saveDownload}>
-        <h2>Dokumen Unduhan</h2>
-        <TextInput
-          label="Judul"
-          value={downloadForm.title}
-          onChange={(v) => setDownloadForm({ ...downloadForm, title: v })}
-        />
-        <TextInput
-          label="Kategori"
-          value={downloadForm.category}
-          onChange={(v) => setDownloadForm({ ...downloadForm, category: v })}
-        />
-        <TextInput
-          label="Path File"
-          value={downloadForm.file_path}
-          placeholder="aset_download/Dokumen.pdf"
-          onChange={(v) => setDownloadForm({ ...downloadForm, file_path: v })}
-        />
-        <button className="btn">Simpan Dokumen</button>
-        <AdminTable
-          columns={[
-            { key: "title", label: "Judul" },
-            { key: "category", label: "Kategori" },
-            { key: "file_path", label: "File" },
-          ]}
-          rows={downloads}
-        />
+        <div className="adminFormGrid">
+          <h2 className="fullRow">Dokumen Unduhan</h2>
+          <TextInput label="Judul" value={downloadForm.title} onChange={(v) => setDownloadForm({ ...downloadForm, title: v })} />
+          <TextInput label="Kategori" value={downloadForm.category} onChange={(v) => setDownloadForm({ ...downloadForm, category: v })} />
+          <TextInput label="Path File" value={downloadForm.file_path} placeholder="aset_download/Dokumen.pdf" onChange={(v) => setDownloadForm({ ...downloadForm, file_path: v })} />
+          <div />
+          <button className="btn fullRow" style={{ justifySelf: "start" }}>Simpan Dokumen</button>
+        </div>
       </form>
+      <AdminTable columns={[
+        { key: "title", label: "Judul" },
+        { key: "category", label: "Kategori" },
+        { key: "file_path", label: "File" },
+      ]} rows={downloads} />
       <form className="cardForm" onSubmit={saveSurvey}>
-        <h2>Survey / Barcode SKM</h2>
-        <TextInput
-          label="Judul"
-          value={surveyForm.title}
-          onChange={(v) => setSurveyForm({ ...surveyForm, title: v })}
-        />
-        <TextInput
-          label="Link Survey KemenPANRB"
-          value={surveyForm.external_url}
-          onChange={(v) => setSurveyForm({ ...surveyForm, external_url: v })}
-        />
-        <TextInput
-          label="Path Barcode/QR"
-          value={surveyForm.qr_image}
-          onChange={(v) => setSurveyForm({ ...surveyForm, qr_image: v })}
-        />
-        <label>
-          Deskripsi
-          <textarea
-            value={surveyForm.description}
-            onChange={(e) =>
-              setSurveyForm({ ...surveyForm, description: e.target.value })
-            }
-          />
-        </label>
-        <button className="btn">Simpan Survey</button>
-        <AdminTable
-          columns={[
-            { key: "title", label: "Judul" },
-            { key: "external_url", label: "Link" },
-            { key: "qr_image", label: "QR" },
-          ]}
-          rows={survey}
-        />
+        <div className="adminFormGrid">
+          <h2 className="fullRow">Survey / Barcode SKM</h2>
+          <TextInput label="Judul" value={surveyForm.title} onChange={(v) => setSurveyForm({ ...surveyForm, title: v })} />
+          <TextInput label="Link Survey KemenPANRB" value={surveyForm.external_url} onChange={(v) => setSurveyForm({ ...surveyForm, external_url: v })} />
+          <TextInput label="Path Barcode/QR" value={surveyForm.qr_image} onChange={(v) => setSurveyForm({ ...surveyForm, qr_image: v })} />
+          <label className="fullRow">
+            Deskripsi
+            <textarea value={surveyForm.description} onChange={(e) => setSurveyForm({ ...surveyForm, description: e.target.value })} />
+          </label>
+          <button className="btn fullRow" style={{ justifySelf: "start" }}>Simpan Survey</button>
+        </div>
       </form>
+      <AdminTable columns={[
+        { key: "title", label: "Judul" },
+        { key: "external_url", label: "Link" },
+        { key: "qr_image", label: "QR" },
+      ]} rows={survey} />
     </div>
   );
 }

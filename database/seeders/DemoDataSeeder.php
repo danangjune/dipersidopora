@@ -60,7 +60,7 @@ class DemoDataSeeder extends Seeder
         }
 
         foreach ($commodityRows as $commodity) {
-            DB::table('het_hap_settings')->updateOrInsert(['komoditas_id' => $commodity->id, 'pasar_id' => null, 'type' => 'HAP'], ['price' => (int) (DB::table('commodity_price_records')->where('komoditas_id', $commodity->id)->avg('price') ?: 0), 'effective_date' => now()->toDateString(), 'is_active' => true, 'notes' => 'Sementara disamakan dengan konsep ESDEGAN; rumus indikator dapat dikaji ulang.', 'created_at' => now(), 'updated_at' => now()]);
+            DB::table('het_hap_settings')->updateOrInsert(['komoditas_id' => $commodity->id, 'pasar_id' => null], ['price' => (int) (DB::table('commodity_price_records')->where('komoditas_id', $commodity->id)->avg('price') ?: 0), 'effective_date' => now()->toDateString(), 'is_active' => true, 'notes' => 'Sementara disamakan dengan konsep ESDEGAN; rumus indikator dapat dikaji ulang.', 'created_at' => now(), 'updated_at' => now()]);
         }
 
         

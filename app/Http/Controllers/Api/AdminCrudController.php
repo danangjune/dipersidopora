@@ -425,7 +425,6 @@ class AdminCrudController extends Controller
         return [
             'komoditas_id' => [$req, 'exists:komoditas,id'],
             'pasar_id' => ['nullable', 'exists:pasars,id'],
-            'type' => [$req, Rule::in(['HET', 'HAP'])],
             'price' => [$req, 'integer', 'min:0'],
             'effective_date' => ['nullable', 'date'],
             'is_active' => ['nullable', 'boolean'],
