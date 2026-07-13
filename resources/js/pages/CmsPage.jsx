@@ -56,7 +56,6 @@ function DownloadPage({ title, items }) {
           Unduhan
         </span>
         <h1>{title}</h1>
-        <p>Dokumen ini diambil dari database melalui CMS admin.</p>
       </div>
 
       <div className="downloadList">

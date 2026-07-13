@@ -20,6 +20,7 @@ import LayananTeraPage from './pages/LayananTeraPage';
 import LayananTdgPage from './pages/LayananTdgPage';
 import LayananMinholPage from './pages/LayananMinholPage';
 import ZonaIntegritasPage from './pages/ZonaIntegritasPage';
+import ZonaSubPage from './pages/ZonaSubPage';
 import { pageForPath } from './pages/StaticPage';
 
 function normalize(path) {
@@ -47,6 +48,10 @@ function App() {
   else if (['/layanan/td-gudang', '/layanan/tdg', '/layanan/td-gudang'].includes(path)) page = <LayananTdgPage />;
   else if (['/layanan/minhol'].includes(path)) page = <LayananMinholPage />;
   else if (['/zona-integritas'].includes(path)) page = <ZonaIntegritasPage />;
+  else if (path.startsWith('/zona-integritas/')) {
+    const sub = path.replace('/zona-integritas/', '');
+    page = <ZonaSubPage slug={sub} />;
+  }
   else page = pageForPath(path);
 
   return <Layout>{page}</Layout>
