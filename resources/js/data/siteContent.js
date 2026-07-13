@@ -57,7 +57,6 @@ export const routeAliases = {
   "/mall.php": "/mall",
   "/ikm.php": "/ikm",
   "/galeri.php": "/galeri",
-  "/peraturan.php": "/peraturan",
   "/contact.php": "/kontak",
   "/contact": "/kontak",
   "/formBokingTera": "/form-booking-tera",
@@ -84,9 +83,6 @@ export const menu = [
       { label: "Minimarket", href: "/minimarket" },
       { label: "Pusat Perbelanjaan", href: "/mall" },
       { label: "Industri Kecil Menengah", href: "/ikm" },
-      { label: "Komoditas", href: "/komoditas" },
-      { label: "Pedagang", href: "/pedagang" },
-      { label: "Peraturan", href: "/peraturan" },
     ],
   },
   {

@@ -220,6 +220,7 @@ const allMenus = [
   { key: "pages", label: "Master Halaman", href: "/admin/pages", roles: ["admin"] },
   { key: "tentang", label: "Halaman Tentang", href: "/admin/tentang", roles: ["admin"] },
   { key: "program-kegiatan", label: "Program Kegiatan", href: "/admin/program-kegiatan", roles: ["admin"] },
+  { key: "ikm", label: "Data IKM", href: "/admin/ikm", roles: ["admin"] },
   { key: "downloads", label: "Master Dokumen", href: "/admin/downloads", roles: ["admin"] },
   { key: "banners", label: "Banner Slider", href: "/admin/banners", roles: ["admin"] },
   {
@@ -1109,6 +1110,176 @@ function ProgramKegiatanAdmin() {
   );
 }
 
+function IkmAdmin() {
+  const [items, setItems] = useState([]);
+  const [form, setForm] = useState({ name: "", category: "fashion", owner: "", description: "", address: "", kelurahan: "", contact: "", location: "", image: "", is_active: true, sort_order: 0 });
+  const [editing, setEditing] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const categoryOptions = [
+    { value: "fashion", label: "Fashion" },
+    { value: "kerajinan", label: "Kerajinan" },
+    { value: "makanan_minuman", label: "Makanan & Minuman" },
+    { value: "lainnya", label: "Lainnya" },
+  ];
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const res = await api("/api/admin/ikm");
+      setItems(res.data || []);
+    } catch {
+      setMessage("Gagal memuat data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const resetForm = () => {
+    setForm({ name: "", category: "fashion", owner: "", description: "", address: "", kelurahan: "", contact: "", location: "", image: "", is_active: true, sort_order: 0 });
+    setEditing(null);
+  };
+
+  const edit = (item) => {
+    setForm({ ...item });
+    setEditing(item.id);
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage("");
+    try {
+      if (editing) {
+        await api(`/api/admin/ikm/${editing}`, {
+          method: "PATCH",
+          body: JSON.stringify(form),
+        });
+        setMessage("Data berhasil diperbarui.");
+      } else {
+        await api("/api/admin/ikm", {
+          method: "POST",
+          body: JSON.stringify(form),
+        });
+        setMessage("Data berhasil ditambahkan.");
+      }
+      resetForm();
+      await load();
+    } catch (err) {
+      setMessage("Gagal menyimpan: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const remove = async (id) => {
+    if (!confirm("Hapus data IKM ini?")) return;
+    try {
+      await api(`/api/admin/ikm/${id}`, { method: "DELETE" });
+      await load();
+    } catch {
+      setMessage("Gagal menghapus data.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <>
+        <div className="admin-header"><div><p>Pengaturan</p><h1>Data IKM</h1></div></div>
+        <div className="admin-card"><p>Memuat data...</p></div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="admin-header">
+        <div>
+          <p>Pengaturan</p>
+          <h1>Data IKM</h1>
+        </div>
+      </div>
+
+      <div className="admin-card">
+        <form onSubmit={submit} className="admin-form">
+          <h2>{editing ? "Edit IKM" : "Tambah IKM Baru"}</h2>
+          <div className="admin-form-grid">
+            <label><span>Nama Usaha *</span><input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} required /></label>
+            <label><span>Kategori *</span>
+              <select value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}>
+                {categoryOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </label>
+            <label><span>Pemilik</span><input value={form.owner || ""} onChange={(e) => setForm((p) => ({ ...p, owner: e.target.value }))} /></label>
+            <label><span>No. HP</span><input value={form.contact || ""} onChange={(e) => setForm((p) => ({ ...p, contact: e.target.value }))} /></label>
+            <label><span>Kelurahan</span><input value={form.kelurahan || ""} onChange={(e) => setForm((p) => ({ ...p, kelurahan: e.target.value }))} /></label>
+            <label className="wide"><span>Alamat</span><input value={form.address || ""} onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))} /></label>
+            <label className="wide"><span>Lokasi (Link Maps)</span><input value={form.location || ""} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} /></label>
+            <label className="wide"><span>Deskripsi</span><textarea value={form.description || ""} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} /></label>
+            <label><span>Gambar</span><input value={form.image || ""} onChange={(e) => setForm((p) => ({ ...p, image: e.target.value }))} /></label>
+            <label><span>Urutan</span><input type="number" value={form.sort_order} onChange={(e) => setForm((p) => ({ ...p, sort_order: Number(e.target.value) }))} /></label>
+            <label className="checkbox">
+              <input type="checkbox" checked={form.is_active} onChange={(e) => setForm((p) => ({ ...p, is_active: e.target.checked }))} />
+              <span>Aktif</span>
+            </label>
+          </div>
+          <div className="admin-actions" style={{ marginTop: 16 }}>
+            <button type="submit" disabled={saving}>{saving ? "Menyimpan..." : editing ? "Perbarui" : "Tambah"}</button>
+            {editing && <button type="button" onClick={resetForm} style={{ background: "#eaecf0", color: "#344054" }}>Batal</button>}
+          </div>
+          {message && <p className="admin-message">{message}</p>}
+        </form>
+      </div>
+
+      <div className="admin-card" style={{ marginTop: 20 }}>
+        <h2>Daftar IKM ({items.length})</h2>
+        <div className="admin-table-wrap" style={{ marginTop: 12 }}>
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Kategori</th>
+                <th>Alamat</th>
+                <th>Kelurahan</th>
+                <th>No. HP</th>
+                <th>Aktif</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item, i) => (
+                <tr key={item.id}>
+                  <td>{i + 1}</td>
+                  <td>{item.name}</td>
+                  <td>{categoryOptions.find((o) => o.value === item.category)?.label || item.category}</td>
+                  <td style={{ maxWidth: 220, whiteSpace: "normal", lineHeight: 1.3 }}>{item.address || "-"}</td>
+                  <td>{item.kelurahan || "-"}</td>
+                  <td>{item.contact || "-"}</td>
+                  <td>{item.is_active ? "Ya" : "Tidak"}</td>
+                  <td>
+                    <div className="table-actions">
+                      <button onClick={() => edit(item)}>Edit</button>
+                      <button className="danger" onClick={() => remove(item.id)}>Hapus</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {items.length === 0 && (
+                <tr><td colSpan={8} style={{ textAlign: "center", padding: 24, color: "#667085" }}>Belum ada data IKM.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
+}
+
 function TentangAdmin() {
   const [data, setData] = useState(null);
   const [form, setForm] = useState({
@@ -1501,6 +1672,8 @@ function AdminApp() {
         <TentangAdmin />
       ) : activeKey === "program-kegiatan" ? (
         <ProgramKegiatanAdmin />
+      ) : activeKey === "ikm" ? (
+        <IkmAdmin />
       ) : config ? (
         <CrudPage config={config} />
       ) : (

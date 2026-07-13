@@ -457,6 +457,15 @@ tr:hover td{background:#f8fafc}
 @media(max-width:900px){
   .commodityGridTen{grid-template-columns:repeat(3,1fr)}
 }
+/* ─── IKM PAGE ─── */
+.ikmFilter{display:flex;gap:8px;flex-wrap:wrap;max-width:var(--max-w);margin:0 auto 20px}
+.ikmFilterBtn{padding:8px 18px;border-radius:100px;border:2px solid var(--border);background:var(--surface);font-size:13px;font-weight:700;cursor:pointer;transition:var(--transition);color:var(--text)}
+.ikmFilterBtn:hover{border-color:var(--accent);color:var(--accent)}
+.ikmFilterBtn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.ikmBadge{display:inline-block;padding:3px 10px;border-radius:100px;color:#fff;font-size:11px;font-weight:700;white-space:nowrap}
+.ikmMapLink{display:inline-flex;align-items:center;gap:4px;color:#0891b2;font-weight:700;font-size:13px;text-decoration:none;transition:color .2s}
+.ikmMapLink:hover{color:#065f73;text-decoration:underline}
+
 @media(max-width:640px){
   .commodityGridTen{grid-template-columns:repeat(2,1fr)}
   .commodityCardTop img{width:36px;height:36px}

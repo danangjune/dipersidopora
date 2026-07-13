@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CommodityPriceRecord;
 use App\Models\DownloadDocument;
 use App\Models\HetHapSetting;
+use App\Models\Ikm;
 use App\Models\Komoditas;
 use App\Models\Pasar;
 use App\Models\SiteBanner;
@@ -202,6 +203,27 @@ class AdminCrudController extends Controller
     public function destroyPage(SitePage $page)
     {
         $page->delete();
+        return response()->json(['status' => 'success']);
+    }
+
+    public function ikm(Request $request)
+    {
+        if ($request->isMethod('get')) {
+            return response()->json(['status' => 'success', 'data' => Ikm::query()->orderBy('sort_order')->orderBy('name')->get()]);
+        }
+        $data = $request->validate($this->ikmRules());
+        return response()->json(['status' => 'success', 'data' => Ikm::create($data)], 201);
+    }
+
+    public function updateIkm(Request $request, Ikm $ikm)
+    {
+        $ikm->update($request->validate($this->ikmRules(true)));
+        return response()->json(['status' => 'success', 'data' => $ikm->fresh()]);
+    }
+
+    public function destroyIkm(Ikm $ikm)
+    {
+        $ikm->delete();
         return response()->json(['status' => 'success']);
     }
 
@@ -609,6 +631,24 @@ class AdminCrudController extends Controller
             'qr_image' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'is_active' => ['nullable', 'boolean'],
+        ];
+    }
+
+    private function ikmRules(bool $partial = false): array
+    {
+        $req = $partial ? 'sometimes' : 'required';
+        return [
+            'name' => [$req, 'string', 'max:180'],
+            'category' => [$req, 'string', 'in:' . implode(',', Ikm::CATEGORIES)],
+            'owner' => ['nullable', 'string', 'max:120'],
+            'description' => ['nullable', 'string'],
+            'address' => ['nullable', 'string'],
+            'kelurahan' => ['nullable', 'string', 'max:120'],
+            'contact' => ['nullable', 'string', 'max:120'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'string', 'max:255'],
+            'is_active' => ['nullable', 'boolean'],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
         ];
     }
 

@@ -154,5 +154,96 @@ class DemoDataSeeder extends Seeder
         }
 
         DB::table('survey_settings')->updateOrInsert(['title' => 'Survey Kepuasan Masyarakat'], ['external_url' => null, 'qr_image' => 'images/IKM survey 1.png', 'description' => 'Survey mengacu pada SKM dari KemenPANRB. Link dan barcode dapat diganti melalui Admin Page.', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()]);
+
+        $defaultMap = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3953.482145629552!2d112.0164!3d-7.8169!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e785b7e2e7b6c8d%3A0x8f0e5c5f5b5e5a5f!2sKota%20Kediri!5e0!3m2!1sid!2sid!4v1';
+        $defaultContact = '081234567890';
+
+        $ikmFashion = [
+            ['NR collection', 'Pakunden', 'Perumahan bence regency blok c18'],
+            ['KAOS GAPLEK', 'Banjaran', 'Jl. Adi Sucipto No.54'],
+            ['ELH COLLECTION', 'Kaliombo', 'Perum Puri Kaliombo Jl. Damai Blok C-9 RT.04 RW.09'],
+            ['AMIRA CRAFT BY SANTI', 'Burengan', 'Jl. Letjen Sutoyo No.29'],
+            ['GALUH KADIRI', 'Dermo', 'Perum Griya Intan Asri Blok A-14'],
+            ['POISON WEARHOUSE', 'Setonopande', 'Jl. Sultan Agung no.71'],
+            ['PERCALES', 'Ngronggo', 'Perumnas Ngronggo Jl. Dahlia 2 No.16'],
+            ['BATIK WECONO ASRI', 'Dandangan', 'Jl. Dandangan I / 154'],
+            ['TENUN IKAT SEMPURNA 2', 'Bandar Kidul', 'Jl. KH. Agus Salim VIII / 42-B'],
+            ['KOPIAH M. THOIB', 'Bangsal', 'Jl. Mauni No. 87'],
+            ['CHARGECITY', 'Ngronggo', 'Jl. Urip Sumoharjo No. 227'],
+            ['TENUN IKAT SINAR BAROKAH', 'Ngronggo', 'Jl. Super Semar'],
+            ['Kirani Craft', 'Ngronggo', 'Jl. Urip Sumoharjo No. 174'],
+        ];
+        foreach ($ikmFashion as $i => [$name, $kelurahan, $address]) {
+            $idx = count($ikmFashion) * 0 + $i;
+            DB::table('ikm')->updateOrInsert(
+                ['name' => $name, 'category' => 'fashion'],
+                ['kelurahan' => $kelurahan, 'address' => $address, 'contact' => $defaultContact, 'location' => $defaultMap, 'is_active' => true, 'sort_order' => $idx + 1, 'created_at' => now(), 'updated_at' => now()]
+            );
+        }
+
+        $ikmKerajinan = [
+            ['NR collection', 'Pakunden', 'Perumahan bence regency blok c18'],
+            ['ELH COLLECTION', 'Kaliombo', 'Perum Puri Kaliombo Jl. Damai Blok C-9 RT.04 RW.09'],
+            ['AMIRA CRAFT BY SANTI', 'Burengan', 'Jl. Letjen Sutoyo No.29'],
+            ['PERCALES', 'Ngronggo', 'Perumnas Ngronggo Jl. Dahlia 2 No.16 Kediri'],
+            ['TENUN IKAT SEMPURNA 2', 'Bandar Kidul', 'Jl. KH. Agus Salim VIII / 42-B Kediri'],
+            ['KOPIAH M. THOIB', 'Bandar Kidul', 'Jl. Bandar Ngalim Gg.III No.7E Bandarkidul, Kota Kediri'],
+            ['CHARGECITY', 'Kaliombo', 'Jl. Kaliombo Raya No.102 Kediri'],
+            ['TENUN IKAT SINAR BAROKAH', 'Bandarkidul', 'Jl. KH. Agus Salim VIII / 9c Bandarkidul, Kota Kediri'],
+            ['Kirani Craft', 'Bandarlor', 'Perum Candra Kirana F1, Kelurahan Bandarlor, Kota Kediri.'],
+        ];
+        foreach ($ikmKerajinan as $i => [$name, $kelurahan, $address]) {
+            $idx = count($ikmFashion) + $i;
+            DB::table('ikm')->updateOrInsert(
+                ['name' => $name, 'category' => 'kerajinan'],
+                ['kelurahan' => $kelurahan, 'address' => $address, 'contact' => $defaultContact, 'location' => $defaultMap, 'is_active' => true, 'sort_order' => $idx + 1, 'created_at' => now(), 'updated_at' => now()]
+            );
+        }
+
+        $ikmMakanan = [
+            ['Shakila food', 'Tamanan', 'Jln taman sari gang putih rt 3 rw 2'],
+            ['ARAFAH KURMA & SEKAR KUNYIT', 'Ngronggo', 'Jln melati VI no 16 perumnas Ngronggo'],
+            ['Kimie Lidi', 'Ngronggo', 'Perum ngronggo indah blok c no 4'],
+            ['819 KITCHEN', 'Lirboyo', 'Griya Lirboyo Harmoni A-11'],
+            ['BUMBU MASAK TE\'MAH', 'Sukorame', 'Jl. Veteran Gg. II No.8'],
+            ['COKELAT TAHU WIJAYA KEMBAR', 'Tinalan', 'Tinalan Gg.IV Timur No.1'],
+            ['CROVORY BUBUK REMPAH (Pakunden)', 'Pakunden', 'Perumahan bence regency blok c18'],
+            ['CROVORY BUBUK REMPAH (Bandar Lor)', 'Bandar Lor', 'Jl. KH. Wahid Hasyim Va / 6'],
+            ['BAKPIA ALMAIR', 'Kemasan', 'Jl. Panglima Polim No.72'],
+            ['Stik Tahu Sis', 'Tinalan', 'Tinalan gg.4 timur no.15B rt.02 rw.02'],
+            ['Pia 313', 'Setonopande', 'Jl. Pandean II/6'],
+            ['KRIPIK PISANG CALLISTA', 'Bujel', 'KEL. BUJEL GG1 NO 14'],
+            ['SAMBEL PECEL ERVINA', 'Ngronggo', 'Perumnas Ngronggo Jl. Kenongo VIII / 07'],
+            ['TAHU MJS', 'Jamsaren', 'Jl. Mawar, Lingk. Kleco'],
+            ['SEMPRONG SEKARJOYO', 'Pojok', 'Perum Wilis Indah I Jl. Wilis Mulya IV / 11'],
+            ['MARIAMA FROZEN FOOD', 'Pesantren', 'Jl. Brigjend Pol. IBH Pranoto'],
+            ['SAMBEL PECEL BU I', 'Blabak', 'Jl. Kapten Tendean No. 400'],
+            ['PIE SUSU MUFFI', 'Ngronggo', 'Jl. Betet Bawang'],
+            ['SAMBEL PECEL MBAH KENDHIL', 'Kampung Dalem', 'Jl. Kilisuci No. 72'],
+            ['GETUK PISANG MADU MANIS 16', 'Semampir', 'Jl. Mayjend Sungkono'],
+            ['KOPI PANDAWA', 'Betet', 'Jl. Raya Betet No.64'],
+            ['EXTRA JUICE', 'Dandangan', 'Jl. Pemuda No.26'],
+            ['SIRUP TRADISIONAL AL-HQ', 'Banaran', 'Jl. Masjid Timur No.405'],
+            ['ARRAYANA HONEY', 'Sukorame', 'Perum KBN Jl. Anggraini Raya No.7'],
+        ];
+        foreach ($ikmMakanan as $i => [$name, $kelurahan, $address]) {
+            $idx = count($ikmFashion) + count($ikmKerajinan) + $i;
+            DB::table('ikm')->updateOrInsert(
+                ['name' => $name, 'category' => 'makanan_minuman'],
+                ['kelurahan' => $kelurahan, 'address' => $address, 'contact' => $defaultContact, 'location' => $defaultMap, 'is_active' => true, 'sort_order' => $idx + 1, 'created_at' => now(), 'updated_at' => now()]
+            );
+        }
+
+        $ikmLainnya = [
+            ['ROKED SOAP', 'Bence', 'Perum Cahaya Permata Blok 12 No.11'],
+            ['ARTERI HANDYCRAFT & SOUVENIR', 'Burengan', 'Jl. Letjend Sutoyo No. 48'],
+        ];
+        foreach ($ikmLainnya as $i => [$name, $kelurahan, $address]) {
+            $idx = count($ikmFashion) + count($ikmKerajinan) + count($ikmMakanan) + $i;
+            DB::table('ikm')->updateOrInsert(
+                ['name' => $name, 'category' => 'lainnya'],
+                ['kelurahan' => $kelurahan, 'address' => $address, 'contact' => $defaultContact, 'location' => $defaultMap, 'is_active' => true, 'sort_order' => $idx + 1, 'created_at' => now(), 'updated_at' => now()]
+            );
+        }
     }
 }

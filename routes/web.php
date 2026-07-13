@@ -89,6 +89,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('api/admin')->group(function (
 
     Route::get('/program-kegiatan', [AdminCrudController::class, 'programKegiatan']);
     Route::post('/program-kegiatan', [AdminCrudController::class, 'updateProgramKegiatan']);
+
+    Route::match(['get', 'post'], '/ikm', [AdminCrudController::class, 'ikm']);
+    Route::patch('/ikm/{ikm}', [AdminCrudController::class, 'updateIkm']);
+    Route::delete('/ikm/{ikm}', [AdminCrudController::class, 'destroyIkm']);
 });
 
 /*

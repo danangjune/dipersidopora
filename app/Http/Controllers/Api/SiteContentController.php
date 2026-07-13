@@ -282,6 +282,32 @@ class SiteContentController extends Controller
         ]);
     }
 
+    public function ikm()
+    {
+        $data = \App\Models\Ikm::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->map(fn($item) => [
+                'id' => $item->id,
+                'name' => $item->name,
+                'category' => $item->category,
+                'owner' => $item->owner,
+                'description' => $item->description,
+                'address' => $item->address,
+                'kelurahan' => $item->kelurahan,
+                'contact' => $item->contact,
+                'location' => $item->location,
+                'image' => $item->image,
+            ]);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $data,
+        ]);
+    }
+
     public function programKegiatan()
     {
         $defaults = [

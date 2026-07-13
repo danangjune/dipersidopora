@@ -12,6 +12,7 @@ import PasarPage from './pages/PasarPage';
 import PasarModernPage from './pages/PasarModernPage';
 import MallPage from './pages/MallPage';
 import { PklDashboard, PklInput } from './pages/PklPages';
+import IkmPage from './pages/IkmPage';
 import { pageForPath } from './pages/StaticPage';
 
 function normalize(path) {
@@ -31,6 +32,7 @@ function App() {
   else if (['/pasar'].includes(path)) page = <PasarPage />;
   else if (['/pasar-modern'].includes(path)) page = <PasarModernPage />;
   else if (['/mall', '/pusat-perbelanjaan'].includes(path)) page = <MallPage />;
+  else if (['/ikm'].includes(path)) page = <IkmPage />;
   else page = pageForPath(path);
 
   return <Layout>{page}</Layout>
