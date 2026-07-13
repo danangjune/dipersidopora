@@ -220,6 +220,13 @@ const allMenus = [
   { key: "pages", label: "Master Halaman", href: "/admin/pages", roles: ["admin"] },
   { key: "tentang", label: "Halaman Tentang", href: "/admin/tentang", roles: ["admin"] },
   { key: "program-kegiatan", label: "Program Kegiatan", href: "/admin/program-kegiatan", roles: ["admin"] },
+  { key: "layanan-halal", label: "Sertifikasi Halal", href: "/admin/layanan-halal", roles: ["admin"] },
+  { key: "layanan-merk", label: "Legalitas Merk", href: "/admin/layanan-merk", roles: ["admin"] },
+  { key: "layanan-sinas", label: "SIINas", href: "/admin/layanan-sinas", roles: ["admin"] },
+  { key: "layanan-tera", label: "Tera / Tera Ulang", href: "/admin/layanan-tera", roles: ["admin"] },
+  { key: "layanan-tdg", label: "Tanda Daftar Gudang", href: "/admin/layanan-tdg", roles: ["admin"] },
+  { key: "layanan-minhol", label: "Perpanjangan Minuman Beralkohol", href: "/admin/layanan-minhol", roles: ["admin"] },
+  { key: "zona-integritas", label: "Zona Integritas", href: "/admin/zona-integritas", roles: ["admin"] },
   { key: "ikm", label: "Data IKM", href: "/admin/ikm", roles: ["admin"] },
   { key: "downloads", label: "Master Dokumen", href: "/admin/downloads", roles: ["admin"] },
   { key: "banners", label: "Banner Slider", href: "/admin/banners", roles: ["admin"] },
@@ -1110,6 +1117,842 @@ function ProgramKegiatanAdmin() {
   );
 }
 
+function LayananHalalAdmin() {
+  const [data, setData] = useState(null);
+  const [form, setForm] = useState({
+    title: "",
+    eyebrow: "",
+    halal_data: {
+      intro: "",
+      description: "",
+      requirements: [""],
+      download_label: "",
+      download_file: "",
+      flowchart_reguler: "",
+      flowchart_gratis: "",
+    },
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState({});
+
+  const uploadFile = async (field, file) => {
+    if (!file) return;
+    setUploading((prev) => ({ ...prev, [field]: true }));
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf },
+        credentials: "same-origin",
+        body,
+      });
+      const result = await res.json();
+      if (result?.data?.path) {
+        setForm((prev) => ({
+          ...prev,
+          halal_data: { ...prev.halal_data, [field]: result.data.path },
+        }));
+      }
+    } catch {
+      /* ignore */
+    } finally {
+      setUploading((prev) => ({ ...prev, [field]: false }));
+    }
+  };
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const result = await api("/api/admin/layanan-halal");
+      const d = result.data || {};
+      setData(d);
+      setForm({
+        title: d.title || "",
+        eyebrow: d.eyebrow || "",
+        halal_data: d.halal_data || {
+          intro: "",
+          description: "",
+          requirements: [""],
+          download_label: "",
+          download_file: "",
+          flowchart_reguler: "",
+          flowchart_gratis: "",
+        },
+      });
+    } catch {
+      setMessage("Gagal memuat data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const updateReq = (index, value) => {
+    setForm((prev) => {
+      const reqs = [...(prev.halal_data.requirements || [])];
+      reqs[index] = value;
+      return { ...prev, halal_data: { ...prev.halal_data, requirements: reqs } };
+    });
+  };
+
+  const addReq = () => {
+    setForm((prev) => ({
+      ...prev,
+      halal_data: { ...prev.halal_data, requirements: [...(prev.halal_data.requirements || []), ""] },
+    }));
+  };
+
+  const removeReq = (index) => {
+    setForm((prev) => {
+      const reqs = [...(prev.halal_data.requirements || [])];
+      reqs.splice(index, 1);
+      return { ...prev, halal_data: { ...prev.halal_data, requirements: reqs } };
+    });
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage("");
+    try {
+      await api("/api/admin/layanan-halal", {
+        method: "POST",
+        body: JSON.stringify({
+          title: form.title,
+          eyebrow: form.eyebrow,
+          halal_data: form.halal_data,
+        }),
+      });
+      setMessage("Data berhasil disimpan.");
+    } catch (err) {
+      setMessage("Gagal menyimpan: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <>
+        <div className="admin-header"><div><p>Pengaturan</p><h1>Sertifikasi Halal</h1></div></div>
+        <div className="admin-card"><p>Memuat data...</p></div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="admin-header">
+        <div>
+          <p>Pengaturan</p>
+          <h1>Halaman Sertifikasi Halal</h1>
+        </div>
+      </div>
+
+      <div className="admin-card">
+        <form onSubmit={submit} className="admin-form">
+          <h2>Hero Section</h2>
+          <div className="admin-form-grid">
+            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
+            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+          </div>
+
+          <h2 style={{ marginTop: 28 }}>Konten</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Judul Intro</span><input value={form.halal_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, halal_data: { ...p.halal_data, intro: e.target.value } }))} /></label>
+            <label className="wide"><span>Deskripsi</span><textarea value={form.halal_data.description || ""} onChange={(e) => setForm((p) => ({ ...p, halal_data: { ...p.halal_data, description: e.target.value } }))} /></label>
+          </div>
+
+          <h2 style={{ marginTop: 28 }}>Persyaratan</h2>
+          {(form.halal_data.requirements || []).map((req, i) => (
+            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
+              <button type="button" onClick={() => removeReq(i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
+              <label className="wide"><span>Syarat {i + 1}</span><input value={req} onChange={(e) => updateReq(i, e.target.value)} /></label>
+            </div>
+          ))}
+          <button type="button" onClick={addReq} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467" }}>
+            + Tambah Syarat
+          </button>
+
+          <h2 style={{ marginTop: 28 }}>Download & Flowchart</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Label Tombol Download</span><input value={form.halal_data.download_label || ""} onChange={(e) => setForm((p) => ({ ...p, halal_data: { ...p.halal_data, download_label: e.target.value } }))} /></label>
+            <label className="wide"><span>File Download (PDF)</span>
+              <div>
+                <input type="file" accept=".pdf" onChange={(e) => uploadFile("download_file", e.target.files[0])} />
+                {uploading.download_file && <span>Uploading...</span>}
+                {form.halal_data.download_file && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.halal_data.download_file}</p>}
+              </div>
+            </label>
+            <label className="wide"><span>Flowchart Reguler (gambar)</span>
+              <div>
+                <input type="file" accept="image/*" onChange={(e) => uploadFile("flowchart_reguler", e.target.files[0])} />
+                {uploading.flowchart_reguler && <span>Uploading...</span>}
+                {form.halal_data.flowchart_reguler && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.halal_data.flowchart_reguler}</p>}
+              </div>
+            </label>
+            <label className="wide"><span>Flowchart Gratis / SEHATI (gambar)</span>
+              <div>
+                <input type="file" accept="image/*" onChange={(e) => uploadFile("flowchart_gratis", e.target.files[0])} />
+                {uploading.flowchart_gratis && <span>Uploading...</span>}
+                {form.halal_data.flowchart_gratis && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.halal_data.flowchart_gratis}</p>}
+              </div>
+            </label>
+          </div>
+
+          <div className="admin-actions" style={{ marginTop: 28 }}>
+            <button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button>
+          </div>
+
+          {message && <p className="admin-message">{message}</p>}
+        </form>
+      </div>
+    </>
+  );
+}
+
+function LayananMerkAdmin() {
+  const [data, setData] = useState(null);
+  const [form, setForm] = useState({
+    title: "",
+    eyebrow: "",
+    merk_data: {
+      intro: "",
+      description: "",
+      mandiri_title: "",
+      mandiri_requirements: [""],
+      fasilitas_title: "",
+      fasilitas_requirements: [""],
+      download_label: "",
+      download_file: "",
+      flowchart: "",
+    },
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState({});
+
+  const uploadFile = async (field, file) => {
+    if (!file) return;
+    setUploading((prev) => ({ ...prev, [field]: true }));
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf },
+        credentials: "same-origin",
+        body,
+      });
+      const result = await res.json();
+      if (result?.data?.path) {
+        setForm((prev) => ({
+          ...prev,
+          merk_data: { ...prev.merk_data, [field]: result.data.path },
+        }));
+      }
+    } catch {
+      /* ignore */
+    } finally {
+      setUploading((prev) => ({ ...prev, [field]: false }));
+    }
+  };
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const result = await api("/api/admin/layanan-merk");
+      const d = result.data || {};
+      setData(d);
+      setForm({
+        title: d.title || "",
+        eyebrow: d.eyebrow || "",
+        merk_data: d.merk_data || {
+          intro: "",
+          description: "",
+          mandiri_title: "",
+          mandiri_requirements: [""],
+          fasilitas_title: "",
+          fasilitas_requirements: [""],
+          download_label: "",
+          download_file: "",
+          flowchart: "",
+        },
+      });
+    } catch {
+      setMessage("Gagal memuat data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const updateArr = (key, index, value) => {
+    setForm((prev) => {
+      const arr = [...(prev.merk_data[key] || [])];
+      arr[index] = value;
+      return { ...prev, merk_data: { ...prev.merk_data, [key]: arr } };
+    });
+  };
+
+  const addArr = (key) => {
+    setForm((prev) => ({
+      ...prev,
+      merk_data: { ...prev.merk_data, [key]: [...(prev.merk_data[key] || []), ""] },
+    }));
+  };
+
+  const removeArr = (key, index) => {
+    setForm((prev) => {
+      const arr = [...(prev.merk_data[key] || [])];
+      arr.splice(index, 1);
+      return { ...prev, merk_data: { ...prev.merk_data, [key]: arr } };
+    });
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage("");
+    try {
+      await api("/api/admin/layanan-merk", {
+        method: "POST",
+        body: JSON.stringify({
+          title: form.title,
+          eyebrow: form.eyebrow,
+          merk_data: form.merk_data,
+        }),
+      });
+      setMessage("Data berhasil disimpan.");
+    } catch (err) {
+      setMessage("Gagal menyimpan: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <>
+        <div className="admin-header"><div><p>Pengaturan</p><h1>Legalitas Merk</h1></div></div>
+        <div className="admin-card"><p>Memuat data...</p></div>
+      </>
+    );
+  }
+
+  const renderReqGroup = (title, key) => (
+    <>
+      <div className="admin-form-grid">
+        <label className="wide"><span>Judul Grup</span><input value={form.merk_data[key + "_title"] || ""} onChange={(e) => setForm((p) => ({ ...p, merk_data: { ...p.merk_data, [key + "_title"]: e.target.value } }))} /></label>
+      </div>
+      <h4 style={{ margin: "12px 0 8px", fontSize: 14, color: "#344054" }}>Daftar Syarat</h4>
+      {(form.merk_data[key + "_requirements"] || []).map((req, i) => (
+        <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
+          <button type="button" onClick={() => removeArr(key + "_requirements", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
+          <label className="wide"><span>Syarat {i + 1}</span><input value={req} onChange={(e) => updateArr(key + "_requirements", i, e.target.value)} /></label>
+        </div>
+      ))}
+      <button type="button" onClick={() => addArr(key + "_requirements")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467", marginBottom: 16 }}>
+        + Tambah Syarat
+      </button>
+    </>
+  );
+
+  const fileUploadField = (field, label, accept) => (
+    <label className="wide">
+      <span>{label}</span>
+      <div>
+        <input type="file" accept={accept} onChange={(e) => uploadFile(field, e.target.files[0])} />
+        {uploading[field] && <span>Uploading...</span>}
+        {form.merk_data[field] && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.merk_data[field]}</p>}
+      </div>
+    </label>
+  );
+
+  return (
+    <>
+      <div className="admin-header">
+        <div>
+          <p>Pengaturan</p>
+          <h1>Halaman Legalitas Merk</h1>
+        </div>
+      </div>
+
+      <div className="admin-card">
+        <form onSubmit={submit} className="admin-form">
+          <h2>Hero Section</h2>
+          <div className="admin-form-grid">
+            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
+            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+          </div>
+
+          <h2 style={{ marginTop: 28 }}>Konten</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Judul Intro</span><input value={form.merk_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, merk_data: { ...p.merk_data, intro: e.target.value } }))} /></label>
+            <label className="wide"><span>Deskripsi</span><textarea value={form.merk_data.description || ""} onChange={(e) => setForm((p) => ({ ...p, merk_data: { ...p.merk_data, description: e.target.value } }))} /></label>
+          </div>
+
+          <h2 style={{ marginTop: 28 }}>Persyaratan Mandiri</h2>
+          {renderReqGroup("mandiri", "mandiri")}
+
+          <h2 style={{ marginTop: 28 }}>Persyaratan Fasilitas Disperdagin</h2>
+          {renderReqGroup("fasilitas", "fasilitas")}
+
+          <h2 style={{ marginTop: 28 }}>Download & Flowchart</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Label Tombol Download</span><input value={form.merk_data.download_label || ""} onChange={(e) => setForm((p) => ({ ...p, merk_data: { ...p.merk_data, download_label: e.target.value } }))} /></label>
+            {fileUploadField("download_file", "File Download (PDF)", ".pdf")}
+            {fileUploadField("flowchart", "Flowchart (gambar)", "image/*")}
+          </div>
+
+          <div className="admin-actions" style={{ marginTop: 28 }}>
+            <button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button>
+          </div>
+
+          {message && <p className="admin-message">{message}</p>}
+        </form>
+      </div>
+    </>
+  );
+}
+
+function LayananSinasAdmin() {
+  const [form, setForm] = useState({ title: "", eyebrow: "", sinas_data: { intro: "", description: "", registrasi_title: "", registrasi_requirements: [""], dokumen_title: "", dokumen_requirements: [""], download_label: "", download_file: "", flowchart: "" } });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState({});
+
+  const uploadFile = async (field, file) => {
+    if (!file) return;
+    setUploading((p) => ({ ...p, [field]: true }));
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf }, credentials: "same-origin", body });
+      const r = await res.json();
+      if (r?.data?.path) setForm((p) => ({ ...p, sinas_data: { ...p.sinas_data, [field]: r.data.path } }));
+    } catch { /* ignore */ } finally { setUploading((p) => ({ ...p, [field]: false })); }
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api("/api/admin/layanan-sinas");
+        const d = res.data || {};
+        setForm({ title: d.title || "", eyebrow: d.eyebrow || "", sinas_data: d.sinas_data || { intro: "", description: "", registrasi_title: "", registrasi_requirements: [""], dokumen_title: "", dokumen_requirements: [""], download_label: "", download_file: "", flowchart: "" } });
+      } catch { setMessage("Gagal memuat data."); } finally { setLoading(false); }
+    })();
+  }, []);
+
+  const arr = (key, i, v) => setForm((p) => { const a = [...(p.sinas_data[key] || [])]; a[i] = v; return { ...p, sinas_data: { ...p.sinas_data, [key]: a } }; });
+  const addArr = (key) => setForm((p) => ({ ...p, sinas_data: { ...p.sinas_data, [key]: [...(p.sinas_data[key] || []), ""] } }));
+  const delArr = (key, i) => setForm((p) => { const a = [...(p.sinas_data[key] || [])]; a.splice(i, 1); return { ...p, sinas_data: { ...p.sinas_data, [key]: a } }; });
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true); setMessage("");
+    try { await api("/api/admin/layanan-sinas", { method: "POST", body: JSON.stringify({ title: form.title, eyebrow: form.eyebrow, sinas_data: form.sinas_data }) }); setMessage("Data berhasil disimpan."); } catch (err) { setMessage("Gagal: " + err.message); } finally { setSaving(false); }
+  };
+
+  if (loading) return (<><div className="admin-header"><div><p>Pengaturan</p><h1>SIINas</h1></div></div><div className="admin-card"><p>Memuat data...</p></div></>);
+
+  const reqGroup = (title, key) => (
+    <>
+      <div className="admin-form-grid"><label className="wide"><span>Judul Grup</span><input value={form.sinas_data[`${key}_title`] || ""} onChange={(e) => setForm((p) => ({ ...p, sinas_data: { ...p.sinas_data, [`${key}_title`]: e.target.value } }))} /></label></div>
+      {(form.sinas_data[`${key}_requirements`] || []).map((r, i) => (
+        <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
+          <button type="button" onClick={() => delArr(`${key}_requirements`, i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
+          <label className="wide"><span>Syarat {i + 1}</span><input value={r} onChange={(e) => arr(`${key}_requirements`, i, e.target.value)} /></label>
+        </div>
+      ))}
+      <button type="button" onClick={() => addArr(`${key}_requirements`)} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467", marginBottom: 16 }}>+ Tambah Syarat</button>
+    </>
+  );
+
+  const fileField = (field, label, accept) => (
+    <label className="wide"><span>{label}</span><div><input type="file" accept={accept} onChange={(e) => uploadFile(field, e.target.files[0])} />{uploading[field] && <span>Uploading...</span>}{form.sinas_data[field] && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.sinas_data[field]}</p>}</div></label>
+  );
+
+  return (
+    <>
+      <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman SIINas</h1></div></div>
+      <div className="admin-card">
+        <form onSubmit={submit} className="admin-form">
+          <h2>Hero Section</h2>
+          <div className="admin-form-grid">
+            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
+            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+          </div>
+          <h2 style={{ marginTop: 28 }}>Konten</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Judul Intro</span><input value={form.sinas_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, sinas_data: { ...p.sinas_data, intro: e.target.value } }))} /></label>
+            <label className="wide"><span>Deskripsi</span><textarea value={form.sinas_data.description || ""} onChange={(e) => setForm((p) => ({ ...p, sinas_data: { ...p.sinas_data, description: e.target.value } }))} /></label>
+          </div>
+          <h2 style={{ marginTop: 28 }}>Persyaratan Registrasi</h2>
+          {reqGroup("registrasi", "registrasi")}
+          <h2 style={{ marginTop: 28 }}>Persyaratan Upload Dokumen</h2>
+          {reqGroup("dokumen", "dokumen")}
+          <h2 style={{ marginTop: 28 }}>Download & Flowchart</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Label Tombol Download</span><input value={form.sinas_data.download_label || ""} onChange={(e) => setForm((p) => ({ ...p, sinas_data: { ...p.sinas_data, download_label: e.target.value } }))} /></label>
+            {fileField("download_file", "File Download (PDF)", ".pdf")}
+            {fileField("flowchart", "Flowchart (gambar)", "image/*")}
+          </div>
+          <div className="admin-actions" style={{ marginTop: 28 }}><button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button></div>
+          {message && <p className="admin-message">{message}</p>}
+        </form>
+      </div>
+    </>
+  );
+}
+
+function LayananTeraAdmin() {
+  const [form, setForm] = useState({ title: "", eyebrow: "", tera_data: { intro: "", description: "", requirements: [""], download_label: "", download_file: "", booking_label: "", booking_url: "", flowchart1_title: "", flowchart1: "", flowchart2_title: "", flowchart2: "" } });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState({});
+
+  const uploadFile = async (field, file) => {
+    if (!file) return;
+    setUploading((p) => ({ ...p, [field]: true }));
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf }, credentials: "same-origin", body });
+      const r = await res.json();
+      if (r?.data?.path) setForm((p) => ({ ...p, tera_data: { ...p.tera_data, [field]: r.data.path } }));
+    } catch { /* ignore */ } finally { setUploading((p) => ({ ...p, [field]: false })); }
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api("/api/admin/layanan-tera");
+        const d = res.data || {};
+        setForm({ title: d.title || "", eyebrow: d.eyebrow || "", tera_data: d.tera_data || { intro: "", description: "", requirements: [""], download_label: "", download_file: "", booking_label: "", booking_url: "", flowchart1_title: "", flowchart1: "", flowchart2_title: "", flowchart2: "" } });
+      } catch { setMessage("Gagal memuat data."); } finally { setLoading(false); }
+    })();
+  }, []);
+
+  const arr = (key, i, v) => setForm((p) => { const a = [...(p.tera_data[key] || [])]; a[i] = v; return { ...p, tera_data: { ...p.tera_data, [key]: a } }; });
+  const addArr = (key) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, [key]: [...(p.tera_data[key] || []), ""] } }));
+  const delArr = (key, i) => setForm((p) => { const a = [...(p.tera_data[key] || [])]; a.splice(i, 1); return { ...p, tera_data: { ...p.tera_data, [key]: a } }; });
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true); setMessage("");
+    try { await api("/api/admin/layanan-tera", { method: "POST", body: JSON.stringify({ title: form.title, eyebrow: form.eyebrow, tera_data: form.tera_data }) }); setMessage("Data berhasil disimpan."); } catch (err) { setMessage("Gagal: " + err.message); } finally { setSaving(false); }
+  };
+
+  if (loading) return (<><div className="admin-header"><div><p>Pengaturan</p><h1>Tera / Tera Ulang</h1></div></div><div className="admin-card"><p>Memuat data...</p></div></>);
+
+  const fileField = (field, label, accept) => (
+    <label className="wide"><span>{label}</span><div><input type="file" accept={accept} onChange={(e) => uploadFile(field, e.target.files[0])} />{uploading[field] && <span>Uploading...</span>}{form.tera_data[field] && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.tera_data[field]}</p>}</div></label>
+  );
+
+  return (
+    <>
+      <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman Tera / Tera Ulang</h1></div></div>
+      <div className="admin-card">
+        <form onSubmit={submit} className="admin-form">
+          <h2>Hero Section</h2>
+          <div className="admin-form-grid">
+            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
+            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+          </div>
+          <h2 style={{ marginTop: 28 }}>Konten</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Judul Intro</span><input value={form.tera_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, intro: e.target.value } }))} /></label>
+            <label className="wide"><span>Deskripsi</span><textarea value={form.tera_data.description || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, description: e.target.value } }))} /></label>
+          </div>
+          <h2 style={{ marginTop: 28 }}>Persyaratan</h2>
+          {(form.tera_data.requirements || []).map((r, i) => (
+            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
+              <button type="button" onClick={() => delArr("requirements", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
+              <label className="wide"><span>Syarat {i + 1}</span><input value={r} onChange={(e) => arr("requirements", i, e.target.value)} /></label>
+            </div>
+          ))}
+          <button type="button" onClick={() => addArr("requirements")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467", marginBottom: 16 }}>+ Tambah Syarat</button>
+          <h2 style={{ marginTop: 28 }}>Download & Booking</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Label Tombol Download</span><input value={form.tera_data.download_label || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, download_label: e.target.value } }))} /></label>
+            {fileField("download_file", "File Download (PDF)", ".pdf")}
+            <label className="wide"><span>Label Tombol Booking</span><input value={form.tera_data.booking_label || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, booking_label: e.target.value } }))} /></label>
+            <label className="wide"><span>URL Booking</span><input value={form.tera_data.booking_url || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, booking_url: e.target.value } }))} /></label>
+          </div>
+          <h2 style={{ marginTop: 28 }}>Flowchart</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Judul Flowchart 1</span><input value={form.tera_data.flowchart1_title || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, flowchart1_title: e.target.value } }))} /></label>
+            {fileField("flowchart1", "Gambar Flowchart 1", "image/*")}
+            <label className="wide"><span>Judul Flowchart 2</span><input value={form.tera_data.flowchart2_title || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, flowchart2_title: e.target.value } }))} /></label>
+            {fileField("flowchart2", "Gambar Flowchart 2", "image/*")}
+          </div>
+          <div className="admin-actions" style={{ marginTop: 28 }}><button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button></div>
+          {message && <p className="admin-message">{message}</p>}
+        </form>
+      </div>
+    </>
+  );
+}
+
+function LayananTdgAdmin() {
+  const [form, setForm] = useState({ title: "", eyebrow: "", tdg_data: { intro: "", description: "", requirements: [""], download_label: "", download_file: "", flowchart: "" } });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState({});
+
+  const uploadFile = async (field, file) => {
+    if (!file) return;
+    setUploading((p) => ({ ...p, [field]: true }));
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf }, credentials: "same-origin", body });
+      const r = await res.json();
+      if (r?.data?.path) setForm((p) => ({ ...p, tdg_data: { ...p.tdg_data, [field]: r.data.path } }));
+    } catch { /* ignore */ } finally { setUploading((p) => ({ ...p, [field]: false })); }
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api("/api/admin/layanan-tdg");
+        const d = res.data || {};
+        setForm({ title: d.title || "", eyebrow: d.eyebrow || "", tdg_data: d.tdg_data || { intro: "", description: "", requirements: [""], download_label: "", download_file: "", flowchart: "" } });
+      } catch { setMessage("Gagal memuat data."); } finally { setLoading(false); }
+    })();
+  }, []);
+
+  const arr = (key, i, v) => setForm((p) => { const a = [...(p.tdg_data[key] || [])]; a[i] = v; return { ...p, tdg_data: { ...p.tdg_data, [key]: a } }; });
+  const addArr = (key) => setForm((p) => ({ ...p, tdg_data: { ...p.tdg_data, [key]: [...(p.tdg_data[key] || []), ""] } }));
+  const delArr = (key, i) => setForm((p) => { const a = [...(p.tdg_data[key] || [])]; a.splice(i, 1); return { ...p, tdg_data: { ...p.tdg_data, [key]: a } }; });
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true); setMessage("");
+    try { await api("/api/admin/layanan-tdg", { method: "POST", body: JSON.stringify({ title: form.title, eyebrow: form.eyebrow, tdg_data: form.tdg_data }) }); setMessage("Data berhasil disimpan."); } catch (err) { setMessage("Gagal: " + err.message); } finally { setSaving(false); }
+  };
+
+  if (loading) return (<><div className="admin-header"><div><p>Pengaturan</p><h1>Tanda Daftar Gudang</h1></div></div><div className="admin-card"><p>Memuat data...</p></div></>);
+
+  const fileField = (field, label, accept) => (
+    <label className="wide"><span>{label}</span><div><input type="file" accept={accept} onChange={(e) => uploadFile(field, e.target.files[0])} />{uploading[field] && <span>Uploading...</span>}{form.tdg_data[field] && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.tdg_data[field]}</p>}</div></label>
+  );
+
+  return (
+    <>
+      <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman Tanda Daftar Gudang</h1></div></div>
+      <div className="admin-card">
+        <form onSubmit={submit} className="admin-form">
+          <h2>Hero Section</h2>
+          <div className="admin-form-grid">
+            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
+            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+          </div>
+          <h2 style={{ marginTop: 28 }}>Konten</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Judul Intro</span><input value={form.tdg_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, tdg_data: { ...p.tdg_data, intro: e.target.value } }))} /></label>
+            <label className="wide"><span>Deskripsi</span><textarea value={form.tdg_data.description || ""} onChange={(e) => setForm((p) => ({ ...p, tdg_data: { ...p.tdg_data, description: e.target.value } }))} /></label>
+          </div>
+          <h2 style={{ marginTop: 28 }}>Persyaratan</h2>
+          {(form.tdg_data.requirements || []).map((r, i) => (
+            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
+              <button type="button" onClick={() => delArr("requirements", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
+              <label className="wide"><span>Syarat {i + 1}</span><input value={r} onChange={(e) => arr("requirements", i, e.target.value)} /></label>
+            </div>
+          ))}
+          <button type="button" onClick={() => addArr("requirements")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467", marginBottom: 16 }}>+ Tambah Syarat</button>
+          <h2 style={{ marginTop: 28 }}>Download & Flowchart</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Label Tombol Download</span><input value={form.tdg_data.download_label || ""} onChange={(e) => setForm((p) => ({ ...p, tdg_data: { ...p.tdg_data, download_label: e.target.value } }))} /></label>
+            {fileField("download_file", "File Download (PDF)", ".pdf")}
+          </div>
+          <div className="admin-form-grid">
+            {fileField("flowchart", "Gambar Flowchart", "image/*")}
+          </div>
+          <div className="admin-actions" style={{ marginTop: 28 }}><button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button></div>
+          {message && <p className="admin-message">{message}</p>}
+        </form>
+      </div>
+    </>
+  );
+}
+
+function LayananMinholAdmin() {
+  const [form, setForm] = useState({ title: "", eyebrow: "", minhol_data: { intro: "", description: "", requirements: [""], download_label: "", download_file: "", flowchart: "" } });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState({});
+
+  const uploadFile = async (field, file) => {
+    if (!file) return;
+    setUploading((p) => ({ ...p, [field]: true }));
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf }, credentials: "same-origin", body });
+      const r = await res.json();
+      if (r?.data?.path) setForm((p) => ({ ...p, minhol_data: { ...p.minhol_data, [field]: r.data.path } }));
+    } catch { /* ignore */ } finally { setUploading((p) => ({ ...p, [field]: false })); }
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api("/api/admin/layanan-minhol");
+        const d = res.data || {};
+        setForm({ title: d.title || "", eyebrow: d.eyebrow || "", minhol_data: d.minhol_data || { intro: "", description: "", requirements: [""], download_label: "", download_file: "", flowchart: "" } });
+      } catch { setMessage("Gagal memuat data."); } finally { setLoading(false); }
+    })();
+  }, []);
+
+  const arr = (key, i, v) => setForm((p) => { const a = [...(p.minhol_data[key] || [])]; a[i] = v; return { ...p, minhol_data: { ...p.minhol_data, [key]: a } }; });
+  const addArr = (key) => setForm((p) => ({ ...p, minhol_data: { ...p.minhol_data, [key]: [...(p.minhol_data[key] || []), ""] } }));
+  const delArr = (key, i) => setForm((p) => { const a = [...(p.minhol_data[key] || [])]; a.splice(i, 1); return { ...p, minhol_data: { ...p.minhol_data, [key]: a } }; });
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true); setMessage("");
+    try { await api("/api/admin/layanan-minhol", { method: "POST", body: JSON.stringify({ title: form.title, eyebrow: form.eyebrow, minhol_data: form.minhol_data }) }); setMessage("Data berhasil disimpan."); } catch (err) { setMessage("Gagal: " + err.message); } finally { setSaving(false); }
+  };
+
+  if (loading) return (<><div className="admin-header"><div><p>Pengaturan</p><h1>Perpanjangan Minuman Beralkohol</h1></div></div><div className="admin-card"><p>Memuat data...</p></div></>);
+
+  const fileField = (field, label, accept) => (
+    <label className="wide"><span>{label}</span><div><input type="file" accept={accept} onChange={(e) => uploadFile(field, e.target.files[0])} />{uploading[field] && <span>Uploading...</span>}{form.minhol_data[field] && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.minhol_data[field]}</p>}</div></label>
+  );
+
+  return (
+    <>
+      <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman Perpanjangan Minuman Beralkohol</h1></div></div>
+      <div className="admin-card">
+        <form onSubmit={submit} className="admin-form">
+          <h2>Hero Section</h2>
+          <div className="admin-form-grid">
+            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
+            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+          </div>
+          <h2 style={{ marginTop: 28 }}>Konten</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Judul Intro</span><input value={form.minhol_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, minhol_data: { ...p.minhol_data, intro: e.target.value } }))} /></label>
+            <label className="wide"><span>Deskripsi</span><textarea value={form.minhol_data.description || ""} onChange={(e) => setForm((p) => ({ ...p, minhol_data: { ...p.minhol_data, description: e.target.value } }))} /></label>
+          </div>
+          <h2 style={{ marginTop: 28 }}>Persyaratan</h2>
+          {(form.minhol_data.requirements || []).map((r, i) => (
+            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
+              <button type="button" onClick={() => delArr("requirements", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
+              <label className="wide"><span>Syarat {i + 1}</span><input value={r} onChange={(e) => arr("requirements", i, e.target.value)} /></label>
+            </div>
+          ))}
+          <button type="button" onClick={() => addArr("requirements")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467", marginBottom: 16 }}>+ Tambah Syarat</button>
+          <h2 style={{ marginTop: 28 }}>Download & Flowchart</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>Label Tombol Download</span><input value={form.minhol_data.download_label || ""} onChange={(e) => setForm((p) => ({ ...p, minhol_data: { ...p.minhol_data, download_label: e.target.value } }))} /></label>
+            {fileField("download_file", "File Download (PDF)", ".pdf")}
+          </div>
+          <div className="admin-form-grid">
+            {fileField("flowchart", "Gambar Flowchart", "image/*")}
+          </div>
+          <div className="admin-actions" style={{ marginTop: 28 }}><button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button></div>
+          {message && <p className="admin-message">{message}</p>}
+        </form>
+      </div>
+    </>
+  );
+}
+
+function ZonaIntegritasAdmin() {
+  const [form, setForm] = useState({ title: "", eyebrow: "", zi_data: { hero_title: "", hero_subtitle: "", about_title: "", about_text: "", about_image: "", buttons: [] } });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState({});
+
+  const uploadFile = async (field, file) => {
+    if (!file) return;
+    setUploading((p) => ({ ...p, [field]: true }));
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf }, credentials: "same-origin", body });
+      const r = await res.json();
+      if (r?.data?.path) {
+        if (field === "about_image") setForm((p) => ({ ...p, zi_data: { ...p.zi_data, about_image: r.data.path } }));
+        else setForm((p) => { const btns = [...(p.zi_data.buttons || [])]; const idx = parseInt(field); if (btns[idx]) btns[idx] = { ...btns[idx], image: r.data.path }; return { ...p, zi_data: { ...p.zi_data, buttons: btns } }; });
+      }
+    } catch { /* ignore */ } finally { setUploading((p) => ({ ...p, [field]: false })); }
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api("/api/admin/zona-integritas");
+        const d = res.data || {};
+        setForm({ title: d.title || "", eyebrow: d.eyebrow || "", zi_data: d.zi_data || { hero_title: "", hero_subtitle: "", about_title: "", about_text: "", about_image: "", buttons: [] } });
+      } catch { setMessage("Gagal memuat data."); } finally { setLoading(false); }
+    })();
+  }, []);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true); setMessage("");
+    try { await api("/api/admin/zona-integritas", { method: "POST", body: JSON.stringify({ title: form.title, eyebrow: form.eyebrow, zi_data: form.zi_data }) }); setMessage("Data berhasil disimpan."); } catch (err) { setMessage("Gagal: " + err.message); } finally { setSaving(false); }
+  };
+
+  const btnUpd = (i, k, v) => setForm((p) => { const btns = [...(p.zi_data.buttons || [])]; if (!btns[i]) btns[i] = { label: "", image: "", url: "" }; btns[i] = { ...btns[i], [k]: v }; return { ...p, zi_data: { ...p.zi_data, buttons: btns } }; });
+  const btnAdd = () => setForm((p) => ({ ...p, zi_data: { ...p.zi_data, buttons: [...(p.zi_data.buttons || []), { label: "", image: "", url: "" }] } }));
+  const btnDel = (i) => setForm((p) => { const btns = [...(p.zi_data.buttons || [])]; btns.splice(i, 1); return { ...p, zi_data: { ...p.zi_data, buttons: btns } }; });
+
+  if (loading) return (<><div className="admin-header"><div><p>Pengaturan</p><h1>Zona Integritas</h1></div></div><div className="admin-card"><p>Memuat data...</p></div></>);
+
+  return (
+    <>
+      <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman Zona Integritas</h1></div></div>
+      <div className="admin-card">
+        <form onSubmit={submit} className="admin-form">
+          <h2>Hero Section</h2>
+          <div className="admin-form-grid">
+            <label><span>Judul Halaman (SEO)</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
+            <label><span>Eyebrow (SEO)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+          </div>
+          <div className="admin-form-grid">
+            <label><span>Hero Title</span><input value={form.zi_data.hero_title || ""} onChange={(e) => setForm((p) => ({ ...p, zi_data: { ...p.zi_data, hero_title: e.target.value } }))} /></label>
+            <label><span>Hero Subtitle</span><input value={form.zi_data.hero_subtitle || ""} onChange={(e) => setForm((p) => ({ ...p, zi_data: { ...p.zi_data, hero_subtitle: e.target.value } }))} /></label>
+          </div>
+          <h2 style={{ marginTop: 28 }}>About Section</h2>
+          <div className="admin-form-grid">
+            <label className="wide"><span>About Title</span><input value={form.zi_data.about_title || ""} onChange={(e) => setForm((p) => ({ ...p, zi_data: { ...p.zi_data, about_title: e.target.value } }))} /></label>
+            <label className="wide"><span>About Text</span><textarea rows={4} value={form.zi_data.about_text || ""} onChange={(e) => setForm((p) => ({ ...p, zi_data: { ...p.zi_data, about_text: e.target.value } }))} /></label>
+            <label className="wide"><span>About Image (lingkaran)</span><div><input type="file" accept="image/*" onChange={(e) => uploadFile("about_image", e.target.files[0])} />{uploading["about_image"] && <span>Uploading...</span>}{form.zi_data.about_image && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.zi_data.about_image}</p>}</div></label>
+          </div>
+          <h2 style={{ marginTop: 28 }}>Tombol Area (3x2)</h2>
+          {(form.zi_data.buttons || []).map((btn, i) => (
+            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
+              <button type="button" onClick={() => btnDel(i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
+              <label><span>Label {i + 1}</span><input value={btn.label || ""} onChange={(e) => btnUpd(i, "label", e.target.value)} /></label>
+              <label><span>URL Tujuan</span><input value={btn.url || ""} onChange={(e) => btnUpd(i, "url", e.target.value)} /></label>
+              <label className="wide"><span>Gambar {i + 1}</span><div><input type="file" accept="image/*" onChange={(e) => uploadFile(String(i), e.target.files[0])} />{uploading[String(i)] && <span>Uploading...</span>}{btn.image && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{btn.image}</p>}</div></label>
+            </div>
+          ))}
+          <button type="button" onClick={btnAdd} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467", marginBottom: 16 }}>+ Tambah Tombol</button>
+          <div className="admin-actions" style={{ marginTop: 28 }}><button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button></div>
+          {message && <p className="admin-message">{message}</p>}
+        </form>
+      </div>
+    </>
+  );
+}
+
 function IkmAdmin() {
   const [items, setItems] = useState([]);
   const [form, setForm] = useState({ name: "", category: "fashion", owner: "", description: "", address: "", kelurahan: "", contact: "", location: "", image: "", is_active: true, sort_order: 0 });
@@ -1672,6 +2515,20 @@ function AdminApp() {
         <TentangAdmin />
       ) : activeKey === "program-kegiatan" ? (
         <ProgramKegiatanAdmin />
+      ) : activeKey === "layanan-halal" ? (
+        <LayananHalalAdmin />
+      ) : activeKey === "layanan-merk" ? (
+        <LayananMerkAdmin />
+      ) : activeKey === "layanan-sinas" ? (
+        <LayananSinasAdmin />
+      ) : activeKey === "layanan-tera" ? (
+        <LayananTeraAdmin />
+      ) : activeKey === "layanan-tdg" ? (
+        <LayananTdgAdmin />
+      ) : activeKey === "layanan-minhol" ? (
+        <LayananMinholAdmin />
+      ) : activeKey === "zona-integritas" ? (
+        <ZonaIntegritasAdmin />
       ) : activeKey === "ikm" ? (
         <IkmAdmin />
       ) : config ? (

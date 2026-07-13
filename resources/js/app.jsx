@@ -13,6 +13,13 @@ import PasarModernPage from './pages/PasarModernPage';
 import MallPage from './pages/MallPage';
 import { PklDashboard, PklInput } from './pages/PklPages';
 import IkmPage from './pages/IkmPage';
+import LayananHalalPage from './pages/LayananHalalPage';
+import LayananMerkPage from './pages/LayananMerkPage';
+import LayananSinasPage from './pages/LayananSinasPage';
+import LayananTeraPage from './pages/LayananTeraPage';
+import LayananTdgPage from './pages/LayananTdgPage';
+import LayananMinholPage from './pages/LayananMinholPage';
+import ZonaIntegritasPage from './pages/ZonaIntegritasPage';
 import { pageForPath } from './pages/StaticPage';
 
 function normalize(path) {
@@ -33,6 +40,13 @@ function App() {
   else if (['/pasar-modern'].includes(path)) page = <PasarModernPage />;
   else if (['/mall', '/pusat-perbelanjaan'].includes(path)) page = <MallPage />;
   else if (['/ikm'].includes(path)) page = <IkmPage />;
+  else if (['/layanan/halal'].includes(path)) page = <LayananHalalPage />;
+  else if (['/layanan/merk'].includes(path)) page = <LayananMerkPage />;
+  else if (['/layanan/sinas', '/layanan/sinas'].includes(path)) page = <LayananSinasPage />;
+  else if (['/layanan/tera'].includes(path)) page = <LayananTeraPage />;
+  else if (['/layanan/td-gudang', '/layanan/tdg', '/layanan/td-gudang'].includes(path)) page = <LayananTdgPage />;
+  else if (['/layanan/minhol'].includes(path)) page = <LayananMinholPage />;
+  else if (['/zona-integritas'].includes(path)) page = <ZonaIntegritasPage />;
   else page = pageForPath(path);
 
   return <Layout>{page}</Layout>

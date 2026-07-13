@@ -90,6 +90,27 @@ Route::middleware(['auth', 'role:admin'])->prefix('api/admin')->group(function (
     Route::get('/program-kegiatan', [AdminCrudController::class, 'programKegiatan']);
     Route::post('/program-kegiatan', [AdminCrudController::class, 'updateProgramKegiatan']);
 
+    Route::get('/layanan-halal', [AdminCrudController::class, 'layananHalal']);
+    Route::post('/layanan-halal', [AdminCrudController::class, 'updateLayananHalal']);
+
+    Route::get('/layanan-merk', [AdminCrudController::class, 'layananMerk']);
+    Route::post('/layanan-merk', [AdminCrudController::class, 'updateLayananMerk']);
+
+    Route::get('/layanan-sinas', [AdminCrudController::class, 'layananSinas']);
+    Route::post('/layanan-sinas', [AdminCrudController::class, 'updateLayananSinas']);
+
+    Route::get('/layanan-tera', [AdminCrudController::class, 'layananTera']);
+    Route::post('/layanan-tera', [AdminCrudController::class, 'updateLayananTera']);
+
+    Route::get('/layanan-tdg', [AdminCrudController::class, 'layananTdg']);
+    Route::post('/layanan-tdg', [AdminCrudController::class, 'updateLayananTdg']);
+
+    Route::get('/layanan-minhol', [AdminCrudController::class, 'layananMinhol']);
+    Route::post('/layanan-minhol', [AdminCrudController::class, 'updateLayananMinhol']);
+
+    Route::get('/zona-integritas', [AdminCrudController::class, 'zonaIntegritas']);
+    Route::post('/zona-integritas', [AdminCrudController::class, 'updateZonaIntegritas']);
+
     Route::match(['get', 'post'], '/ikm', [AdminCrudController::class, 'ikm']);
     Route::patch('/ikm/{ikm}', [AdminCrudController::class, 'updateIkm']);
     Route::delete('/ikm/{ikm}', [AdminCrudController::class, 'destroyIkm']);

@@ -97,7 +97,6 @@ class DemoDataSeeder extends Seeder
             ['Galeri','galeri','Publikasi','Publikasi','images/galeri/Halal-bihalal.jpg','Album kegiatan.'],
             ['Kontak','kontak','Kontak','Profil','images/office.png','Kontak DISPERDAGIN.'],
             ['Form Booking Tera','form-booking-tera','Layanan','Layanan','images/flowchart_sidangtera.png','Booking tera.'],
-            ['Zona Integritas','zona-integritas','Reformasi Birokrasi','Zona Integritas','images/zona-integritas.webp','Komitmen Zona Integritas.'],
             ['Manajemen Perubahan','mnj-perubahan','Zona Integritas','Zona Integritas','images/mnj-perubahan.webp','Area manajemen perubahan.'],
             ['Penataan Tata Laksana','tata-laksana','Zona Integritas','Zona Integritas','images/tata-laksana.webp','Area tata laksana.'],
             ['Penataan Manajemen SDM','mnj-sdm','Zona Integritas','Zona Integritas','images/mnj-sdm.webp','Area manajemen SDM.'],
@@ -110,19 +109,212 @@ class DemoDataSeeder extends Seeder
             DB::table('site_pages')->updateOrInsert(['slug' => $slug], ['title' => $title, 'eyebrow' => $eyebrow, 'group' => $group, 'image' => $image, 'excerpt' => $excerpt, 'content' => $excerpt."\nKonten ini dapat diubah dari Admin Page tanpa mengedit file kode.", 'is_published' => true, 'sort_order' => $idx + 1, 'created_at' => now(), 'updated_at' => now()]);
         }
 
+        $ziDefaults = json_encode([
+            'hero_title' => 'Zona Integritas',
+            'hero_subtitle' => 'DISPERDAGIN Kota Kediri',
+            'about_title' => 'Apa itu Zona Integritas?',
+            'about_text' => 'Zona Integritas adalah predikat yang diberikan kepada instansi pemerintah yang pimpinan beserta jajarannya mempunyai komitmen untuk mewujudkan Wilayah Bebas Korupsi (WBK) atau Wilayah Birokrasi Bersih Melayani (WBBM) melalui reformasi birokrasi, khususnya dalam hal pencegahan korupsi dan peningkatan kualitas pelayanan publik.',
+            'about_image' => 'images/tandatanya.webp',
+            'buttons' => [
+                ['label' => 'Manajemen Perubahan', 'image' => 'images/mnj-perubahan.webp', 'url' => '/zona-integritas/mnj-perubahan'],
+                ['label' => 'Tata Laksana', 'image' => 'images/tata-laksana.webp', 'url' => '/zona-integritas/tata-laksana'],
+                ['label' => 'Manajemen SDM', 'image' => 'images/mnj-sdm.webp', 'url' => '/zona-integritas/mnj-sdm'],
+                ['label' => 'Akuntabilitas', 'image' => 'images/akuntabilitas.webp', 'url' => '/zona-integritas/akuntabilitas'],
+                ['label' => 'Pengawasan', 'image' => 'images/pengawasan.webp', 'url' => '/zona-integritas/pengawasan'],
+                ['label' => 'Pelayanan Publik', 'image' => 'images/pelayanan-publik.webp', 'url' => '/zona-integritas/pelayanan-publik'],
+            ],
+        ]);
+        DB::table('site_pages')->updateOrInsert(['slug' => 'zona-integritas'], [
+            'title' => 'Zona Integritas',
+            'eyebrow' => 'Reformasi Birokrasi',
+            'group' => 'Zona Integritas',
+            'image' => 'images/zona-integritas.webp',
+            'excerpt' => 'Komitmen Zona Integritas.',
+            'content' => $ziDefaults,
+            'is_published' => true, 'sort_order' => 0, 'created_at' => now(), 'updated_at' => now()
+        ]);
+
         DB::table('site_pages')->updateOrInsert(['slug' => 'bantuan-modal'], ['title' => 'Bantuan Modal', 'eyebrow' => 'Layanan', 'group' => 'Layanan', 'external_url' => 'https://sultan.kedirikota.go.id/', 'excerpt' => 'Informasi bantuan modal dan penguatan usaha masyarakat.', 'is_published' => true, 'sort_order' => 0, 'created_at' => now(), 'updated_at' => now()]);
 
-        $servicePages = [
-            ['Sertifikasi Halal','layanan/halal','Layanan','Layanan','images/flowchart_sidangtera.png','Informasi prosedur sertifikasi halal.'],
-            ['Legalitas Merk','layanan/merk','Layanan','Layanan','images/flowchart_sidangtera.png','Informasi prosedur legalitas merk.'],
-            ['SIINas','layanan/sinas','Layanan','Layanan','images/flowchart_sidangtera.png','Informasi prosedur SIINas.'],
-            ['Tera / Tera Ulang','layanan/tera','Layanan','Layanan','images/flowchart_sidangtera.png','Informasi prosedur tera dan tera ulang.'],
-            ['Tanda Daftar Gudang','layanan/td-gudang','Layanan','Layanan','images/flowchart_sidangtera.png','Informasi prosedur tanda daftar gudang.'],
-            ['Perpanjangan Minuman Beralkohol','layanan/minhol','Layanan','Layanan','images/flowchart_sidangtera.png','Informasi perpanjangan minuman beralkohol.'],
-        ];
-        foreach ($servicePages as $idx => [$title, $slug, $eyebrow, $group, $image, $excerpt]) {
-            DB::table('site_pages')->updateOrInsert(['slug' => $slug], ['title' => $title, 'eyebrow' => $eyebrow, 'group' => $group, 'image' => $image, 'excerpt' => $excerpt, 'content' => $excerpt."\nKonten ini dapat diubah dari Admin Page tanpa mengedit file kode.", 'is_published' => true, 'sort_order' => $idx + 1, 'created_at' => now(), 'updated_at' => now()]);
-        }
+        $halalDefaults = json_encode([
+            'intro' => 'Tata Cara Pendaftaran Sertifikasi Halal',
+            'description' => 'Persyaratan yang dibutuhkan :',
+            'requirements' => [
+                'Surat Permohonan',
+                'Formulir Permohonan',
+                'NIB',
+                'Dokumen Penyelia halal (SK penetapan penyelia halal, salinan KTP, daftar riwayat hidup)',
+                'Daftar Nama Produk',
+                'Daftar produk dan bahan yang digunakan',
+                'Manual SJPH',
+                'Izin edar atau SLHS (jika ada)',
+            ],
+            'download_label' => 'Unduh Panduan Lengkap Sertifikasi Halal',
+            'download_file' => 'aset_download/File Layanan Disperdagin Halal.pdf',
+            'flowchart_reguler' => 'images/flowchart_halalReguler.png',
+            'flowchart_gratis' => 'images/flowchart_halalGratis.png',
+        ]);
+        DB::table('site_pages')->updateOrInsert(['slug' => 'layanan/halal'], [
+            'title' => 'Sertifikasi Halal',
+            'eyebrow' => 'Layanan',
+            'group' => 'Layanan',
+            'image' => 'images/flowchart_sidangtera.png',
+            'excerpt' => 'Informasi prosedur sertifikasi halal.',
+            'content' => $halalDefaults,
+            'is_published' => true, 'sort_order' => 1, 'created_at' => now(), 'updated_at' => now()
+        ]);
+
+        $merkDefaults = json_encode([
+            'intro' => 'Tata Cara Pendaftaran Legalitas Merek',
+            'description' => 'Persyaratan yang dibutuhkan :',
+            'mandiri_title' => 'Persyaratan pendaftaran mandiri :',
+            'mandiri_requirements' => [
+                'E-tiket Merk / label merek (JPG)',
+                'Scan TTD permohonan (JPG)',
+                'Surat rekomendasi UKM dari Disperindag/Koperasi (jika UMKM)',
+                'Surat pernyataan UKM bermaterai (jika UMKM)',
+            ],
+            'fasilitas_title' => 'Persyaratan pendaftaran melalui fasilitas Disperdagin :',
+            'fasilitas_requirements' => [
+                'Formulir',
+                'E-tiket Merk / label merek (JPG)',
+                'Scan TTD permohonan (JPG)',
+                'Surat rekomendasi UKM dari Disperindag/Koperasi (jika UMKM)',
+                'Surat pernyataan UKM bermaterai (jika UMKM)',
+            ],
+            'download_label' => 'Unduh Panduan Lengkap Legalitas Merk',
+            'download_file' => 'aset_download/File Layanan Disperdagin Merk.pdf',
+            'flowchart' => 'images/flowchart_merk.png',
+        ]);
+        DB::table('site_pages')->updateOrInsert(['slug' => 'layanan/merk'], [
+            'title' => 'Legalitas Merk',
+            'eyebrow' => 'Layanan',
+            'group' => 'Layanan',
+            'image' => 'images/flowchart_sidangtera.png',
+            'excerpt' => 'Informasi prosedur legalitas merk.',
+            'content' => $merkDefaults,
+            'is_published' => true, 'sort_order' => 2, 'created_at' => now(), 'updated_at' => now()
+        ]);
+
+        $sinasDefaults = json_encode([
+            'intro' => 'Tata Cara Pendaftaran SIINas',
+            'description' => 'Persyaratan yang dibutuhkan :',
+            'registrasi_title' => 'Persyaratan registrasi :',
+            'registrasi_requirements' => [
+                'NPWP',
+                'NiB OSSRBA',
+                'Email (Email yang didaftarkan harus sama dengan email yang tercantum pada NIB)',
+            ],
+            'dokumen_title' => 'Persyaratan minimum upload dokumen :',
+            'dokumen_requirements' => [
+                'Akta pendirian perusahaan/akta perusahaan',
+                'NIB',
+                'NPWP',
+                'Dokumen perizinan berusaha sektor industri (PB-Sektor Industri)',
+                'Rendah (Upload NIB)',
+                'Menengah Rendah + Menengah Tinggi (Upload Sertif Standar)',
+                'Tinggi (Upload Izin)',
+            ],
+            'download_label' => 'Unduh Panduan Lengkap SIINas',
+            'download_file' => 'aset_download/File Layanan Disperdagin SIINas.pdf',
+            'flowchart' => 'images/flowchart_sinas.png',
+        ]);
+        DB::table('site_pages')->updateOrInsert(['slug' => 'layanan/sinas'], [
+            'title' => 'SIINas',
+            'eyebrow' => 'Layanan',
+            'group' => 'Layanan',
+            'image' => 'images/flowchart_sidangtera.png',
+            'excerpt' => 'Informasi prosedur SIINas.',
+            'content' => $sinasDefaults,
+            'is_published' => true, 'sort_order' => 3, 'created_at' => now(), 'updated_at' => now()
+        ]);
+
+        $teraDefaults = json_encode([
+            'intro' => 'Tata Cara Pendaftaran Tera/Tera Ulang',
+            'description' => 'Persyaratan yang dibutuhkan :',
+            'requirements' => [
+                'Data Nama Usaha',
+                'Lokasi Usaha',
+                'Surat Permohonan',
+                'Alat UTTP',
+                'Fotocopy KTP',
+                'Nomor Hp',
+                'Booking Tera',
+            ],
+            'download_label' => 'Unduh Panduan Lengkap Tera/Tera Ulang',
+            'download_file' => 'aset_download/File Layanan Disperdagin TERA.pdf',
+            'booking_label' => 'Booking Tera',
+            'booking_url' => 'https://docs.google.com/forms/d/e/1FAIpQLSebipggAPdH7eIew2qQNZGRM3z4Ty4x9GidBEvYPp8VoxJ1yw/viewform',
+            'flowchart1_title' => 'Langkah - Langkah Tera/Tera Ulang Di Kantor dan Di Tempat',
+            'flowchart1' => 'images/flowchart_tera1.png',
+            'flowchart2_title' => 'Sidang Tera Ulang Di Kantor',
+            'flowchart2' => 'images/flowchart_tera2.png',
+        ]);
+        DB::table('site_pages')->updateOrInsert(['slug' => 'layanan/tera'], [
+            'title' => 'Tera / Tera Ulang',
+            'eyebrow' => 'Layanan',
+            'group' => 'Layanan',
+            'image' => 'images/flowchart_sidangtera.png',
+            'excerpt' => 'Informasi prosedur tera dan tera ulang.',
+            'content' => $teraDefaults,
+            'is_published' => true, 'sort_order' => 4, 'created_at' => now(), 'updated_at' => now()
+        ]);
+
+        $tdgDefaults = json_encode([
+            'intro' => 'Tata Cara Pendaftaran Tanda Daftar Gudang',
+            'description' => 'Persyaratan yang dibutuhkan :',
+            'requirements' => [
+                'KTP Asli',
+                'NPWP',
+                'Nomor BPJS Ketenagakerjaan (Jika ada)',
+                'Nomor BPJS Kesehatan (Jika ada)',
+                'NIB',
+                'Sertifikasi Gudang',
+                'IMB/PBG (Persetujuan Bagunan Gedung)',
+            ],
+            'download_label' => 'Unduh Panduan Lengkap Tanda Daftar Gudang',
+            'download_file' => 'aset_download/File Layanan Disperdagin TDG.pdf',
+            'flowchart' => 'images/flowchart_tdg.png',
+        ]);
+        DB::table('site_pages')->updateOrInsert(['slug' => 'layanan/td-gudang'], [
+            'title' => 'Tanda Daftar Gudang',
+            'eyebrow' => 'Layanan',
+            'group' => 'Layanan',
+            'image' => 'images/flowchart_sidangtera.png',
+            'excerpt' => 'Informasi prosedur tanda daftar gudang.',
+            'content' => $tdgDefaults,
+            'is_published' => true, 'sort_order' => 5, 'created_at' => now(), 'updated_at' => now()
+        ]);
+
+        $minholDefaults = json_encode([
+            'intro' => 'Tata Cara Pendaftaran Perpanjangan Minuman Beralkohol',
+            'description' => 'Persyaratan yang dibutuhkan :',
+            'requirements' => [
+                'Scan Nomor Induk Berusaha (NIB) dan lampirannya',
+                'Scan KTP/Pasport Asli Pemilik atau Penanggung Jawab',
+                'Scan Akte Pendirian / Perubahan Perusahaan yang telah disahkan instansi terkait (Perseroan Terbatas (PT), Koperasi)',
+                'Scan Asli Nomor Pokok Wajib Pajak (kecuali usaha mikro)',
+                'Scan Izin Usaha Perdagangan atau Tanda Daftar Usaha Pariwisata yang Diterbitkan oleh OSS',
+                'Surat penunjukan dari sub distributor sebagai pengecer atau penjual langsung',
+                'Scan Asli Lunas Pajak Bumi dan Bangunan (PBB) terbaru',
+                'Scan SIUP MB Asli (bagi Perpanjangan)',
+                'Rencana Penjualan Minuman Beralkohol 1 tahun kedepan',
+                'Pas Foto (1/2 Badan) Berwarna 4 x 6 dengan latar belakang Merah atau Biru (Formal)',
+                'Scan NPPBKC',
+            ],
+            'download_label' => 'Unduh Panduan Lengkap Perpanjangan Minuman Beralkohol',
+            'download_file' => 'aset_download/File Layanan Disperdagin MINHOL.pdf',
+            'flowchart' => 'images/flowchart_minhol.png',
+        ]);
+        DB::table('site_pages')->updateOrInsert(['slug' => 'layanan/minhol'], [
+            'title' => 'Perpanjangan Minuman Beralkohol',
+            'eyebrow' => 'Layanan',
+            'group' => 'Layanan',
+            'image' => 'images/flowchart_sidangtera.png',
+            'excerpt' => 'Informasi perpanjangan minuman beralkohol.',
+            'content' => $minholDefaults,
+            'is_published' => true, 'sort_order' => 6, 'created_at' => now(), 'updated_at' => now()
+        ]);
 
         $defaultSettings = [
             ['address', 'Jl. Penanggungan No. 7, Bandar Lor, Kec. Mojoroto, Kota Kediri, Jawa Timur'],

@@ -302,6 +302,491 @@ class AdminCrudController extends Controller
         return response()->json(['status' => 'success', 'data' => $result]);
     }
 
+    public function layananHalal()
+    {
+        $defaults = [
+            'intro' => 'Tata Cara Pendaftaran Sertifikasi Halal',
+            'description' => 'Persyaratan yang dibutuhkan :',
+            'requirements' => [
+                'Surat Permohonan',
+                'Formulir Permohonan',
+                'NIB',
+                'Dokumen Penyelia halal (SK penetapan penyelia halal, salinan KTP, daftar riwayat hidup)',
+                'Daftar Nama Produk',
+                'Daftar produk dan bahan yang digunakan',
+                'Manual SJPH',
+                'Izin edar atau SLHS (jika ada)',
+            ],
+            'download_label' => 'Unduh Panduan Lengkap Sertifikasi Halal',
+            'download_file' => 'aset_download/File Layanan Disperdagin Halal.pdf',
+            'flowchart_reguler' => 'images/flowchart_halalReguler.png',
+            'flowchart_gratis' => 'images/flowchart_halalGratis.png',
+        ];
+
+        $page = SitePage::query()->where('slug', 'layanan/halal')->first();
+        if (!$page) {
+            $page = SitePage::create([
+                'title' => 'Sertifikasi Halal',
+                'slug' => 'layanan/halal',
+                'group' => 'Layanan',
+                'eyebrow' => 'Layanan',
+                'image' => 'images/flowchart_sidangtera.png',
+                'excerpt' => 'Informasi prosedur sertifikasi halal.',
+                'is_published' => true,
+                'content' => json_encode($defaults),
+            ]);
+        }
+        $data = $page->toArray();
+        $parsed = json_decode($page->content, true);
+        $data['halal_data'] = is_array($parsed) ? $parsed : $defaults;
+        return response()->json(['status' => 'success', 'data' => $data]);
+    }
+
+    public function updateLayananHalal(Request $request)
+    {
+        $page = SitePage::query()->where('slug', 'layanan/halal')->firstOrFail();
+
+        $validated = $request->validate([
+            'title' => ['sometimes', 'string', 'max:180'],
+            'eyebrow' => ['nullable', 'string', 'max:120'],
+            'halal_data' => ['nullable', 'array'],
+        ]);
+
+        $updateData = [];
+        if (isset($validated['title'])) {
+            $updateData['title'] = $validated['title'];
+        }
+        if (array_key_exists('eyebrow', $validated)) {
+            $updateData['eyebrow'] = $validated['eyebrow'];
+        }
+        if (isset($validated['halal_data'])) {
+            $updateData['content'] = json_encode($validated['halal_data']);
+        }
+
+        $page->update($updateData);
+        $result = $page->fresh()->toArray();
+        $result['halal_data'] = json_decode($page->content, true) ?? [];
+
+        return response()->json(['status' => 'success', 'data' => $result]);
+    }
+
+    public function layananMerk()
+    {
+        $defaults = [
+            'intro' => 'Tata Cara Pendaftaran Legalitas Merek',
+            'description' => 'Persyaratan yang dibutuhkan :',
+            'mandiri_title' => 'Persyaratan pendaftaran mandiri :',
+            'mandiri_requirements' => [
+                'E-tiket Merk / label merek (JPG)',
+                'Scan TTD permohonan (JPG)',
+                'Surat rekomendasi UKM dari Disperindag/Koperasi (jika UMKM)',
+                'Surat pernyataan UKM bermaterai (jika UMKM)',
+            ],
+            'fasilitas_title' => 'Persyaratan pendaftaran melalui fasilitas Disperdagin :',
+            'fasilitas_requirements' => [
+                'Formulir',
+                'E-tiket Merk / label merek (JPG)',
+                'Scan TTD permohonan (JPG)',
+                'Surat rekomendasi UKM dari Disperindag/Koperasi (jika UMKM)',
+                'Surat pernyataan UKM bermaterai (jika UMKM)',
+            ],
+            'download_label' => 'Unduh Panduan Lengkap Legalitas Merk',
+            'download_file' => 'aset_download/File Layanan Disperdagin Merk.pdf',
+            'flowchart' => 'images/flowchart_merk.png',
+        ];
+
+        $page = SitePage::query()->where('slug', 'layanan/merk')->first();
+        if (!$page) {
+            $page = SitePage::create([
+                'title' => 'Legalitas Merk',
+                'slug' => 'layanan/merk',
+                'group' => 'Layanan',
+                'eyebrow' => 'Layanan',
+                'image' => 'images/flowchart_sidangtera.png',
+                'excerpt' => 'Informasi prosedur legalitas merk.',
+                'is_published' => true,
+                'content' => json_encode($defaults),
+            ]);
+        }
+        $data = $page->toArray();
+        $parsed = json_decode($page->content, true);
+        $data['merk_data'] = is_array($parsed) ? $parsed : $defaults;
+        return response()->json(['status' => 'success', 'data' => $data]);
+    }
+
+    public function updateLayananMerk(Request $request)
+    {
+        $page = SitePage::query()->where('slug', 'layanan/merk')->firstOrFail();
+
+        $validated = $request->validate([
+            'title' => ['sometimes', 'string', 'max:180'],
+            'eyebrow' => ['nullable', 'string', 'max:120'],
+            'merk_data' => ['nullable', 'array'],
+        ]);
+
+        $updateData = [];
+        if (isset($validated['title'])) {
+            $updateData['title'] = $validated['title'];
+        }
+        if (array_key_exists('eyebrow', $validated)) {
+            $updateData['eyebrow'] = $validated['eyebrow'];
+        }
+        if (isset($validated['merk_data'])) {
+            $updateData['content'] = json_encode($validated['merk_data']);
+        }
+
+        $page->update($updateData);
+        $result = $page->fresh()->toArray();
+        $result['merk_data'] = json_decode($page->content, true) ?? [];
+
+        return response()->json(['status' => 'success', 'data' => $result]);
+    }
+
+    public function layananSinas()
+    {
+        $defaults = [
+            'intro' => 'Tata Cara Pendaftaran SIINas',
+            'description' => 'Persyaratan yang dibutuhkan :',
+            'registrasi_title' => 'Persyaratan registrasi :',
+            'registrasi_requirements' => [
+                'NPWP',
+                'NiB OSSRBA',
+                'Email (Email yang didaftarkan harus sama dengan email yang tercantum pada NIB)',
+            ],
+            'dokumen_title' => 'Persyaratan minimum upload dokumen :',
+            'dokumen_requirements' => [
+                'Akta pendirian perusahaan/akta perusahaan',
+                'NIB',
+                'NPWP',
+                'Dokumen perizinan berusaha sektor industri (PB-Sektor Industri)',
+                'Rendah (Upload NIB)',
+                'Menengah Rendah + Menengah Tinggi (Upload Sertif Standar)',
+                'Tinggi (Upload Izin)',
+            ],
+            'download_label' => 'Unduh Panduan Lengkap SIINas',
+            'download_file' => 'aset_download/File Layanan Disperdagin SIINas.pdf',
+            'flowchart' => 'images/flowchart_sinas.png',
+        ];
+
+        $page = SitePage::query()->where('slug', 'layanan/sinas')->first();
+        if (!$page) {
+            $page = SitePage::create([
+                'title' => 'SIINas',
+                'slug' => 'layanan/sinas',
+                'group' => 'Layanan',
+                'eyebrow' => 'Layanan',
+                'image' => 'images/flowchart_sidangtera.png',
+                'excerpt' => 'Informasi prosedur SIINas.',
+                'is_published' => true,
+                'content' => json_encode($defaults),
+            ]);
+        }
+        $data = $page->toArray();
+        $parsed = json_decode($page->content, true);
+        $data['sinas_data'] = is_array($parsed) ? $parsed : $defaults;
+        return response()->json(['status' => 'success', 'data' => $data]);
+    }
+
+    public function updateLayananSinas(Request $request)
+    {
+        $page = SitePage::query()->where('slug', 'layanan/sinas')->firstOrFail();
+
+        $validated = $request->validate([
+            'title' => ['sometimes', 'string', 'max:180'],
+            'eyebrow' => ['nullable', 'string', 'max:120'],
+            'sinas_data' => ['nullable', 'array'],
+        ]);
+
+        $updateData = [];
+        if (isset($validated['title'])) {
+            $updateData['title'] = $validated['title'];
+        }
+        if (array_key_exists('eyebrow', $validated)) {
+            $updateData['eyebrow'] = $validated['eyebrow'];
+        }
+        if (isset($validated['sinas_data'])) {
+            $updateData['content'] = json_encode($validated['sinas_data']);
+        }
+
+        $page->update($updateData);
+        $result = $page->fresh()->toArray();
+        $result['sinas_data'] = json_decode($page->content, true) ?? [];
+
+        return response()->json(['status' => 'success', 'data' => $result]);
+    }
+
+    public function layananTera()
+    {
+        $defaults = [
+            'intro' => 'Tata Cara Pendaftaran Tera/Tera Ulang',
+            'description' => 'Persyaratan yang dibutuhkan :',
+            'requirements' => [
+                'Data Nama Usaha',
+                'Lokasi Usaha',
+                'Surat Permohonan',
+                'Alat UTTP',
+                'Fotocopy KTP',
+                'Nomor Hp',
+                'Booking Tera',
+            ],
+            'download_label' => 'Unduh Panduan Lengkap Tera/Tera Ulang',
+            'download_file' => 'aset_download/File Layanan Disperdagin TERA.pdf',
+            'booking_label' => 'Booking Tera',
+            'booking_url' => 'https://docs.google.com/forms/d/e/1FAIpQLSebipggAPdH7eIew2qQNZGRM3z4Ty4x9GidBEvYPp8VoxJ1yw/viewform',
+            'flowchart1_title' => 'Langkah - Langkah Tera/Tera Ulang Di Kantor dan Di Tempat',
+            'flowchart1' => 'images/flowchart_tera1.png',
+            'flowchart2_title' => 'Sidang Tera Ulang Di Kantor',
+            'flowchart2' => 'images/flowchart_tera2.png',
+        ];
+
+        $page = SitePage::query()->where('slug', 'layanan/tera')->first();
+        if (!$page) {
+            $page = SitePage::create([
+                'title' => 'Tera / Tera Ulang',
+                'slug' => 'layanan/tera',
+                'group' => 'Layanan',
+                'eyebrow' => 'Layanan',
+                'image' => 'images/flowchart_sidangtera.png',
+                'excerpt' => 'Informasi prosedur tera dan tera ulang.',
+                'is_published' => true,
+                'content' => json_encode($defaults),
+            ]);
+        }
+        $data = $page->toArray();
+        $parsed = json_decode($page->content, true);
+        $data['tera_data'] = is_array($parsed) ? $parsed : $defaults;
+        return response()->json(['status' => 'success', 'data' => $data]);
+    }
+
+    public function updateLayananTera(Request $request)
+    {
+        $page = SitePage::query()->where('slug', 'layanan/tera')->firstOrFail();
+
+        $validated = $request->validate([
+            'title' => ['sometimes', 'string', 'max:180'],
+            'eyebrow' => ['nullable', 'string', 'max:120'],
+            'tera_data' => ['nullable', 'array'],
+        ]);
+
+        $updateData = [];
+        if (isset($validated['title'])) {
+            $updateData['title'] = $validated['title'];
+        }
+        if (array_key_exists('eyebrow', $validated)) {
+            $updateData['eyebrow'] = $validated['eyebrow'];
+        }
+        if (isset($validated['tera_data'])) {
+            $updateData['content'] = json_encode($validated['tera_data']);
+        }
+
+        $page->update($updateData);
+        $result = $page->fresh()->toArray();
+        $result['tera_data'] = json_decode($page->content, true) ?? [];
+
+        return response()->json(['status' => 'success', 'data' => $result]);
+    }
+
+    public function layananTdg()
+    {
+        $defaults = [
+            'intro' => 'Tata Cara Pendaftaran Tanda Daftar Gudang',
+            'description' => 'Persyaratan yang dibutuhkan :',
+            'requirements' => [
+                'KTP Asli',
+                'NPWP',
+                'Nomor BPJS Ketenagakerjaan (Jika ada)',
+                'Nomor BPJS Kesehatan (Jika ada)',
+                'NIB',
+                'Sertifikasi Gudang',
+                'IMB/PBG (Persetujuan Bagunan Gedung)',
+            ],
+            'download_label' => 'Unduh Panduan Lengkap Tanda Daftar Gudang',
+            'download_file' => 'aset_download/File Layanan Disperdagin TDG.pdf',
+            'flowchart' => 'images/flowchart_tdg.png',
+        ];
+
+        $page = SitePage::query()->where('slug', 'layanan/td-gudang')->first();
+        if (!$page) {
+            $page = SitePage::create([
+                'title' => 'Tanda Daftar Gudang',
+                'slug' => 'layanan/td-gudang',
+                'group' => 'Layanan',
+                'eyebrow' => 'Layanan',
+                'image' => 'images/flowchart_sidangtera.png',
+                'excerpt' => 'Informasi prosedur tanda daftar gudang.',
+                'is_published' => true,
+                'content' => json_encode($defaults),
+            ]);
+        }
+        $data = $page->toArray();
+        $parsed = json_decode($page->content, true);
+        $data['tdg_data'] = is_array($parsed) ? $parsed : $defaults;
+        return response()->json(['status' => 'success', 'data' => $data]);
+    }
+
+    public function updateLayananTdg(Request $request)
+    {
+        $page = SitePage::query()->where('slug', 'layanan/td-gudang')->firstOrFail();
+
+        $validated = $request->validate([
+            'title' => ['sometimes', 'string', 'max:180'],
+            'eyebrow' => ['nullable', 'string', 'max:120'],
+            'tdg_data' => ['nullable', 'array'],
+        ]);
+
+        $updateData = [];
+        if (isset($validated['title'])) {
+            $updateData['title'] = $validated['title'];
+        }
+        if (array_key_exists('eyebrow', $validated)) {
+            $updateData['eyebrow'] = $validated['eyebrow'];
+        }
+        if (isset($validated['tdg_data'])) {
+            $updateData['content'] = json_encode($validated['tdg_data']);
+        }
+
+        $page->update($updateData);
+        $result = $page->fresh()->toArray();
+        $result['tdg_data'] = json_decode($page->content, true) ?? [];
+
+        return response()->json(['status' => 'success', 'data' => $result]);
+    }
+
+    public function layananMinhol()
+    {
+        $defaults = [
+            'intro' => 'Tata Cara Pendaftaran Perpanjangan Minuman Beralkohol',
+            'description' => 'Persyaratan yang dibutuhkan :',
+            'requirements' => [
+                'Scan Nomor Induk Berusaha (NIB) dan lampirannya',
+                'Scan KTP/Pasport Asli Pemilik atau Penanggung Jawab',
+                'Scan Akte Pendirian / Perubahan Perusahaan yang telah disahkan instansi terkait (Perseroan Terbatas (PT), Koperasi)',
+                'Scan Asli Nomor Pokok Wajib Pajak (kecuali usaha mikro)',
+                'Scan Izin Usaha Perdagangan atau Tanda Daftar Usaha Pariwisata yang Diterbitkan oleh OSS',
+                'Surat penunjukan dari sub distributor sebagai pengecer atau penjual langsung',
+                'Scan Asli Lunas Pajak Bumi dan Bangunan (PBB) terbaru',
+                'Scan SIUP MB Asli (bagi Perpanjangan)',
+                'Rencana Penjualan Minuman Beralkohol 1 tahun kedepan',
+                'Pas Foto (1/2 Badan) Berwarna 4 x 6 dengan latar belakang Merah atau Biru (Formal)',
+                'Scan NPPBKC',
+            ],
+            'download_label' => 'Unduh Panduan Lengkap Perpanjangan Minuman Beralkohol',
+            'download_file' => 'aset_download/File Layanan Disperdagin MINHOL.pdf',
+            'flowchart' => 'images/flowchart_minhol.png',
+        ];
+
+        $page = SitePage::query()->where('slug', 'layanan/minhol')->first();
+        if (!$page) {
+            $page = SitePage::create([
+                'title' => 'Perpanjangan Minuman Beralkohol',
+                'slug' => 'layanan/minhol',
+                'group' => 'Layanan',
+                'eyebrow' => 'Layanan',
+                'image' => 'images/flowchart_sidangtera.png',
+                'excerpt' => 'Informasi perpanjangan minuman beralkohol.',
+                'is_published' => true,
+                'content' => json_encode($defaults),
+            ]);
+        }
+        $data = $page->toArray();
+        $parsed = json_decode($page->content, true);
+        $data['minhol_data'] = is_array($parsed) ? $parsed : $defaults;
+        return response()->json(['status' => 'success', 'data' => $data]);
+    }
+
+    public function updateLayananMinhol(Request $request)
+    {
+        $page = SitePage::query()->where('slug', 'layanan/minhol')->firstOrFail();
+
+        $validated = $request->validate([
+            'title' => ['sometimes', 'string', 'max:180'],
+            'eyebrow' => ['nullable', 'string', 'max:120'],
+            'minhol_data' => ['nullable', 'array'],
+        ]);
+
+        $updateData = [];
+        if (isset($validated['title'])) {
+            $updateData['title'] = $validated['title'];
+        }
+        if (array_key_exists('eyebrow', $validated)) {
+            $updateData['eyebrow'] = $validated['eyebrow'];
+        }
+        if (isset($validated['minhol_data'])) {
+            $updateData['content'] = json_encode($validated['minhol_data']);
+        }
+
+        $page->update($updateData);
+        $result = $page->fresh()->toArray();
+        $result['minhol_data'] = json_decode($page->content, true) ?? [];
+
+        return response()->json(['status' => 'success', 'data' => $result]);
+    }
+
+    public function zonaIntegritas()
+    {
+        $defaults = [
+            'hero_title' => 'Zona Integritas',
+            'hero_subtitle' => 'DISPERDAGIN Kota Kediri',
+            'about_title' => 'Apa itu Zona Integritas?',
+            'about_text' => 'Zona Integritas adalah predikat yang diberikan kepada instansi pemerintah yang pimpinan beserta jajarannya mempunyai komitmen untuk mewujudkan Wilayah Bebas Korupsi (WBK) atau Wilayah Birokrasi Bersih Melayani (WBBM) melalui reformasi birokrasi, khususnya dalam hal pencegahan korupsi dan peningkatan kualitas pelayanan publik.',
+            'about_image' => 'images/tandatanya.webp',
+            'buttons' => [
+                ['label' => 'Manajemen Perubahan', 'image' => 'images/mnj-perubahan.webp', 'url' => '/zona-integritas/mnj-perubahan'],
+                ['label' => 'Tata Laksana', 'image' => 'images/tata-laksana.webp', 'url' => '/zona-integritas/tata-laksana'],
+                ['label' => 'Manajemen SDM', 'image' => 'images/mnj-sdm.webp', 'url' => '/zona-integritas/mnj-sdm'],
+                ['label' => 'Akuntabilitas', 'image' => 'images/akuntabilitas.webp', 'url' => '/zona-integritas/akuntabilitas'],
+                ['label' => 'Pengawasan', 'image' => 'images/pengawasan.webp', 'url' => '/zona-integritas/pengawasan'],
+                ['label' => 'Pelayanan Publik', 'image' => 'images/pelayanan-publik.webp', 'url' => '/zona-integritas/pelayanan-publik'],
+            ],
+        ];
+
+        $page = SitePage::query()->where('slug', 'zona-integritas')->first();
+        if (!$page) {
+            $page = SitePage::create([
+                'title' => 'Zona Integritas',
+                'slug' => 'zona-integritas',
+                'group' => 'Zona Integritas',
+                'eyebrow' => 'Reformasi Birokrasi',
+                'image' => 'images/zona-integritas.webp',
+                'excerpt' => 'Komitmen Zona Integritas.',
+                'is_published' => true,
+                'content' => json_encode($defaults),
+            ]);
+        }
+        $data = $page->toArray();
+        $parsed = json_decode($page->content, true);
+        $data['zi_data'] = is_array($parsed) ? $parsed : $defaults;
+        return response()->json(['status' => 'success', 'data' => $data]);
+    }
+
+    public function updateZonaIntegritas(Request $request)
+    {
+        $page = SitePage::query()->where('slug', 'zona-integritas')->firstOrFail();
+
+        $validated = $request->validate([
+            'title' => ['sometimes', 'string', 'max:180'],
+            'eyebrow' => ['nullable', 'string', 'max:120'],
+            'zi_data' => ['nullable', 'array'],
+        ]);
+
+        $updateData = [];
+        if (isset($validated['title'])) {
+            $updateData['title'] = $validated['title'];
+        }
+        if (array_key_exists('eyebrow', $validated)) {
+            $updateData['eyebrow'] = $validated['eyebrow'];
+        }
+        if (isset($validated['zi_data'])) {
+            $updateData['content'] = json_encode($validated['zi_data']);
+        }
+
+        $page->update($updateData);
+        $result = $page->fresh()->toArray();
+        $result['zi_data'] = json_decode($page->content, true) ?? [];
+
+        return response()->json(['status' => 'success', 'data' => $result]);
+    }
+
     public function programKegiatan()
     {
         $defaults = [

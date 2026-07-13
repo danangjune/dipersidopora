@@ -466,6 +466,19 @@ tr:hover td{background:#f8fafc}
 .ikmMapLink{display:inline-flex;align-items:center;gap:4px;color:#0891b2;font-weight:700;font-size:13px;text-decoration:none;transition:color .2s}
 .ikmMapLink:hover{color:#065f73;text-decoration:underline}
 
+/* ─── LAYANAN HALAL PAGE ─── */
+.halalCard{max-width:var(--max-w);margin:0 auto 28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:clamp(20px,3vw,32px);box-shadow:var(--shadow)}
+.halalCard h3{margin:0 0 8px;font-size:clamp(18px,2vw,24px);color:var(--primary)}
+.halalCard p{margin:0 0 16px;font-size:14px;color:var(--text)}
+.halalList{margin:0 0 20px;padding:0 0 0 20px;display:grid;gap:8px}
+.halalList li{font-size:14px;line-height:1.5;color:var(--text)}
+.halalDownload{display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;padding:12px 24px;border-radius:var(--radius-sm);font-weight:700;font-size:14px;text-decoration:none;transition:var(--transition)}
+.halalDownload:hover{background:var(--accent)}
+.halalFlowchart{max-width:var(--max-w);margin:0 auto 28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:clamp(16px,3vw,24px);box-shadow:var(--shadow)}
+.halalFlowchart h3{margin:0 0 16px;font-size:16px;color:var(--primary)}
+.halalFlowchartImg{width:100%;overflow:auto}
+.halalFlowchartImg img{max-width:100%;height:auto;display:block}
+
 @media(max-width:640px){
   .commodityGridTen{grid-template-columns:repeat(2,1fr)}
   .commodityCardTop img{width:36px;height:36px}
@@ -481,3 +494,25 @@ tr:hover td{background:#f8fafc}
   .tentangAlamatGrid{grid-template-columns:1fr}
   .tentangMap{position:static}
 }
+.ziHero{position:relative;overflow:hidden;padding:clamp(48px,8vw,100px) 20px clamp(40px,6vw,80px);text-align:center;background:linear-gradient(135deg,#043953 0%,#065e89 50%,#076797 100%)}
+.ziHeroBg{position:absolute;inset:0;opacity:.12;background:radial-gradient(circle at 20% 80%,rgba(255,255,255,.6)0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(255,255,255,.4)0%,transparent 50%);pointer-events:none}
+.ziHeroContent{position:relative;z-index:1}
+.ziHeroBadge{display:inline-block;background:rgba(255,255,255,.15);backdrop-filter:blur(6px);color:#fff;padding:6px 18px;border-radius:20px;font-size:13px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px}
+.ziHeroTitle{color:#fff;font-size:clamp(32px,5vw,56px);font-weight:800;margin:0 0 8px;line-height:1.15;text-shadow:0 2px 12px rgba(0,0,0,.15)}
+.ziHeroSub{color:rgba(255,255,255,.85);font-size:clamp(16px,2vw,22px);font-weight:500;margin:0}
+.ziAbout{max-width:var(--max-w);margin:0 auto;display:grid;grid-template-columns:auto 1fr;gap:clamp(20px,3vw,40px);align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:clamp(24px,3vw,40px);box-shadow:var(--shadow)}
+.ziAboutImg{width:clamp(80px,12vw,140px);height:clamp(80px,12vw,140px);flex-shrink:0;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#e0f2fe,#bae6fd);display:flex;align-items:center;justify-content:center}
+.ziAboutImg img{width:100%;height:100%;object-fit:cover}
+.ziAboutIcon{font-size:clamp(36px,5vw,60px);font-weight:800;color:var(--primary);opacity:.6}
+.ziAboutText h2{margin:0 0 12px;font-size:clamp(20px,2.5vw,28px);color:var(--primary)}
+.ziAboutText p{margin:0;font-size:15px;line-height:1.7;color:var(--text)}
+.ziGrid{max-width:var(--max-w);margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,3vw,36px);justify-items:center}
+.ziBtn{display:flex;flex-direction:column;align-items:center;text-decoration:none;gap:12px;transition:var(--transition);cursor:pointer}
+.ziBtnCircle{width:clamp(110px,16vw,160px);height:clamp(110px,16vw,160px);border-radius:50%;overflow:hidden;border:3px solid var(--border);box-shadow:var(--shadow);transition:var(--transition);background:var(--surface);display:flex;align-items:center;justify-content:center}
+.ziBtnCircle img{width:100%;height:100%;object-fit:cover;transition:var(--transition)}
+.ziBtn:hover .ziBtnCircle{border-color:var(--primary);box-shadow:0 12px 40px rgba(7,103,151,.25);transform:scale(1.06)}
+.ziBtn:hover .ziBtnCircle img{transform:scale(1.1)}
+.ziBtnLabel{font-size:clamp(13px,1.2vw,15px);font-weight:600;color:var(--primary);text-align:center;line-height:1.3;transition:var(--transition)}
+.ziBtn:hover .ziBtnLabel{color:var(--primary-dark)}
+@media(max-width:768px){.ziGrid{grid-template-columns:repeat(2,1fr);gap:24px}}
+@media(max-width:480px){.ziAbout{grid-template-columns:1fr;justify-items:center;text-align:center}.ziGrid{grid-template-columns:repeat(2,1fr);gap:16px}}
