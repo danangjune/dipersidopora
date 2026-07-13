@@ -211,44 +211,58 @@ const resources = {
   },
 };
 
-const allMenus = [
+const menuGroups = [
   { key: "dashboard", label: "Dashboard", href: "/admin", roles: ["admin", "surveyor"] },
-  { key: "prices", label: "Input Harga", href: "/admin/prices", roles: ["admin", "surveyor"] },
-  { key: "prices-monitor", label: "Pemantauan Harga", href: "/admin/prices-monitor", roles: ["admin", "surveyor"] },
-  { key: "markets", label: "Master Pasar", href: "/admin/markets", roles: ["admin"] },
-  { key: "commodities", label: "Master Komoditas", href: "/admin/commodities", roles: ["admin"] },
-  { key: "pages", label: "Master Halaman", href: "/admin/pages", roles: ["admin"] },
-  { key: "tentang", label: "Halaman Tentang", href: "/admin/tentang", roles: ["admin"] },
-  { key: "program-kegiatan", label: "Program Kegiatan", href: "/admin/program-kegiatan", roles: ["admin"] },
-  { key: "layanan-halal", label: "Sertifikasi Halal", href: "/admin/layanan-halal", roles: ["admin"] },
-  { key: "layanan-merk", label: "Legalitas Merk", href: "/admin/layanan-merk", roles: ["admin"] },
-  { key: "layanan-sinas", label: "SIINas", href: "/admin/layanan-sinas", roles: ["admin"] },
-  { key: "layanan-tera", label: "Tera / Tera Ulang", href: "/admin/layanan-tera", roles: ["admin"] },
-  { key: "layanan-tdg", label: "Tanda Daftar Gudang", href: "/admin/layanan-tdg", roles: ["admin"] },
-  { key: "layanan-minhol", label: "Perpanjangan Minuman Beralkohol", href: "/admin/layanan-minhol", roles: ["admin"] },
-  { key: "zona-integritas", label: "Zona Integritas", href: "/admin/zona-integritas", roles: ["admin"] },
-  { key: "ikm", label: "Data IKM", href: "/admin/ikm", roles: ["admin"] },
-  { key: "downloads", label: "Master Dokumen", href: "/admin/downloads", roles: ["admin"] },
-  { key: "banners", label: "Banner Slider", href: "/admin/banners", roles: ["admin"] },
   {
-    key: "het-hap",
-    label: "HET / HAP",
-    href: "/admin/het-hap",
-    roles: ["admin"],
+    label: "Master Data", roles: ["admin"],
+    items: [
+      { key: "markets", label: "Pasar", href: "/admin/markets" },
+      { key: "commodities", label: "Komoditas", href: "/admin/commodities" },
+      { key: "pages", label: "Halaman", href: "/admin/pages" },
+      { key: "downloads", label: "Dokumen", href: "/admin/downloads" },
+      { key: "survey-settings", label: "Survey", href: "/admin/survey-settings" },
+    ],
   },
   {
-    key: "survey-settings",
-    label: "Master Survey",
-    href: "/admin/survey-settings",
-    roles: ["admin"],
+    label: "Harga", roles: ["admin", "surveyor"],
+    items: [
+      { key: "prices", label: "Input Harga", href: "/admin/prices" },
+      { key: "prices-monitor", label: "Pemantauan Harga", href: "/admin/prices-monitor" },
+    ],
+    extra: [
+      { key: "het-hap", label: "HET / HAP", href: "/admin/het-hap", roles: ["admin"] },
+    ],
   },
   {
-    key: "users",
-    label: "Manajemen User",
-    href: "/admin/users",
-    roles: ["admin"],
+    label: "Konten", roles: ["admin"],
+    items: [
+      { key: "tentang", label: "Halaman Tentang", href: "/admin/tentang" },
+      { key: "program-kegiatan", label: "Program Kegiatan", href: "/admin/program-kegiatan" },
+      { key: "banners", label: "Banner Slider", href: "/admin/banners" },
+      { key: "ikm", label: "Data IKM", href: "/admin/ikm" },
+      { key: "zona-integritas", label: "Zona Integritas", href: "/admin/zona-integritas" },
+    ],
   },
+  {
+    label: "Layanan", roles: ["admin"],
+    items: [
+      { key: "layanan-halal", label: "Sertifikasi Halal", href: "/admin/layanan-halal" },
+      { key: "layanan-merk", label: "Legalitas Merk", href: "/admin/layanan-merk" },
+      { key: "layanan-sinas", label: "SIINas", href: "/admin/layanan-sinas" },
+      { key: "layanan-tera", label: "Tera / Tera Ulang", href: "/admin/layanan-tera" },
+      { key: "layanan-tdg", label: "Tanda Daftar Gudang", href: "/admin/layanan-tdg" },
+      { key: "layanan-minhol", label: "Perpanjangan Minuman Beralkohol", href: "/admin/layanan-minhol" },
+    ],
+  },
+  { key: "users", label: "Manajemen User", href: "/admin/users", roles: ["admin"] },
 ];
+
+const allMenus = [];
+menuGroups.forEach((g) => {
+  if (g.items) { g.items.forEach((i) => { allMenus.push({ ...i, roles: g.roles }); }); }
+  if (g.extra) { g.extra.forEach((i) => { allMenus.push(i); }); }
+  if (!g.items && !g.extra) { allMenus.push({ key: g.key, label: g.label, href: g.href, roles: g.roles }); }
+});
 
 function getActiveKey() {
   const parts = window.location.pathname.split("/").filter(Boolean);
@@ -280,8 +294,26 @@ function normalizePayload(form, fields) {
   return payload;
 }
 
-function AdminLayout({ children, menus }) {
+function AdminLayout({ children, menus, groups }) {
   const activeKey = getActiveKey();
+  const [expanded, setExpanded] = useState({});
+
+  const toggle = (label) => setExpanded((p) => ({ ...p, [label]: !p[label] }));
+
+  const flatKeys = {};
+  menus.forEach((m) => { flatKeys[m.key] = true; });
+
+  const isGroupVisible = (g) => {
+    if (g.key) return flatKeys[g.key];
+    if (g.extra) return (g.items || []).some((i) => flatKeys[i.key]) || g.extra.some((i) => flatKeys[i.key]);
+    return (g.items || []).some((i) => flatKeys[i.key]);
+  };
+
+  const hasItemInGroup = (g) => (g.items || []).some((i) => flatKeys[i.key]);
+
+  const renderItem = (item) => (
+    <a key={item.key} href={item.href} className={activeKey === item.key ? "active" : ""}>{item.label}</a>
+  );
 
   return (
     <div className="admin-shell">
@@ -292,14 +324,20 @@ function AdminLayout({ children, menus }) {
         </div>
 
         <nav className="admin-menu">
-          {menus.map((menu) => (
-            <a
-              key={menu.key}
-              href={menu.href}
-              className={activeKey === menu.key ? "active" : ""}
-            >
-              {menu.label}
-            </a>
+          {groups.filter(isGroupVisible).map((g) => (
+            g.key ? renderItem({ key: g.key, label: g.label, href: g.href }) : (
+              <div key={g.label} className="admin-menuGroup">
+                <button type="button" className={expanded[g.label] ? "admin-menuGroupBtn open" : "admin-menuGroupBtn"}
+                  onClick={() => toggle(g.label)}>
+                  <span>{g.label}</span>
+                  <svg className="admin-menuArrow" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M6 8l4 4 4-4" /></svg>
+                </button>
+                <div className={expanded[g.label] ? "admin-menuSub open" : "admin-menuSub"}>
+                  {g.items.filter((i) => flatKeys[i.key]).map(renderItem)}
+                  {hasItemInGroup(g) && g.extra && g.extra.filter((i) => flatKeys[i.key]).map(renderItem)}
+                </div>
+              </div>
+            )
           ))}
         </nav>
 
@@ -2607,7 +2645,7 @@ function AdminApp() {
 
   if (loading) {
     return (
-      <AdminLayout menus={[]}>
+      <AdminLayout menus={[]} groups={menuGroups}>
         <div className="admin-header"><h1>Memuat...</h1></div>
       </AdminLayout>
     );
@@ -2621,7 +2659,7 @@ function AdminApp() {
 
   if (!hasAccess) {
     return (
-      <AdminLayout menus={menus}>
+      <AdminLayout menus={menus} groups={menuGroups}>
         <div className="admin-header">
           <h1>Akses Ditolak</h1>
           <p>Anda tidak memiliki izin untuk mengakses halaman ini.</p>
@@ -2633,7 +2671,7 @@ function AdminApp() {
   const config = resources[activeKey];
 
   return (
-    <AdminLayout menus={menus}>
+    <AdminLayout menus={menus} groups={menuGroups}>
       {activeKey === "dashboard" ? (
         <Dashboard />
       ) : activeKey === "prices-monitor" ? (

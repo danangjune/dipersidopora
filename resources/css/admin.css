@@ -49,15 +49,64 @@
 .admin-menu a {
   color: rgba(255, 255, 255, 0.82);
   text-decoration: none;
-  padding: 12px 14px;
-  border-radius: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
   transition: 0.2s;
+  font-size: 14px;
 }
 
 .admin-menu a:hover,
 .admin-menu a.active {
   background: #ffd166;
   color: #0f2d52;
+}
+
+.admin-menuGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-menuGroupBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 14px 14px 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-menuGroupBtn:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.admin-menuArrow {
+  transition: transform 0.25s ease;
+}
+
+.admin-menuGroupBtn.open .admin-menuArrow {
+  transform: rotate(180deg);
+}
+
+.admin-menuSub {
+  display: none;
+  flex-direction: column;
+}
+
+.admin-menuSub.open {
+  display: flex;
+}
+
+.admin-menuSub a {
+  padding-left: 24px;
+  font-size: 13px;
 }
 
 .admin-logout {
