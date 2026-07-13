@@ -70,6 +70,7 @@ Route::patch('/commodities/{commodity}', [AdminCrudController::class, 'updateCom
 Route::delete('/commodities/{commodity}', [AdminCrudController::class, 'destroyCommodity']);
 
 Route::match(['get', 'post'], '/prices', [AdminCrudController::class, 'prices']);
+Route::post('/prices/bulk', [AdminCrudController::class, 'bulkPrices']);
 Route::patch('/prices/{price}', [AdminCrudController::class, 'updatePrice']);
 Route::delete('/prices/{price}', [AdminCrudController::class, 'destroyPrice']);
 Route::get('/prices/export', [AdminCrudController::class, 'exportPrices']);

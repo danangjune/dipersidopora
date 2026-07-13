@@ -39,6 +39,7 @@ Route::middleware(['auth'])->prefix('api/admin')->name('admin.api.')->group(func
     Route::get('/commodities', [AdminCrudController::class, 'commodities']);
 
     Route::match(['get', 'post'], '/prices', [AdminCrudController::class, 'prices']);
+    Route::post('/prices/bulk', [AdminCrudController::class, 'bulkPrices']);
     Route::patch('/prices/{price}', [AdminCrudController::class, 'updatePrice']);
     Route::delete('/prices/{price}', [AdminCrudController::class, 'destroyPrice']);
     Route::get('/prices/export', [AdminCrudController::class, 'exportPrices']);

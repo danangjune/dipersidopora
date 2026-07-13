@@ -140,6 +140,40 @@ class AdminCrudController extends Controller
         return response()->json(['status' => 'success', 'data' => $record->load(['pasar:id,name', 'komoditas:id,name'])], 201);
     }
 
+    public function bulkPrices(Request $request)
+    {
+        $data = $request->validate([
+            'pasar_id' => ['required', 'exists:pasars,id'],
+            'price_date' => ['required', 'date'],
+            'prices' => ['required', 'array'],
+            'prices.*.komoditas_id' => ['required', 'exists:komoditas,id'],
+            'prices.*.price' => ['nullable', 'integer', 'min:0'],
+            'prices.*.previous_price' => ['nullable', 'integer', 'min:0'],
+        ]);
+
+        $saved = [];
+        foreach ($data['prices'] as $item) {
+            if ($item['price'] === null || $item['price'] === '' || $item['price'] < 0) {
+                continue;
+            }
+            $previous = $item['previous_price']
+                ?? CommodityPriceRecord::query()
+                    ->where('pasar_id', $data['pasar_id'])
+                    ->where('komoditas_id', $item['komoditas_id'])
+                    ->whereDate('price_date', '<', $data['price_date'])
+                    ->orderByDesc('price_date')
+                    ->value('price')
+                ?? 0;
+            $record = CommodityPriceRecord::updateOrCreate(
+                ['pasar_id' => $data['pasar_id'], 'komoditas_id' => $item['komoditas_id'], 'price_date' => $data['price_date']],
+                ['price' => $item['price'], 'previous_price' => $previous, 'indicator_status' => 'belum_dikaji']
+            );
+            $saved[] = $record;
+        }
+
+        return response()->json(['status' => 'success', 'data' => $saved, 'count' => count($saved)]);
+    }
+
     public function updatePrice(Request $request, CommodityPriceRecord $price)
     {
         $data = $request->validate($this->priceRules(true));

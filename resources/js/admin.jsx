@@ -2463,6 +2463,133 @@ function TentangAdmin() {
   );
 }
 
+function PricesAdmin() {
+  const [markets, setMarkets] = useState([]);
+  const [commodities, setCommodities] = useState([]);
+  const [selectedMarket, setSelectedMarket] = useState("");
+  const [prices, setPrices] = useState({});
+  const [priceDate, setPriceDate] = useState(new Date().toISOString().slice(0, 10));
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => { api("/api/admin/markets").then((d) => setMarkets((d.data || []).filter((m) => m.category === "Pasar Rakyat"))).catch(() => {}); }, []);
+
+  const loadCommodities = async (marketId) => {
+    if (!marketId) return;
+    setLoading(true); setMessage("");
+    try {
+      const [comRes, priceRes] = await Promise.all([
+        api("/api/admin/commodities"),
+        api(`/api/admin/prices?market_id=${marketId}&start_date=${priceDate}&end_date=${priceDate}&limit=200`),
+      ]);
+      const allCom = comRes.data || [];
+      const existingPrices = priceRes.data || [];
+      const priceMap = {};
+      existingPrices.forEach((p) => { priceMap[p.komoditas_id] = p.price; });
+      setCommodities(allCom);
+      setPrices(priceMap);
+    } catch { setMessage("Gagal memuat data."); } finally { setLoading(false); }
+  };
+
+  const handleMarketChange = (e) => {
+    const val = e.target.value;
+    setSelectedMarket(val);
+    if (val) loadCommodities(val);
+    else { setCommodities([]); setPrices({}); }
+  };
+
+  const updatePrice = (komoditasId, val) => {
+    setPrices((p) => ({ ...p, [komoditasId]: val === "" ? "" : Number(val) }));
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!selectedMarket) { setMessage("Pilih pasar terlebih dahulu."); return; }
+    setSaving(true); setMessage("");
+    const entries = Object.entries(prices).filter(([, v]) => v !== "" && v !== null);
+    if (entries.length === 0) { setMessage("Tidak ada harga yang diisi."); setSaving(false); return; }
+    const payload = {
+      pasar_id: selectedMarket,
+      price_date: priceDate,
+      prices: entries.map(([komoditasId, price]) => ({ komoditas_id: Number(komoditasId), price })),
+    };
+    try {
+      const res = await api("/api/admin/prices/bulk", { method: "POST", body: JSON.stringify(payload) });
+      setMessage(`Berhasil menyimpan ${res.count || "semua"} data harga.`);
+    } catch (err) { setMessage("Gagal menyimpan: " + (err.message || "")); } finally { setSaving(false); }
+  };
+
+  return (
+    <>
+      <div className="admin-header"><div><p>Pengaturan</p><h1>Input Harga Komoditas</h1></div></div>
+      <div className="admin-card">
+        <form onSubmit={submit} className="admin-form">
+          <div className="admin-form-grid">
+            <label><span>Pasar</span>
+              <select value={selectedMarket} onChange={handleMarketChange}>
+                <option value="">-- Pilih Pasar --</option>
+                {markets.map((m) => (<option key={m.id} value={m.id}>{m.name}</option>))}
+              </select>
+            </label>
+            <label><span>Tanggal</span>
+              <input type="date" value={priceDate} onChange={(e) => setPriceDate(e.target.value)} />
+            </label>
+          </div>
+
+          {loading && <p style={{ margin: "16px 0", color: "#64748b" }}>Memuat komoditas...</p>}
+
+          {!loading && commodities.length > 0 && (
+            <>
+              <div style={{ overflowX: "auto", marginTop: 20 }}>
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: 50, textAlign: "center" }}>No</th>
+                      <th style={{ textAlign: "left" }}>Komoditas</th>
+                      <th style={{ width: 160, textAlign: "right" }}>Harga (Rp)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {commodities.map((com, i) => (
+                      <tr key={com.id}>
+                        <td style={{ textAlign: "center", color: "#64748b", fontSize: 13 }}>{i + 1}</td>
+                        <td>
+                          <strong style={{ fontSize: 14 }}>{com.name}</strong>
+                          {com.unit && <span style={{ color: "#64748b", fontSize: 12, marginLeft: 6 }}>/ {com.unit}</span>}
+                        </td>
+                        <td style={{ textAlign: "right" }}>
+                          <input
+                            type="number"
+                            min="0"
+                            style={{ width: 140, textAlign: "right" }}
+                            placeholder="0"
+                            value={prices[com.id] ?? ""}
+                            onChange={(e) => updatePrice(com.id, e.target.value)}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="admin-actions" style={{ marginTop: 20 }}>
+                <button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan Semua Harga"}</button>
+              </div>
+            </>
+          )}
+
+          {!loading && selectedMarket && commodities.length === 0 && (
+            <p style={{ margin: "16px 0", color: "#64748b" }}>Tidak ada komoditas tersedia.</p>
+          )}
+
+          {message && <p className="admin-message" style={{ marginTop: 12 }}>{message}</p>}
+        </form>
+      </div>
+    </>
+  );
+}
+
 function AdminApp() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -2531,6 +2658,8 @@ function AdminApp() {
         <ZonaIntegritasAdmin />
       ) : activeKey === "ikm" ? (
         <IkmAdmin />
+      ) : activeKey === "prices" ? (
+        <PricesAdmin />
       ) : config ? (
         <CrudPage config={config} />
       ) : (
