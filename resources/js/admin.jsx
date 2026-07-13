@@ -1,6 +1,14 @@
 import "./bootstrap";
 import { createRoot } from "react-dom/client";
 import { useEffect, useMemo, useState } from "react";
+import BuildingStorefrontIcon from "@heroicons/react/24/outline/BuildingStorefrontIcon";
+import CubeIcon from "@heroicons/react/24/outline/CubeIcon";
+import BanknotesIcon from "@heroicons/react/24/outline/BanknotesIcon";
+import BuildingOffice2Icon from "@heroicons/react/24/outline/BuildingOffice2Icon";
+import ChartBarIcon from "@heroicons/react/24/outline/ChartBarIcon";
+import ArrowTrendingUpIcon from "@heroicons/react/24/outline/ArrowTrendingUpIcon";
+import ArrowTrendingDownIcon from "@heroicons/react/24/outline/ArrowTrendingDownIcon";
+import MinusIcon from "@heroicons/react/24/outline/MinusIcon";
 
 const csrf = document
   .querySelector('meta[name="csrf-token"]')
@@ -352,34 +360,154 @@ function AdminLayout({ children, menus, groups }) {
   );
 }
 
-function Dashboard() {
-  const [stats, setStats] = useState(null);
+const statCards = [
+  { key: "markets", label: "Pasar", icon: BuildingStorefrontIcon, color: "#076797" },
+  { key: "commodities", label: "Komoditas", icon: CubeIcon, color: "#108879" },
+  { key: "ikm", label: "IKM", icon: BuildingOffice2Icon, color: "#16a34a" },
+];
 
-  useEffect(() => {
-    api("/api/admin/dashboard")
-      .then((result) => setStats(result.data || {}))
-      .catch(() => setStats({}));
-  }, []);
+const ikmColorMap = { fashion: "#076797", kerajinan: "#108879", makanan_minuman: "#d97706", lainnya: "#6d28d9" };
+const ikmLabelMap = { fashion: "Fashion", kerajinan: "Kerajinan", makanan_minuman: "Makanan & Minuman", lainnya: "Lainnya" };
+
+const marketColorMap = { "Pasar Rakyat": "#076797", "Pasar Modern": "#108879", Minimarket: "#d97706", "Pusat Perbelanjaan": "#6d28d9" };
+
+function Dashboard() {
+  const [data, setData] = useState(null);
+  useEffect(() => { api("/api/admin/dashboard").then((r) => setData(r.data || {})).catch(() => setData({})); }, []);
+
+  if (!data) return (<><div className="admin-header"><div><p>Dashboard</p><h1>Ringkasan Admin</h1></div></div><div className="admin-card"><p>Memuat data...</p></div></>);
+
+  const maxIkm = Math.max(...Object.values(data.ikm_categories || {}), 1);
+  const maxMarket = Math.max(...Object.values(data.market_categories || {}), 1);
+  const priceTrend = data.price_trend || 0;
+  const TrendIcon = priceTrend > 0 ? ArrowTrendingUpIcon : priceTrend < 0 ? ArrowTrendingDownIcon : MinusIcon;
+  const trendColor = priceTrend > 0 ? "#dc2626" : priceTrend < 0 ? "#16a34a" : "#64748b";
 
   return (
     <>
-      <div className="admin-header">
-        <div>
-          <p>Dashboard</p>
-          <h1>Ringkasan Admin</h1>
+      <div className="admin-header"><div><p>Dashboard</p><h1>Ringkasan Admin</h1></div></div>
+
+      <div className="dashGrid">
+        {statCards.map((card) => {
+          const val = data[card.key] ?? 0;
+          const Icon = card.icon;
+          return (
+            <div key={card.key} className="dashCard">
+              <div className="dashCardIcon" style={{ background: `${card.color}18`, color: card.color }}>
+                <Icon style={{ width: 24, height: 24 }} />
+              </div>
+              <div className="dashCardBody">
+                <span className="dashCardLabel">{card.label}</span>
+                <strong className="dashCardValue">{typeof val === "number" ? val.toLocaleString() : val}</strong>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="dashRow">
+        <div className="dashPanel">
+          <div className="dashPanelHead">
+            <ChartBarIcon style={{ width: 18, height: 18 }} />
+            <h3>Harga Rata-Rata</h3>
+          </div>
+          <div className="dashPriceRow">
+            <div className="dashPriceBox">
+              <span className="dashPriceLabel">Hari Ini</span>
+              <strong className="dashPriceValue">Rp {(data.price_avg_today || 0).toLocaleString()}</strong>
+            </div>
+            <div className="dashPriceDivider" />
+            <div className="dashPriceBox">
+              <span className="dashPriceLabel">Kemarin</span>
+              <strong className="dashPriceValue">Rp {(data.price_avg_yesterday || 0).toLocaleString()}</strong>
+            </div>
+            <div className="dashPriceDivider" />
+            <div className="dashPriceBox">
+              <span className="dashPriceLabel">Trend</span>
+              <strong className="dashPriceValue" style={{ color: trendColor }}>
+                <TrendIcon style={{ width: 18, height: 18, verticalAlign: -3, marginRight: 2 }} />
+                {priceTrend > 0 ? "+" : ""}{priceTrend}%
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        <div className="dashPanel">
+          <div className="dashPanelHead">
+            <BuildingOffice2Icon style={{ width: 18, height: 18 }} />
+            <h3>IKM per Kategori</h3>
+          </div>
+          <div className="dashBarList">
+            {Object.entries(data.ikm_categories || {}).map(([cat, count]) => (
+              <div key={cat} className="dashBarRow">
+                <span className="dashBarLabel">{ikmLabelMap[cat] || cat}</span>
+                <div className="dashBarTrack">
+                  <div className="dashBarFill" style={{ width: `${(count / maxIkm) * 100}%`, background: ikmColorMap[cat] || "#076797" }} />
+                </div>
+                <span className="dashBarCount">{count}</span>
+              </div>
+            ))}
+            {Object.keys(data.ikm_categories || {}).length === 0 && <p style={{ color: "#64748b", fontSize: 13 }}>Belum ada data IKM.</p>}
+          </div>
+        </div>
+
+        <div className="dashPanel">
+          <div className="dashPanelHead">
+            <BuildingStorefrontIcon style={{ width: 18, height: 18 }} />
+            <h3>Pasar per Kategori</h3>
+          </div>
+          <div className="dashBarList">
+            {Object.entries(data.market_categories || {}).map(([cat, count]) => (
+              <div key={cat} className="dashBarRow">
+                <span className="dashBarLabel">{cat}</span>
+                <div className="dashBarTrack">
+                  <div className="dashBarFill" style={{ width: `${(count / maxMarket) * 100}%`, background: marketColorMap[cat] || "#076797" }} />
+                </div>
+                <span className="dashBarCount">{count}</span>
+              </div>
+            ))}
+            {Object.keys(data.market_categories || {}).length === 0 && <p style={{ color: "#64748b", fontSize: 13 }}>Belum ada data pasar.</p>}
+          </div>
         </div>
       </div>
 
-      <div className="admin-stats">
-        {stats ? (
-          Object.entries(stats).map(([key, value]) => (
-            <div className="admin-stat-card" key={key}>
-              <span>{key.replaceAll("_", " ")}</span>
-              <strong>{value}</strong>
-            </div>
-          ))
+      <div className="dashPanel" style={{ marginTop: 0 }}>
+        <div className="dashPanelHead">
+          <BanknotesIcon style={{ width: 18, height: 18 }} />
+          <h3>Harga Terbaru Hari Ini</h3>
+        </div>
+        {(data.recent_prices || []).length === 0 ? (
+          <p style={{ color: "#64748b", fontSize: 13, padding: 12 }}>Belum ada harga yang diinput hari ini.</p>
         ) : (
-          <p>Memuat data...</p>
+          <div className="dashTableWrap">
+            <table className="admin-table" style={{ margin: 0 }}>
+              <thead>
+                <tr>
+                  <th>Pasar</th>
+                  <th>Komoditas</th>
+                  <th style={{ textAlign: "right" }}>Harga</th>
+                  <th style={{ textAlign: "right" }}>Sebelumnya</th>
+                  <th style={{ textAlign: "center" }}>Selisih</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(data.recent_prices || []).map((p) => {
+                  const diff = p.price - p.previous_price;
+                  return (
+                    <tr key={p.id}>
+                      <td>{p.pasar}</td>
+                      <td>{p.komoditas} {p.unit && <span style={{ color: "#64748b", fontSize: 12 }}>/ {p.unit}</span>}</td>
+                      <td style={{ textAlign: "right", fontWeight: 600 }}>Rp {p.price.toLocaleString()}</td>
+                      <td style={{ textAlign: "right", color: "#64748b" }}>Rp {p.previous_price.toLocaleString()}</td>
+                      <td style={{ textAlign: "center", color: diff > 0 ? "#dc2626" : diff < 0 ? "#16a34a" : "#64748b" }}>
+                        {diff > 0 ? "+" : ""}{diff.toLocaleString()}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </>

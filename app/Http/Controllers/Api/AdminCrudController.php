@@ -40,15 +40,53 @@ class AdminCrudController extends Controller
 
     public function dashboard()
     {
+        $today = now()->toDateString();
+        $yesterday = now()->subDay()->toDateString();
+
+        $pasarRakyatIds = Pasar::where('category', 'Pasar Rakyat')->pluck('id');
+
+        $avgToday = CommodityPriceRecord::whereIn('pasar_id', $pasarRakyatIds)->whereDate('price_date', $today)->avg('price');
+        $avgYesterday = CommodityPriceRecord::whereIn('pasar_id', $pasarRakyatIds)->whereDate('price_date', $yesterday)->avg('price');
+        $priceTrend = $avgToday && $avgYesterday ? round((($avgToday - $avgYesterday) / $avgYesterday) * 100, 1) : 0;
+
+        $ikmCategories = Ikm::selectRaw('category, COUNT(*) as count')
+            ->groupBy('category')->pluck('count', 'category')->toArray();
+
+        $marketCategories = Pasar::selectRaw('category, COUNT(*) as count')
+            ->groupBy('category')->pluck('count', 'category')->toArray();
+
+        $recentPrices = CommodityPriceRecord::with(['pasar:id,name', 'komoditas:id,name,unit'])
+            ->whereIn('pasar_id', $pasarRakyatIds)
+            ->whereDate('price_date', $today)
+            ->where('price', '>', 0)
+            ->orderByDesc('id')->limit(500)->get()
+            ->map(fn ($r) => [
+                'id' => $r->id,
+                'pasar' => $r->pasar?->name,
+                'komoditas' => $r->komoditas?->name,
+                'unit' => $r->komoditas?->unit,
+                'price' => (int) $r->price,
+                'previous_price' => (int) ($r->previous_price ?? 0),
+            ]);
+
+        $totalIkm = Ikm::count();
+        $pedagangCount = \App\Models\Pedagang::count();
+        $totalMarkets = Pasar::count();
+        $totalCommodities = Komoditas::count();
+
         return response()->json([
             'status' => 'success',
             'data' => [
-                'markets' => Pasar::count(),
-                'commodities' => Komoditas::count(),
-                'prices' => CommodityPriceRecord::count(),
-                'pages' => SitePage::count(),
-                'pending_prices' => CommodityPriceRecord::where('status_validasi', 'pending')->count(),
-                'het_hap' => HetHapSetting::count(),
+                'markets' => $totalMarkets,
+                'commodities' => $totalCommodities,
+                'ikm' => $totalIkm,
+                'pedagang' => $pedagangCount,
+                'price_avg_today' => round((float) ($avgToday ?: 0)),
+                'price_avg_yesterday' => round((float) ($avgYesterday ?: 0)),
+                'price_trend' => $priceTrend,
+                'ikm_categories' => $ikmCategories,
+                'market_categories' => $marketCategories,
+                'recent_prices' => $recentPrices,
             ],
         ]);
     }

@@ -342,3 +342,31 @@
   }
 }
 
+.dashGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.dashCard{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #eaecf0;border-radius:14px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:.2s}
+.dashCard:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);border-color:#d0d5dd}
+.dashCardIcon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dashCardBody{min-width:0}
+.dashCardLabel{display:block;font-size:12px;color:#64748b;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dashCardValue{display:block;font-size:20px;font-weight:700;color:#0f2d52;line-height:1.2}
+.dashRow{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px}
+.dashPanel{background:#fff;border:1px solid #eaecf0;border-radius:16px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.dashPanelHead{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
+.dashPanelHead h3{margin:0;font-size:14px;font-weight:600;color:#0f2d52}
+.dashPanelHead svg{color:#076797}
+.dashPriceRow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:12px}
+.dashPriceBox{text-align:center;padding:8px 0}
+.dashPriceLabel{display:block;font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:.4px;margin-bottom:4px}
+.dashPriceValue{display:block;font-size:18px;font-weight:700;color:#0f2d52}
+.dashPriceDivider{width:1px;height:32px;background:#e2e8f0}
+.dashBarList{display:flex;flex-direction:column;gap:10px}
+.dashBarRow{display:grid;grid-template-columns:1fr 1fr 30px;align-items:center;gap:10px}
+.dashBarLabel{font-size:13px;color:#334155;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dashBarTrack{height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden}
+.dashBarFill{height:100%;border-radius:4px;transition:width .4s ease}
+.dashBarCount{font-size:13px;font-weight:600;color:#0f2d52;text-align:right}
+.dashTableWrap{max-height:400px;overflow-y:auto;overflow-x:auto;border:1px solid #eaecf0;border-radius:12px}
+.dashTableWrap .admin-table{border:none}
+.dashTableWrap .admin-table thead{position:sticky;top:0;z-index:1}
+.dashTableWrap .admin-table thead th{background:#f9fafb}
+
