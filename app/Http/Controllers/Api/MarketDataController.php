@@ -20,7 +20,7 @@ class MarketDataController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => [
-                'markets' => Pasar::query()->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get(),
+                'markets' => Pasar::query()->where('category', 'Pasar Rakyat')->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get(),
                 'commodities' => Komoditas::query()->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get(),
             ],
         ]);

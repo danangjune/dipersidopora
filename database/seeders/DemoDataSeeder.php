@@ -61,7 +61,7 @@ class DemoDataSeeder extends Seeder
             DB::table('komoditas')->updateOrInsert(['slug' => Str::slug($name)], ['name' => $name, 'unit' => $unit, 'image' => $image, 'is_active' => true, 'sort_order' => $idx + 1, 'created_at' => now(), 'updated_at' => now()]);
         }
 
-        $markets = DB::table('pasars')->pluck('id', 'slug');
+        $markets = DB::table('pasars')->where('category', 'Pasar Rakyat')->where('is_active', true)->pluck('id', 'slug');
         $commodityRows = DB::table('komoditas')->get();
         foreach ($markets as $marketSlug => $marketId) {
             foreach ($commodityRows as $idx => $commodity) {

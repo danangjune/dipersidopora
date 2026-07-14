@@ -5,25 +5,55 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Laravel') }} — Panel Admin</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-                </a>
+    <body class="font-sans antialiased">
+        <div class="min-h-screen flex">
+            <!-- Left Panel: Brand / Ilustrasi -->
+            <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0f2d52] to-[#1a4a7a] items-center justify-center p-12 relative overflow-hidden">
+                <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(circle at 25% 50%, #fff 1px, transparent 1px); background-size: 32px 32px;"></div>
+                <div class="relative text-center max-w-md">
+                    <img src="/assets/images/project/logo.png" alt="Logo Disperdagin" class="h-28 w-auto mx-auto mb-8 brightness-0 invert opacity-90" />
+                    <h2 class="text-3xl font-bold text-white mb-4">DISPERDAGIN</h2>
+                    <p class="text-white/70 text-lg leading-relaxed">
+                        Dinas Perdagangan dan Perindustrian<br>Kota Kediri
+                    </p>
+                    <div class="mt-10 h-px bg-white/10 w-24 mx-auto"></div>
+                    <p class="mt-6 text-white/40 text-sm">
+                        Sistem Informasi Harga & Pengelolaan Data Pasar
+                    </p>
+                </div>
             </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                {{ $slot }}
+            <!-- Right Panel: Form -->
+            <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-gray-50">
+                <div class="w-full max-w-sm">
+                    <!-- Mobile logo -->
+                    <div class="lg:hidden text-center mb-8">
+                        <img src="/assets/images/project/logo.png" alt="Logo" class="h-16 w-auto mx-auto mb-3" />
+                        <h2 class="text-xl font-bold text-[#0f2d52]">DISPERDAGIN Kota Kediri</h2>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg shadow-gray-200/80 p-8">
+                        <div class="text-center mb-6">
+                            <h1 class="text-2xl font-bold text-gray-900">Selamat Datang</h1>
+                            <p class="text-sm text-gray-500 mt-1">Silakan masuk ke panel admin</p>
+                        </div>
+
+                        {{ $slot }}
+                    </div>
+
+                    <p class="text-center text-xs text-gray-400 mt-8">
+                        &copy; {{ date('Y') }} DISPERDAGIN Kota Kediri
+                    </p>
+                </div>
             </div>
         </div>
     </body>

@@ -80,7 +80,6 @@ export const menu = [
       { label: "Informasi Harga", href: "/informasi-pasar" },
       { label: "Pasar Rakyat", href: "/pasar" },
       { label: "Pasar Modern", href: "/pasar-modern" },
-      { label: "Minimarket", href: "/minimarket" },
       { label: "Pusat Perbelanjaan", href: "/mall" },
       { label: "Industri Kecil Menengah", href: "/ikm" },
     ],
