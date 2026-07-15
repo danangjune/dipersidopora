@@ -23,7 +23,6 @@ class DemoDataSeeder extends Seeder
             'password' => Hash::make('Surveyor#12345'), 'user_password' => Hash::make('Surveyor#12345'), 'user_role' => 'surveyor', 'created_at' => now(), 'updated_at' => now(),
         ]);
 
-        DB::table('login_pkl')->updateOrInsert(['username' => 'admin'], ['password' => Hash::make('Admin#12345'), 'role' => 'admin', 'created_at' => now(), 'updated_at' => now()]);
 
         $marketSeeds = [
             // Pasar Rakyat
@@ -53,9 +52,49 @@ class DemoDataSeeder extends Seeder
         }
 
         $commodities = [
-            ['Beras', 'beras.webp', 13000, 12800, 'kg'], ['Beras Medium', 'beras_medium.webp', 12500, 12600, 'kg'], ['Gula Pasir', 'gula_pasir.webp', 17000, 17000, 'kg'], ['Minyak Goreng Curah', 'minyak_curah.webp', 16500, 16800, 'liter'], ['Minyakita', 'minyakita.webp', 15500, 15500, 'liter'],
-            ['Telur Ayam Ras', 'telur_ras.webp', 28000, 27500, 'kg'], ['Daging Ayam Ras', 'ayam_ras.webp', 36000, 36000, 'kg'], ['Daging Sapi', 'daging.webp', 115000, 114000, 'kg'], ['Bawang Merah', 'bamer.webp', 34000, 33000, 'kg'], ['Bawang Putih', 'baput.webp', 36000, 35000, 'kg'],
-            ['Cabai Rawit', 'cabe_rawit.webp', 42000, 39000, 'kg'], ['Cabai Merah', 'cabe_merah.webp', 38000, 37500, 'kg'], ['Tomat', 'tomat.webp', 12000, 13000, 'kg'], ['Kentang', 'kentang.webp', 18000, 18000, 'kg'], ['Wortel', 'wortel.webp', 16000, 16500, 'kg'],
+            ['Beras Premium', 'beras.webp', 0, 0, 'kg'],
+            ['Beras Medium', 'beras_medium.webp', 0, 0, 'kg'],
+            ['Gula Kristal Putih', 'gula_pasir.webp', 0, 0, 'kg'],
+            ['Minyak Goreng Curah', 'minyak_curah.webp', 0, 0, 'kg'],
+            ['Minyak Goreng Kemasan Premium', 'minyak_kemasan.webp', 0, 0, 'liter'],
+            ['Minyak Goreng Kemasan Sederhana', 'minyak_botol.webp', 0, 0, 'liter'],
+            ['Minyak Goreng MINYAKITA', 'minyakita.webp', 0, 0, 'liter'],
+            ['Daging Sapi Paha Belakang', 'daging.webp', 0, 0, 'kg'],
+            ['Daging Ayam Ras', 'ayam_ras.webp', 0, 0, 'kg'],
+            ['Daging Ayam Kampung', 'ayam_kampung.webp', 0, 0, 'kg'],
+            ['Telur Ayam Ras', 'telur_ras.webp', 0, 0, 'kg'],
+            ['Telur Ayam Kampung', 'telur_kampung.webp', 0, 0, 'kg'],
+            ['SKM Merk Bendera 370gr', 'skm_bendera.webp', 0, 0, 'kaleng'],
+            ['SKM Merk Indomilk 370gr', 'skm_indomilk.webp', 0, 0, 'kaleng'],
+            ['Susu Bubuk Merk Bendera (Instant) 400gr', 'sb_bendera.webp', 0, 0, 'dos'],
+            ['Susu Bubuk Merk Indomilk (Instant) 400gr', 'sb_indomilk.webp', 0, 0, 'dos'],
+            ['Jagung Pipilan Kering', 'jagung.webp', 0, 0, 'kg'],
+            ['Garam Beryodium Bata', 'garam_bata.webp', 0, 0, 'buah'],
+            ['Garam Beryodium Halus', 'garam_halus.webp', 0, 0, 'kg'],
+            ['Terigu Protein Sedang (Kemasan)', 'terigu.webp', 0, 0, 'kg'],
+            ['Kedelai Impor', 'kedelai.webp', 0, 0, 'kg'],
+            ['Kedelai Lokal', 'kedelai_lokal.webp', 0, 0, 'kg'],
+            ['Indomie Rasa Kari Ayam', 'kari_ayam.webp', 0, 0, 'bungkus'],
+            ['Cabe Merah Keriting', 'cabe_keriting.webp', 0, 0, 'kg'],
+            ['Cabe Merah Besar', 'cabe_merah.webp', 0, 0, 'kg'],
+            ['Cabe Rawit Merah', 'cabe_rawit.webp', 0, 0, 'kg'],
+            ['Bawang Merah', 'bamer.webp', 0, 0, 'kg'],
+            ['Bawang Putih Sinco/Honan', 'baput.webp', 0, 0, 'kg'],
+            ['Ikan Asin Teri', 'ikan_teri.webp', 0, 0, 'kg'],
+            ['Kacang Hijau', 'kacang_hijau.webp', 0, 0, 'kg'],
+            ['Kacang Tanah', 'kacang_tanah.webp', 0, 0, 'kg'],
+            ['Ketela Pohon', 'ketela_pohon.webp', 0, 0, 'kg'],
+            ['Kol/Kubis', 'kubis.webp', 0, 0, 'kg'],
+            ['Kentang', 'kentang.webp', 0, 0, 'kg'],
+            ['Tomat Merah', 'tomat.webp', 0, 0, 'kg'],
+            ['Wortel', 'wortel.webp', 0, 0, 'kg'],
+            ['Buncis', 'buncis.webp', 0, 0, 'kg'],
+            ['Ikan Bandeng', 'bandeng.webp', 0, 0, 'kg'],
+            ['Ikan Kembung', 'kembung.webp', 0, 0, 'kg'],
+            ['Ikan Tuna', 'tuna.webp', 0, 0, 'kg'],
+            ['Ikan Tongkol', 'tongkol.webp', 0, 0, 'kg'],
+            ['Ikan Cakalang', 'cakalang.webp', 0, 0, 'kg'],
+            ['Gas LPG 3Kg', 'LPG.webp', 0, 0, 'tabung'],
         ];
         foreach ($commodities as $idx => [$name, $image, $today, $yesterday, $unit]) {
             DB::table('komoditas')->updateOrInsert(['slug' => Str::slug($name)], ['name' => $name, 'unit' => $unit, 'image' => $image, 'is_active' => true, 'sort_order' => $idx + 1, 'created_at' => now(), 'updated_at' => now()]);

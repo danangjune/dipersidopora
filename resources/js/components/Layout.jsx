@@ -18,7 +18,9 @@ export function Header() {
     <div className="top-hero">
       <a className="brand" href="/">
         <img src={asset('images/dp1.png')} alt="DISPERDAGIN Kota Kediri" />
+        <img src={asset('images/mapan.png')} alt="Kediri Mapan" />
       </a>
+      
       <div className="searchBox">
         <MagnifyingGlassIcon className="searchIcon" />
         <input value={keyword} onChange={e => setKeyword(e.target.value)} placeholder="Cari informasi..." />
