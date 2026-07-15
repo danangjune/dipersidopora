@@ -110,12 +110,16 @@ p{line-height:1.7;margin:0 0 12px;color:var(--text-muted)}
 .commodityCardTop{display:flex;align-items:center;gap:14px;padding:20px 20px 0}
 .commodityCardTop img{width:52px;height:52px;object-fit:cover;border-radius:var(--radius);background:var(--soft);flex-shrink:0;border:1px solid var(--border)}
 .commodityCardTop h3{font-size:15px;margin:0;color:var(--text);font-weight:700;line-height:1.3;flex:1}
-.commodityCardBody{padding:14px 20px 20px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--soft);margin-top:14px}
-.commodityCardBody strong{color:var(--primary);font-size:19px;font-weight:800;letter-spacing:-.02em}
-.commodityTrend{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:700;border-radius:999px;padding:5px 12px}
-.commodityTrend.naik{background:#fef2f2;color:#dc2626}
-.commodityTrend.turun{background:#f0fdf4;color:#16a34a}
-.commodityTrend.tetap{background:#f1f5f9;color:#64748b}
+.commodityCardBody{padding:14px 20px 20px;display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--soft);margin-top:14px}
+.commodityCardPrice{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.commodityCardPrice strong{color:var(--primary);font-size:20px;font-weight:800;letter-spacing:-.02em}
+.commodityCardPrev{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:4px}
+.commodityCardPrev span{color:#94a3b8}
+.commodityTrendBadge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;border-radius:999px;padding:4px 10px;white-space:nowrap;line-height:1}
+.commodityTrendBadge.naik{background:#fef2f2;color:#dc2626}
+.commodityTrendBadge.turun{background:#f0fdf4;color:#16a34a}
+.commodityTrendBadge.tetap{background:#f1f5f9;color:#64748b}
+.commodityTrendBadge svg{flex-shrink:0}
 .blank{display:grid;place-items:center;padding:40px;color:var(--text-muted)}
 .center{text-align:center;margin-top:28px;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px}
 
@@ -273,6 +277,12 @@ tr:hover td{background:#f8fafc}
 
 /* ─── INDICATOR ─── */
 .indicator{display:inline-flex;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.indicatorTrend{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.indicatorTrend.naik{background:#fef2f2;color:#dc2626}
+.indicatorTrend.turun{background:#f0fdf4;color:#16a34a}
+.indicatorTrend.tetap{background:#f1f5f9;color:#64748b}
+.indicatorTrend svg{flex-shrink:0}
+.badgeMarket{display:inline-flex;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:var(--soft);color:var(--primary)}
 .indicator.aman{background:#dcfce7;color:#166534}
 .indicator.waspada{background:#fef9c3;color:#854d0e}
 .indicator.intervensi{background:#fee2e2;color:#991b1b}

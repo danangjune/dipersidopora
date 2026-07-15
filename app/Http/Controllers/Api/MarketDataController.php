@@ -30,8 +30,31 @@ class MarketDataController extends Controller
     {
         [$start, $end] = $this->dateRange($request);
         $marketId = $request->integer('market_id') ?: null;
-        $commodityId = $request->integer('commodity_id') ?: null;
+        $commodityIds = $request->query('commodity_ids');
+        if (is_string($commodityIds)) {
+            $commodityIds = array_filter(explode(',', $commodityIds));
+        } else {
+            $commodityIds = [];
+        }
+        $singleCommodityId = $request->integer('commodity_id') ?: null;
+        if ($singleCommodityId) {
+            $commodityIds[] = $singleCommodityId;
+        }
         $internal = $request->boolean('internal', false);
+
+        // Default ke data hari terbaru di Pasar Rakyat
+        if (!$request->query('start_date') && !$request->query('end_date')) {
+            $latestPasarRakyat = CommodityPriceRecord::query()
+                ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
+                ->where('pasars.category', 'Pasar Rakyat')
+                ->where('commodity_price_records.status_validasi', 'true')
+                ->when($marketId, fn ($q) => $q->where('commodity_price_records.pasar_id', $marketId))
+                ->max('commodity_price_records.price_date');
+            if ($latestPasarRakyat) {
+                $end = Carbon::parse($latestPasarRakyat);
+            }
+            $start = $end->copy();
+        }
 
         $query = CommodityPriceRecord::query()
             ->join('komoditas', 'komoditas.id', '=', 'commodity_price_records.komoditas_id')
@@ -41,15 +64,16 @@ class MarketDataController extends Controller
                     ->where('het_hap_settings.is_active', true);
             })
             ->where('commodity_price_records.status_validasi', 'true')
+            ->where('pasars.category', 'Pasar Rakyat')
             ->whereBetween('commodity_price_records.price_date', [$start->toDateString(), $end->toDateString()])
             ->when($marketId, fn ($q) => $q->where('commodity_price_records.pasar_id', $marketId))
-            ->when($commodityId, fn ($q) => $q->where('commodity_price_records.komoditas_id', $commodityId));
+            ->when(!empty($commodityIds), fn ($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds));
 
         $rows = $query
             ->groupBy('komoditas.id', 'komoditas.name', 'komoditas.unit', 'komoditas.image')
             ->selectRaw('komoditas.id, komoditas.name, komoditas.unit, komoditas.image')
-            ->selectRaw('FLOOR(AVG(commodity_price_records.price)) AS average_price')
-            ->selectRaw('FLOOR(AVG(commodity_price_records.previous_price)) AS previous_average_price')
+            ->selectRaw('FLOOR(AVG(commodity_price_records.price)) AS harga_sekarang')
+            ->selectRaw('FLOOR(AVG(commodity_price_records.previous_price)) AS harga_sebelumnya')
             ->selectRaw('MAX(commodity_price_records.price_date) AS latest_date')
             ->selectRaw('COUNT(DISTINCT commodity_price_records.pasar_id) AS market_count')
             ->selectRaw('MAX(het_hap_settings.price) AS reference_price')
@@ -57,10 +81,27 @@ class MarketDataController extends Controller
             ->get()
             ->map(fn ($row) => $this->formatSummaryRow($row, $internal));
 
+        // Weekly average for Rata-rata column
+        $weekAgo = $end->copy()->subDays(6);
+        $weeklyAvg = CommodityPriceRecord::query()
+            ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
+            ->where('commodity_price_records.status_validasi', 'true')
+            ->where('pasars.category', 'Pasar Rakyat')
+            ->whereBetween('commodity_price_records.price_date', [$weekAgo->toDateString(), $end->toDateString()])
+            ->when($marketId, fn ($q) => $q->where('commodity_price_records.pasar_id', $marketId))
+            ->when(!empty($commodityIds), fn ($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
+            ->groupBy('commodity_price_records.komoditas_id')
+            ->selectRaw('commodity_price_records.komoditas_id, FLOOR(AVG(commodity_price_records.price)) AS rata_rata')
+            ->pluck('rata_rata', 'komoditas_id');
+
+        $rows = $rows->map(fn ($row) => array_merge($row, [
+            'rata_rata' => (int) ($weeklyAvg[$row['commodity_id']] ?? 0),
+        ]));
+
         return response()->json([
             'status' => 'success',
             'data' => [
-                'period' => ['start' => $start->toDateString(), 'end' => $end->toDateString(), 'label' => 'Rata-rata 1 Minggu'],
+                'period' => ['start' => $start->toDateString(), 'end' => $end->toDateString(), 'label' => 'Harga Terkini'],
                 'rows' => $rows,
                 'total' => $rows->count(),
             ],
@@ -81,13 +122,15 @@ class MarketDataController extends Controller
 
         $query = CommodityPriceRecord::query()
             ->join('komoditas', 'komoditas.id', '=', 'commodity_price_records.komoditas_id')
+            ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
             ->where('status_validasi', 'true')
-            ->whereBetween('price_date', [$start->toDateString(), $end->toDateString()])
-            ->when($marketId, fn ($q) => $q->where('pasar_id', $marketId))
+            ->where('pasars.category', 'Pasar Rakyat')
+            ->whereBetween('commodity_price_records.price_date', [$start->toDateString(), $end->toDateString()])
+            ->when($marketId, fn ($q) => $q->where('commodity_price_records.pasar_id', $marketId))
             ->when(!empty($commodityIds), fn ($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
-            ->groupBy('price_date', 'komoditas.id', 'komoditas.name')
-            ->selectRaw('price_date, komoditas.id AS commodity_id, komoditas.name AS commodity_name, FLOOR(AVG(price)) AS average_price')
-            ->orderBy('price_date')
+            ->groupBy('commodity_price_records.price_date', 'komoditas.id', 'komoditas.name')
+            ->selectRaw('commodity_price_records.price_date, komoditas.id AS commodity_id, komoditas.name AS commodity_name, FLOOR(AVG(commodity_price_records.price)) AS average_price')
+            ->orderBy('commodity_price_records.price_date')
             ->limit(500)
             ->get();
 
@@ -142,19 +185,16 @@ class MarketDataController extends Controller
 
     private function formatSummaryRow($row, bool $internal = false): array
     {
-        $average = (int) ($row->average_price ?? 0);
-        $previous = (int) ($row->previous_average_price ?? 0);
-        $diff = $average - $previous;
+        $hargaSekarang = (int) ($row->harga_sekarang ?? 0);
+        $hargaSebelumnya = (int) ($row->harga_sebelumnya ?? 0);
+        $diff = $hargaSekarang - $hargaSebelumnya;
         $reference = $row->reference_price ? (int) $row->reference_price : null;
         $indicator = 'belum_dikaji';
 
-        // WASPADA <= RATA-RATA <= 110% RATA-RATA
-        // INTERVENSI > 110% RATA-RATA
-        
         if ($reference) {
-            if ($average <= $reference) {
+            if ($hargaSekarang <= $reference) {
                 $indicator = 'aman';
-            } elseif ($average <= round($reference * 1.10)) {
+            } elseif ($hargaSekarang <= round($reference * 1.10)) {
                 $indicator = 'waspada';
             } else {
                 $indicator = 'intervensi';
@@ -167,16 +207,16 @@ class MarketDataController extends Controller
             'unit' => $row->unit,
             'image' => $row->image,
             'url_gambar' => asset('assets/images/komoditas/'.($row->image ?: 'default.png')),
-            'average_price' => $average,
-            'previous_average_price' => $previous,
+            'harga_sekarang' => $hargaSekarang,
+            'harga_sebelumnya' => $hargaSebelumnya,
             'selisih' => $diff,
             'tren' => $diff > 0 ? 'naik' : ($diff < 0 ? 'turun' : 'tetap'),
             'latest_date' => $row->latest_date,
             'market_count' => (int) $row->market_count,
+            'reference_price' => $reference,
         ];
 
         if ($internal) {
-            $payload['reference_price'] = $reference;
             $payload['indicator_status'] = $indicator;
         }
 

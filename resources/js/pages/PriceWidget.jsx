@@ -3,6 +3,9 @@ import ChartBarIcon from "@heroicons/react/24/outline/ChartBarIcon";
 import ChevronDownIcon from "@heroicons/react/24/outline/ChevronDownIcon";
 import ChevronUpIcon from "@heroicons/react/24/outline/ChevronUpIcon";
 import ArrowRightIcon from "@heroicons/react/24/outline/ArrowRightIcon";
+import ArrowTrendingUpIcon from "@heroicons/react/24/solid/ArrowTrendingUpIcon";
+import ArrowTrendingDownIcon from "@heroicons/react/24/solid/ArrowTrendingDownIcon";
+import MinusIcon from "@heroicons/react/24/solid/MinusIcon";
 
 const rupiah = (value) =>
   new Intl.NumberFormat("id-ID", {
@@ -28,20 +31,14 @@ export default function PriceWidget() {
   const displayed = showAll ? items : items.slice(0, limit);
   const hasMore = items.length > limit;
 
-  const trendIcon = (tren) => {
-    if (tren === "naik") return "▲";
-    if (tren === "turun") return "▼";
-    return "—";
-  };
-
   return (
     <section className="section">
       <div className="sectionTitle">
         <span>Harga Komoditas</span>
-        <h2>Rata-rata Harga Komoditas Mingguan</h2>
+        <h2>Pantau Harga Komoditas Hari Ini</h2>
         <p>
-          Pantau harga kebutuhan pokok terkini di pasar tradisional dan modern
-          Kota Kediri.
+          Data harga kebutuhan pokok terkini dari berbagai pasar di Kota Kediri
+          diperbarui setiap hari.
         </p>
       </div>
 
@@ -60,6 +57,12 @@ export default function PriceWidget() {
           <div className="commodityGridTen">
             {displayed.map((item) => {
               const tren = item.tren || "tetap";
+              const TrendIcon =
+                tren === "naik"
+                  ? ArrowTrendingUpIcon
+                  : tren === "turun"
+                    ? ArrowTrendingDownIcon
+                    : MinusIcon;
               return (
                 <article className="commodityCard" key={item.nama_komoditas}>
                   <div className="commodityCardTop">
@@ -75,13 +78,19 @@ export default function PriceWidget() {
                     <h3>{item.nama_komoditas}</h3>
                   </div>
                   <div className="commodityCardBody">
-                    <strong>
-                      {rupiah(item.average_price ?? item.harga_sekarang)}
-                    </strong>
-                    <span className={`commodityTrend ${tren}`}>
-                      <i>{trendIcon(tren)}</i>{" "}
-                      {rupiah(Math.abs(item.selisih || 0))}
-                    </span>
+                    <div className="commodityCardPrice">
+                      <strong>
+                        {rupiah(item.harga_sekarang)}
+                      </strong>
+                      <span className={`commodityTrendBadge ${tren}`}>
+                        <TrendIcon style={{ width: 14, height: 14 }} />
+                        {rupiah(Math.abs(item.selisih || 0))}
+                      </span>
+                    </div>
+                    <div className="commodityCardPrev">
+                      <span>Sebelumnya </span>
+                      {rupiah(item.harga_sebelumnya)}
+                    </div>
                   </div>
                 </article>
               );

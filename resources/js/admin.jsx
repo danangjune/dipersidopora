@@ -1,6 +1,10 @@
 import "./bootstrap";
 import { createRoot } from "react-dom/client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Chart, LineController, LineElement, PointElement,
+  LinearScale, CategoryScale, Title, Tooltip, Legend, Filler,
+} from "chart.js";
 import BuildingStorefrontIcon from "@heroicons/react/24/outline/BuildingStorefrontIcon";
 import CubeIcon from "@heroicons/react/24/outline/CubeIcon";
 import BanknotesIcon from "@heroicons/react/24/outline/BanknotesIcon";
@@ -9,6 +13,8 @@ import ChartBarIcon from "@heroicons/react/24/outline/ChartBarIcon";
 import ArrowTrendingUpIcon from "@heroicons/react/24/outline/ArrowTrendingUpIcon";
 import ArrowTrendingDownIcon from "@heroicons/react/24/outline/ArrowTrendingDownIcon";
 import MinusIcon from "@heroicons/react/24/outline/MinusIcon";
+
+Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Legend, Filler);
 
 const csrf = document
   .querySelector('meta[name="csrf-token"]')
@@ -918,16 +924,15 @@ function IndicatorBadge({ status }) {
 }
 
 function PriceMonitoring() {
-  const today = new Date();
-  const iso = (d) => d.toISOString().slice(0, 10);
-  const weekAgo = new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000);
+  const chartCanvasRef = useRef(null);
+  const chartInstanceRef = useRef(null);
   const [filters, setFilters] = useState({ markets: [], commodities: [] });
   const [marketId, setMarketId] = useState("");
-  const [commodityId, setCommodityId] = useState("");
-  const [startDate, setStartDate] = useState(iso(weekAgo));
-  const [endDate, setEndDate] = useState(iso(today));
+  const [commodityIds, setCommodityIds] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [rows, setRows] = useState([]);
-  const [chart, setChart] = useState({ dates: [], series: [] });
+  const [chartData, setChartData] = useState({ dates: [], series: [] });
   const [adminAverages, setAdminAverages] = useState(null);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -936,45 +941,116 @@ function PriceMonitoring() {
   const [page, setPage] = useState(1);
   const perPage = 10;
 
+  const COLORS = ["#076797", "#108879", "#e2a200", "#dc2626", "#7c3aed", "#0891b2", "#84cc16", "#f97316", "#ec4899", "#6366f1"];
+
+  const toggleCommodity = (id) => {
+    setCommodityIds((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]);
+  };
+
+  const setDatePreset = (days) => {
+    const now = new Date();
+    const e = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const s = new Date(e.getTime() - (days - 1) * 86400000);
+    const fmt = (d) => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    setStartDate(fmt(s));
+    setEndDate(fmt(e));
+  };
+
   useEffect(() => {
     fetch("/api/market/filters")
       .then((r) => r.json())
       .then((d) => setFilters(d.data || { markets: [], commodities: [] }));
   }, []);
 
-  const query = useMemo(() => {
+  const summaryQuery = useMemo(() => {
+    const q = new URLSearchParams();
+    q.set("internal", "1");
+    return q.toString();
+  }, []);
+
+  const chartQuery = useMemo(() => {
     const q = new URLSearchParams();
     if (marketId) q.set("market_id", marketId);
-    if (commodityId) q.set("commodity_id", commodityId);
+    if (commodityIds.length > 0) q.set("commodity_ids", commodityIds.join(","));
     if (startDate) q.set("start_date", startDate);
     if (endDate) q.set("end_date", endDate);
     q.set("internal", "1");
     return q.toString();
-  }, [marketId, commodityId, startDate, endDate]);
+  }, [marketId, commodityIds, startDate, endDate]);
 
   const load = () => {
     setLoading(true);
     Promise.all([
-      fetch(`/api/market/summary?${query}`).then((r) => r.json()),
-      fetch(`/api/market/chart?${query}`).then((r) => r.json()),
-      fetch(`/api/market/admin-averages?${query}`).then((r) => r.json()),
+      fetch(`/api/market/summary?${summaryQuery}`).then((r) => r.json()),
+      fetch(`/api/market/chart?${chartQuery}`).then((r) => r.json()),
+      fetch(`/api/market/admin-averages?${summaryQuery}`).then((r) => r.json()),
     ])
-      .then(([summary, chartData, avg]) => {
+      .then(([summary, chartDataResult, avg]) => {
         setRows(summary?.data?.rows || []);
-        setChart(chartData?.data || { dates: [], series: [] });
+        setChartData(chartDataResult?.data || { dates: [], series: [] });
         setAdminAverages(avg?.data || null);
       })
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, [query]);
+  useEffect(() => { load(); }, [summaryQuery, chartQuery]);
+
+  useEffect(() => {
+    if (!chartCanvasRef.current || chartData.dates.length === 0) return;
+    if (chartInstanceRef.current) chartInstanceRef.current.destroy();
+
+    const ctx = chartCanvasRef.current.getContext("2d");
+    chartInstanceRef.current = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: chartData.dates,
+        datasets: chartData.series.map((s, i) => ({
+          label: s.name,
+          data: s.data,
+          borderColor: COLORS[i % COLORS.length],
+          backgroundColor: COLORS[i % COLORS.length] + "15",
+          fill: true,
+          tension: 0.3,
+          pointRadius: 4,
+          pointHoverRadius: 7,
+          borderWidth: 2.5,
+        })),
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { intersect: false, mode: "index" },
+        plugins: {
+          legend: { position: "bottom", labels: { padding: 20, usePointStyle: true, font: { size: 12, family: "Inter, sans-serif" } } },
+          tooltip: {
+            backgroundColor: "#0f2d52",
+            titleFont: { size: 13, family: "Inter, sans-serif" },
+            bodyFont: { size: 12, family: "Inter, sans-serif" },
+            padding: 12,
+            cornerRadius: 12,
+            callbacks: { label: (ctx) => ` ${ctx.dataset.label}: ${rupiah(ctx.parsed.y)}` },
+          },
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 11, family: "Inter, sans-serif" } } },
+          y: {
+            grid: { color: "#eef2f7" },
+            ticks: { font: { size: 11, family: "Inter, sans-serif" }, callback: (v) => rupiah(v).replace(",00", "") },
+          },
+        },
+      },
+    });
+
+    return () => { if (chartInstanceRef.current) chartInstanceRef.current.destroy(); };
+  }, [chartData]);
 
   const filteredRows = useMemo(() => {
     let data = rows;
     if (search) {
       const q = search.toLowerCase();
       data = rows.filter((r) =>
-        [r.nama_komoditas, r.average_price, r.previous_average_price, r.indicator_status, r.latest_date]
+        [r.nama_komoditas, r.harga_sekarang, r.harga_sebelumnya, r.indicator_status, r.latest_date]
           .some((v) => v != null && String(v).toLowerCase().includes(q))
       );
     }
@@ -1013,32 +1089,7 @@ function PriceMonitoring() {
           <p>Admin</p>
           <h1>Pemantauan Harga Komoditas</h1>
         </div>
-        <a className="btn" href={`/api/admin/prices/export?${query}`}>Download Excel</a>
-      </div>
-
-      <div className="filterPanel" style={{ background: "#fff", border: "1px solid #d0d5dd", borderRadius: 12, padding: 18, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 22 }}>
-        <label style={{ display: "grid", gap: 6, fontWeight: 600, color: "#344054", fontSize: 13 }}>
-          Pasar
-          <select value={marketId} onChange={(e) => setMarketId(e.target.value)} style={{ border: "1px solid #d0d5dd", borderRadius: 10, padding: "10px 12px", font: "inherit", background: "#fff" }}>
-            <option value="">Semua Pasar</option>
-            {filters.markets.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
-          </select>
-        </label>
-        <label style={{ display: "grid", gap: 6, fontWeight: 600, color: "#344054", fontSize: 13 }}>
-          Dari Tanggal
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ border: "1px solid #d0d5dd", borderRadius: 10, padding: "10px 12px", font: "inherit" }} />
-        </label>
-        <label style={{ display: "grid", gap: 6, fontWeight: 600, color: "#344054", fontSize: 13 }}>
-          Sampai Tanggal
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} style={{ border: "1px solid #d0d5dd", borderRadius: 10, padding: "10px 12px", font: "inherit" }} />
-        </label>
-        <label style={{ display: "grid", gap: 6, fontWeight: 600, color: "#344054", fontSize: 13 }}>
-          Komoditas
-          <select value={commodityId} onChange={(e) => setCommodityId(e.target.value)} style={{ border: "1px solid #d0d5dd", borderRadius: 10, padding: "10px 12px", font: "inherit", background: "#fff" }}>
-            <option value="">Semua</option>
-            {filters.commodities.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        </label>
+        <a className="btn" href={`/api/admin/prices/export?${chartQuery}`}>Download Excel</a>
       </div>
 
       <div className="admin-card">
@@ -1058,27 +1109,31 @@ function PriceMonitoring() {
                 <tr>
                   <th>No</th>
                   <th className={sortKey === "nama_komoditas" ? sortDir : ""} onClick={() => toggleSort("nama_komoditas")}>Komoditas <span className="sortIcon">{sortKey === "nama_komoditas" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
-                  <th className={sortKey === "average_price" ? sortDir : ""} onClick={() => toggleSort("average_price")}>Rata-rata <span className="sortIcon">{sortKey === "average_price" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
-                  <th>Sebelumnya</th>
+                  <th>Satuan</th>
+                  <th>HET/HAP</th>
+                  <th className={sortKey === "harga_sekarang" ? sortDir : ""} onClick={() => toggleSort("harga_sekarang")}>Harga Terkini <span className="sortIcon">{sortKey === "harga_sekarang" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
+                  <th>Harga Sebelumnya</th>
+                  <th>Rata-rata</th>
                   <th>Selisih</th>
-                  <th className={sortKey === "market_count" ? sortDir : ""} onClick={() => toggleSort("market_count")}>Pasar <span className="sortIcon">{sortKey === "market_count" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
-                  <th>Harga Acuan</th>
+                  <th className={sortKey === "market_count" ? sortDir : ""} onClick={() => toggleSort("market_count")}>Jumlah Pasar <span className="sortIcon">{sortKey === "market_count" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
                   <th className={sortKey === "indicator_status" ? sortDir : ""} onClick={() => toggleSort("indicator_status")}>Indikator <span className="sortIcon">{sortKey === "indicator_status" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
-                  <th>Update</th>
+                  <th>Tanggal Update</th>
                 </tr>
               </thead>
               <tbody>
                 {paginated.map((r, i) => (
                   <tr key={r.commodity_id}>
                     <td>{(safePage - 1) * perPage + i + 1}</td>
-                    <td>{r.nama_komoditas}</td>
-                    <td>{rupiah(r.average_price)}</td>
-                    <td>{rupiah(r.previous_average_price)}</td>
-                    <td style={{ color: r.tren === "naik" ? "#dc2626" : r.tren === "turun" ? "#16a34a" : "#64748b" }}>{rupiah(Math.abs(r.selisih))}</td>
-                    <td>{r.market_count}</td>
+                    <td><strong>{r.nama_komoditas}</strong></td>
+                    <td>{r.unit || "-"}</td>
                     <td>{r.reference_price ? rupiah(r.reference_price) : "-"}</td>
+                    <td><strong style={{color:"var(--primary)"}}>{rupiah(r.harga_sekarang)}</strong></td>
+                    <td>{rupiah(r.harga_sebelumnya)}</td>
+                    <td>{rupiah(r.rata_rata)}</td>
+                    <td style={{ color: r.tren === "naik" ? "#dc2626" : r.tren === "turun" ? "#16a34a" : "#64748b" }}>{rupiah(Math.abs(r.selisih))}</td>
+                    <td><span className="badgeMarket">{r.market_count}</span></td>
                     <td><IndicatorBadge status={r.indicator_status} /></td>
-                    <td>{r.latest_date || "-"}</td>
+                    <td style={{fontSize:13, color:"var(--text-muted)"}}>{r.latest_date || "-"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1095,6 +1150,105 @@ function PriceMonitoring() {
             <button disabled={safePage >= totalPages} onClick={() => setPage(safePage + 1)}>Next ›</button>
           </div>
         )}
+      </div>
+
+      <div className="admin-card">
+
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:24}}>
+          <div>
+            <h2 style={{margin:0,fontSize:20,color:"var(--text)"}}>Grafik Harga</h2>
+            <p style={{margin:"4px 0 0",fontSize:14,color:"var(--text-muted)"}}>Visualisasi tren harga komoditas</p>
+          </div>
+        </div>
+
+        <div style={{
+          background:"var(--bg)", borderRadius:"var(--radius-lg)", padding:20, marginBottom:20,
+          display:"flex", flexDirection:"column", gap:16
+        }}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,alignItems:"end"}}>
+            <div>
+              <label style={{display:"grid",gap:6,fontSize:12,fontWeight:700,color:"var(--text)",textTransform:"uppercase",letterSpacing:".04em"}}>
+                Pasar
+                <select value={marketId} onChange={(e) => setMarketId(e.target.value)}
+                  style={{width:"100%",border:"1.5px solid var(--border)",borderRadius:"var(--radius-sm)",padding:"10px 12px",font:"inherit",background:"var(--surface)",outline:"none",transition:"var(--transition)"}}
+                  onFocus={e=>e.target.style.borderColor="var(--accent)"}
+                  onBlur={e=>e.target.style.borderColor="var(--border)"}>
+                  <option value="">Semua Pasar</option>
+                  {filters.markets.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+                </select>
+              </label>
+            </div>
+            <div>
+              <label style={{display:"grid",gap:6,fontSize:12,fontWeight:700,color:"var(--text)",textTransform:"uppercase",letterSpacing:".04em"}}>
+                Dari
+                <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
+                  style={{width:"100%",border:"1.5px solid var(--border)",borderRadius:"var(--radius-sm)",padding:"10px 12px",font:"inherit",background:"var(--surface)",outline:"none",transition:"var(--transition)"}}
+                  onFocus={e=>e.target.style.borderColor="var(--accent)"}
+                  onBlur={e=>e.target.style.borderColor="var(--border)"} />
+              </label>
+            </div>
+            <div>
+              <label style={{display:"grid",gap:6,fontSize:12,fontWeight:700,color:"var(--text)",textTransform:"uppercase",letterSpacing:".04em"}}>
+                Sampai
+                <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
+                  style={{width:"100%",border:"1.5px solid var(--border)",borderRadius:"var(--radius-sm)",padding:"10px 12px",font:"inherit",background:"var(--surface)",outline:"none",transition:"var(--transition)"}}
+                  onFocus={e=>e.target.style.borderColor="var(--accent)"}
+                  onBlur={e=>e.target.style.borderColor="var(--border)"} />
+              </label>
+            </div>
+            <div style={{display:"flex",gap:8,alignItems:"end"}}>
+              {[7, 14, 30].map((n) => (
+                <button key={n} onClick={() => setDatePreset(n)}
+                  style={{
+                    flex:1, padding:"10px 12px", border:"1.5px solid var(--border)", borderRadius:"var(--radius-sm)",
+                    background:"var(--surface)", color:"var(--text-muted)", fontSize:13, fontWeight:700,
+                    cursor:"pointer", transition:"var(--transition)", fontFamily:"inherit"
+                  }}
+                  onMouseEnter={e=>{e.target.style.borderColor="var(--accent)";e.target.style.color="var(--accent)"}}
+                  onMouseLeave={e=>{e.target.style.borderColor="var(--border)";e.target.style.color="var(--text-muted)"}}>
+                  {n}H
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{borderTop:"1px solid var(--border)",paddingTop:14}}>
+            <p style={{margin:"0 0 10px",fontSize:12,fontWeight:700,color:"var(--text)",textTransform:"uppercase",letterSpacing:".04em"}}>
+              Komoditas
+            </p>
+            <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+              {filters.commodities.map((c, i) => {
+                const checked = commodityIds.includes(c.id);
+                return (
+                  <label key={c.id} style={{
+                    display:"inline-flex",alignItems:"center",gap:6,
+                    padding:"7px 14px", borderRadius:999,
+                    border:"1.5px solid", cursor:"pointer", transition:"var(--transition)",
+                    userSelect:"none", fontSize:13, fontWeight:600,
+                    background: checked ? COLORS[i%COLORS.length] : "var(--surface)",
+                    borderColor: checked ? COLORS[i%COLORS.length] : "var(--border)",
+                    color: checked ? "#fff" : "var(--text)",
+                  }}>
+                    <input type="checkbox" checked={checked} onChange={() => toggleCommodity(c.id)}
+                      style={{display:"none"}} />
+                    {c.name}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="chartContainer" style={{margin:0}}>
+          {loading && <p className="blank">Memuat grafik...</p>}
+          {!loading && chartData.dates.length === 0 && <p className="blank">Belum ada data grafik.</p>}
+          {!loading && chartData.dates.length > 0 && (
+            <div className="chartWrapper">
+              <canvas ref={chartCanvasRef} />
+            </div>
+          )}
+        </div>
+
       </div>
 
       <div className="admin-card">
@@ -1115,34 +1269,6 @@ function PriceMonitoring() {
             ))}
           </div>
         )}
-      </div>
-
-      <div className="admin-card">
-        <h2>Grafik Harga</h2>
-        <div className="chartBox" style={{ background: "#fff", border: "1px solid #eaecf0", borderRadius: 12, padding: 16 }}>
-          {(!chart.dates || chart.dates.length === 0) && <p>Belum ada data grafik.</p>}
-          {chart.dates && chart.dates.length > 0 && chart.series && chart.series.map((s) => {
-            const maxVal = Math.max(...s.data.filter(v => v !== null), 1);
-            return (
-              <div key={s.commodity_id} style={{ marginBottom: 14 }}>
-                <strong style={{ fontSize: 13, color: "#0f2d52", display: "block", marginBottom: 6 }}>{s.name}</strong>
-                {chart.dates.map((d, i) => {
-                  const val = s.data[i];
-                  if (val === null) return null;
-                  return (
-                    <div key={d} className="barRow" style={{ display: "grid", gridTemplateColumns: "minmax(100px,1fr) minmax(80px,1.8fr) minmax(80px,0.7fr)", gap: 8, alignItems: "center", fontSize: 11, marginBottom: 3 }}>
-                      <span>{d}</span>
-                      <div style={{ height: 10, background: "#eef2f7", borderRadius: 999, overflow: "hidden" }}>
-                        <i style={{ display: "block", height: "100%", width: `${Math.max(4, (val / maxVal) * 100)}%`, background: "linear-gradient(90deg,#0f2d52,#2563eb)", borderRadius: 999 }} />
-                      </div>
-                      <strong>{rupiah(val)}</strong>
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
       </div>
     </div>
   );
