@@ -115,12 +115,24 @@ const resources = {
       is_published: true,
     },
   },
+  "download-categories": {
+    title: "Master Kategori Unduhan",
+    endpoint: "/api/admin/download-categories",
+    fields: [
+      { name: "name", label: "Nama Kategori", required: true },
+      { name: "slug", label: "Slug", required: true },
+      { name: "sort_order", label: "Urutan", type: "number" },
+      { name: "is_active", label: "Aktif", type: "checkbox" },
+    ],
+    columns: ["name", "slug", "sort_order", "is_active"],
+    defaults: { name: "", slug: "", sort_order: 0, is_active: true },
+  },
   downloads: {
     title: "Master Dokumen Unduhan",
     endpoint: "/api/admin/downloads",
     fields: [
       { name: "title", label: "Judul", required: true },
-      { name: "category", label: "Kategori", type: "select", required: true, options: [["laporan", "laporan"], ["layanan", "layanan"], ["renja", "renja"], ["renstra", "renstra"]] },
+      { name: "category", label: "Kategori", type: "select", required: true, optionsUrl: "/api/admin/download-categories", optionValue: "slug" },
       { name: "file_path", label: "File", type: "file", accept: ".pdf,.doc,.docx,.xls,.xlsx", required: true },
       { name: "sort_order", label: "Urutan", type: "number" },
       { name: "is_published", label: "Publish", type: "checkbox" },
@@ -128,7 +140,6 @@ const resources = {
     columns: ["title", "category", "file_path", "is_published"],
     defaults: {
       title: "",
-      category: "renja",
       file_path: "",
       sort_order: 0,
       is_published: true,
@@ -233,6 +244,7 @@ const menuGroups = [
       { key: "markets", label: "Pasar", href: "/admin/markets" },
       { key: "commodities", label: "Komoditas", href: "/admin/commodities" },
       { key: "pages", label: "Halaman", href: "/admin/pages" },
+      { key: "download-categories", label: "Kategori Unduhan", href: "/admin/download-categories" },
       { key: "downloads", label: "Dokumen", href: "/admin/downloads" },
       { key: "survey-settings", label: "Survey", href: "/admin/survey-settings" },
     ],
@@ -712,7 +724,7 @@ function CrudPage({ config }) {
       const allOptions =
         options.length > 0
           ? options
-          : loaded.map((item) => [item.id, item.name]);
+          : loaded.map((item) => [item[field.optionValue || 'id'], item.name]);
 
       return (
         <select

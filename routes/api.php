@@ -17,6 +17,7 @@ Route::get('/site/page/{slug}', [SiteContentController::class, 'page'])
     ->where('slug', '.*');
 
 Route::get('/site/downloads/{category}', [SiteContentController::class, 'downloads']);
+Route::get('/site/download-categories', [SiteContentController::class, 'downloadCategories']);
 
 Route::get('/site/survey-setting', [SiteContentController::class, 'surveySetting']);
 
@@ -87,6 +88,10 @@ Route::delete('/pages/{page}', [AdminCrudController::class, 'destroyPage']);
 Route::match(['get', 'post'], '/downloads', [AdminCrudController::class, 'downloads']);
 Route::patch('/downloads/{download}', [AdminCrudController::class, 'updateDownload']);
 Route::delete('/downloads/{download}', [AdminCrudController::class, 'destroyDownload']);
+
+Route::match(['get', 'post'], '/download-categories', [AdminCrudController::class, 'downloadCategories']);
+Route::patch('/download-categories/{downloadCategory}', [AdminCrudController::class, 'updateDownloadCategory']);
+Route::delete('/download-categories/{downloadCategory}', [AdminCrudController::class, 'destroyDownloadCategory']);
 
 Route::match(['get', 'post'], '/survey-settings', [AdminCrudController::class, 'surveySettings']);
 Route::patch('/survey-settings/{surveySetting}', [AdminCrudController::class, 'updateSurveySetting']);

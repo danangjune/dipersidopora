@@ -4,21 +4,6 @@ import ArrowDownTrayIcon from "@heroicons/react/24/outline/ArrowDownTrayIcon";
 import DocumentTextIcon from "@heroicons/react/24/outline/DocumentTextIcon";
 import DocumentArrowDownIcon from "@heroicons/react/24/outline/DocumentArrowDownIcon";
 
-const downloadMap = {
-  "/unduhan/renstra": {
-    title: "Rencana Strategis",
-    category: "renstra",
-  },
-  "/unduhan/renja": {
-    title: "Rencana Kerja",
-    category: "renja",
-  },
-  "/unduhan/laporan": {
-    title: "Laporan",
-    category: "laporan",
-  },
-};
-
 function Loading() {
   return (
     <section className="section">
@@ -150,21 +135,19 @@ export default function CmsPage({ path }) {
       setMissing(false);
 
       try {
-        const downloadConfig = downloadMap[normalizedPath];
-
-        if (downloadConfig) {
-          const items = await apiGet(
-            `/api/site/downloads/${downloadConfig.category}`,
-          );
-
+        if (normalizedPath.startsWith("/unduhan/")) {
+          const slug = normalizedPath.replace("/unduhan/", "");
+          const [categories, items] = await Promise.all([
+            apiGet("/api/site/download-categories"),
+            apiGet(`/api/site/downloads/${slug}`),
+          ]);
           if (!active) return;
-
+          const cat = (categories || []).find((c) => c.slug === slug);
           setDownloads(items || []);
           setPage({
             type: "download",
-            title: downloadConfig.title,
+            title: cat ? cat.name : slug,
           });
-
           return;
         }
 

@@ -50,6 +50,8 @@ export const routeAliases = {
   "/unduhan-renja.php": "/unduhan/renja",
   "/unduhan-laporan": "/unduhan/laporan",
   "/unduhan-laporan.php": "/unduhan/laporan",
+  "/unduhan-layanan": "/unduhan/layanan",
+  "/unduhan-layanan.php": "/unduhan/layanan",
 
   "/pasar.php": "/pasar",
   "/pasar-modern.php": "/pasar-modern",

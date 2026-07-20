@@ -308,6 +308,16 @@ class SiteContentController extends Controller
         ]);
     }
 
+    public function downloadCategories()
+    {
+        $categories = \App\Models\DownloadCategory::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug']);
+        return response()->json(['status' => 'success', 'data' => $categories]);
+    }
+
     public function programKegiatan()
     {
         $defaults = [

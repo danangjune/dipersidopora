@@ -406,6 +406,19 @@ class DemoDataSeeder extends Seeder
             'is_published' => true, 'sort_order' => 6, 'created_at' => now(), 'updated_at' => now()
         ]);
 
+        $downloadCategories = [
+            ['Rencana Strategis', 'renstra', 1],
+            ['Rencana Kerja', 'renja', 2],
+            ['Laporan', 'laporan', 3],
+            ['Layanan', 'layanan', 4],
+        ];
+        foreach ($downloadCategories as $i => [$name, $slug, $order]) {
+            DB::table('download_categories')->updateOrInsert(
+                ['slug' => $slug],
+                ['name' => $name, 'sort_order' => $order, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()]
+            );
+        }
+
         $defaultSettings = [
             ['address', 'Jl. Penanggungan No. 7, Bandar Lor, Kec. Mojoroto, Kota Kediri, Jawa Timur'],
             ['phone', '0354-771908'],

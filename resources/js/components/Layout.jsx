@@ -1,4 +1,4 @@
-import { menu, asset, routesIndex } from '../data/siteContent';
+import { menu as staticMenu, asset, routesIndex } from '../data/siteContent';
 import { useEffect, useState } from 'react';
 import { InformationCircleIcon, ChartBarIcon, Cog6ToothIcon, ArrowDownTrayIcon, ShieldCheckIcon, ClipboardDocumentCheckIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
@@ -12,7 +12,18 @@ const groupIcons = {
 export function Header() {
   const [open, setOpen] = useState(false);
   const [keyword, setKeyword] = useState('');
-  const results = keyword.trim() ? routesIndex.filter(([label]) => label.toLowerCase().includes(keyword.toLowerCase())).slice(0, 6) : [];
+  const [downloadCategories, setDownloadCategories] = useState([]);
+  const allRoutes = downloadCategories.length > 0
+    ? [...routesIndex, ...downloadCategories.map(c => [c.name, '/unduhan/' + c.slug])]
+    : routesIndex;
+  const results = keyword.trim() ? allRoutes.filter(([label]) => label.toLowerCase().includes(keyword.toLowerCase())).slice(0, 6) : [];
+
+  useEffect(() => {
+    fetch('/api/site/download-categories')
+      .then(r => r.json())
+      .then(d => setDownloadCategories(d.data || []))
+      .catch(() => {});
+  }, []);
 
   return <>
     <div className="top-hero">
@@ -35,7 +46,7 @@ export function Header() {
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10zm0 5.25a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd"/></svg>
       </button>
       <div className={`navItems ${open ? 'show' : ''}`}>
-        {menu.map(group => {
+        {(staticMenu.map(g => g.title === 'Unduhan' ? { ...g, items: downloadCategories.length > 0 ? downloadCategories.map(c => ({ label: c.name, href: '/unduhan/' + c.slug })) : g.items } : g)).map(group => {
           const GroupIcon = groupIcons[group.title];
           return <div className="dropdown" key={group.title}>
             <button>

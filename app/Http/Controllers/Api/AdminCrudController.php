@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\CommodityPriceRecord;
+use App\Models\DownloadCategory;
 use App\Models\DownloadDocument;
 use App\Models\HetHapSetting;
 use App\Models\Ikm;
@@ -943,6 +944,38 @@ class AdminCrudController extends Controller
         return response()->json(['status' => 'success']);
     }
 
+    public function downloadCategories(Request $request)
+    {
+        if ($request->isMethod('get')) {
+            return response()->json(['status' => 'success', 'data' => DownloadCategory::query()->orderBy('sort_order')->orderBy('name')->get()]);
+        }
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'slug' => ['required', 'string', 'max:80', 'unique:download_categories,slug'],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+        return response()->json(['status' => 'success', 'data' => DownloadCategory::create($data)], 201);
+    }
+
+    public function updateDownloadCategory(Request $request, DownloadCategory $downloadCategory)
+    {
+        $data = $request->validate([
+            'name' => ['sometimes', 'string', 'max:120'],
+            'slug' => ['sometimes', 'string', 'max:80', 'unique:download_categories,slug,' . $downloadCategory->id],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+        $downloadCategory->update($data);
+        return response()->json(['status' => 'success', 'data' => $downloadCategory->fresh()]);
+    }
+
+    public function destroyDownloadCategory(DownloadCategory $downloadCategory)
+    {
+        $downloadCategory->delete();
+        return response()->json(['status' => 'success']);
+    }
+
     public function surveySettings(Request $request)
     {
         if ($request->isMethod('get')) {
@@ -1306,9 +1339,10 @@ class AdminCrudController extends Controller
     private function downloadRules(bool $partial = false): array
     {
         $req = $partial ? 'sometimes' : 'required';
+        $slugs = \App\Models\DownloadCategory::query()->where('is_active', true)->pluck('slug')->toArray();
         return [
             'title' => [$req, 'string', 'max:220'],
-            'category' => [$req, 'string', 'max:80', Rule::in(DownloadDocument::CATEGORIES)],
+            'category' => [$req, 'string', 'max:80', Rule::in($slugs)],
             'file_path' => [$req, 'string', 'max:255'],
             'is_published' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
