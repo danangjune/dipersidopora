@@ -43,6 +43,7 @@ Route::middleware(['auth'])->prefix('api/admin')->name('admin.api.')->group(func
     Route::patch('/prices/{price}', [AdminCrudController::class, 'updatePrice']);
     Route::delete('/prices/{price}', [AdminCrudController::class, 'destroyPrice']);
     Route::get('/prices/export', [AdminCrudController::class, 'exportPrices']);
+Route::get('/prices/export-avg', [AdminCrudController::class, 'exportPricesAggregated']);
 
     Route::post('/upload', [AdminCrudController::class, 'upload']);
 });

@@ -48,7 +48,7 @@ class MarketDataController extends Controller
                 ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
                 ->where('pasars.category', 'Pasar Rakyat')
                 ->where('commodity_price_records.status_validasi', 'true')
-                ->when($marketId, fn ($q) => $q->where('commodity_price_records.pasar_id', $marketId))
+                ->when($marketId, fn($q) => $q->where('commodity_price_records.pasar_id', $marketId))
                 ->max('commodity_price_records.price_date');
             if ($latestPasarRakyat) {
                 $end = Carbon::parse($latestPasarRakyat);
@@ -66,8 +66,8 @@ class MarketDataController extends Controller
             ->where('commodity_price_records.status_validasi', 'true')
             ->where('pasars.category', 'Pasar Rakyat')
             ->whereBetween('commodity_price_records.price_date', [$start->toDateString(), $end->toDateString()])
-            ->when($marketId, fn ($q) => $q->where('commodity_price_records.pasar_id', $marketId))
-            ->when(!empty($commodityIds), fn ($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds));
+            ->when($marketId, fn($q) => $q->where('commodity_price_records.pasar_id', $marketId))
+            ->when(!empty($commodityIds), fn($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds));
 
         $rows = $query
             ->groupBy('komoditas.id', 'komoditas.name', 'komoditas.unit', 'komoditas.image')
@@ -79,7 +79,7 @@ class MarketDataController extends Controller
             ->selectRaw('MAX(het_hap_settings.price) AS reference_price')
             ->orderBy('komoditas.name')
             ->get()
-            ->map(fn ($row) => $this->formatSummaryRow($row, $internal));
+            ->map(fn($row) => $this->formatSummaryRow($row, $internal));
 
         // Weekly average for Rata-rata column
         $weekAgo = $end->copy()->subDays(6);
@@ -88,13 +88,13 @@ class MarketDataController extends Controller
             ->where('commodity_price_records.status_validasi', 'true')
             ->where('pasars.category', 'Pasar Rakyat')
             ->whereBetween('commodity_price_records.price_date', [$weekAgo->toDateString(), $end->toDateString()])
-            ->when($marketId, fn ($q) => $q->where('commodity_price_records.pasar_id', $marketId))
-            ->when(!empty($commodityIds), fn ($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
+            ->when($marketId, fn($q) => $q->where('commodity_price_records.pasar_id', $marketId))
+            ->when(!empty($commodityIds), fn($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
             ->groupBy('commodity_price_records.komoditas_id')
             ->selectRaw('commodity_price_records.komoditas_id, FLOOR(AVG(commodity_price_records.price)) AS rata_rata')
             ->pluck('rata_rata', 'komoditas_id');
 
-        $rows = $rows->map(fn ($row) => array_merge($row, [
+        $rows = $rows->map(fn($row) => array_merge($row, [
             'rata_rata' => (int) ($weeklyAvg[$row['commodity_id']] ?? 0),
         ]));
 
@@ -126,8 +126,8 @@ class MarketDataController extends Controller
             ->where('status_validasi', 'true')
             ->where('pasars.category', 'Pasar Rakyat')
             ->whereBetween('commodity_price_records.price_date', [$start->toDateString(), $end->toDateString()])
-            ->when($marketId, fn ($q) => $q->where('commodity_price_records.pasar_id', $marketId))
-            ->when(!empty($commodityIds), fn ($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
+            ->when($marketId, fn($q) => $q->where('commodity_price_records.pasar_id', $marketId))
+            ->when(!empty($commodityIds), fn($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
             ->groupBy('commodity_price_records.price_date', 'komoditas.id', 'komoditas.name')
             ->selectRaw('commodity_price_records.price_date, komoditas.id AS commodity_id, komoditas.name AS commodity_name, FLOOR(AVG(commodity_price_records.price)) AS average_price')
             ->orderBy('commodity_price_records.price_date')
@@ -135,13 +135,13 @@ class MarketDataController extends Controller
             ->get();
 
         $dates = $query->pluck('price_date')->unique()->sort()->values()
-            ->map(fn ($d) => $d instanceof \Carbon\Carbon ? $d->toDateString() : $d);
+            ->map(fn($d) => $d instanceof \Carbon\Carbon ? $d->toDateString() : $d);
         $series = $query->groupBy('commodity_id')->map(function ($items, $cid) use ($dates) {
-            $byDate = $items->keyBy(fn ($item) => $item->price_date instanceof \Carbon\Carbon ? $item->price_date->toDateString() : $item->price_date);
+            $byDate = $items->keyBy(fn($item) => $item->price_date instanceof \Carbon\Carbon ? $item->price_date->toDateString() : $item->price_date);
             return [
                 'commodity_id' => (int) $cid,
                 'name' => $items->first()->commodity_name,
-                'data' => $dates->map(fn ($d) => isset($byDate[$d]) ? (int) $byDate[$d]->average_price : null),
+                'data' => $dates->map(fn($d) => isset($byDate[$d]) ? (int) $byDate[$d]->average_price : null),
             ];
         })->values();
 
@@ -172,8 +172,8 @@ class MarketDataController extends Controller
                 ->join('komoditas', 'komoditas.id', '=', 'commodity_price_records.komoditas_id')
                 ->where('status_validasi', 'true')
                 ->whereBetween('price_date', [$start->toDateString(), $end->toDateString()])
-                ->when($marketId, fn ($q) => $q->where('pasar_id', $marketId))
-                ->when($commodityId, fn ($q) => $q->where('komoditas_id', $commodityId))
+                ->when($marketId, fn($q) => $q->where('pasar_id', $marketId))
+                ->when($commodityId, fn($q) => $q->where('komoditas_id', $commodityId))
                 ->groupBy('komoditas.id', 'komoditas.name', 'komoditas.unit')
                 ->selectRaw('komoditas.id, komoditas.name, komoditas.unit, FLOOR(AVG(price)) AS average_price, COUNT(*) AS total_records')
                 ->orderBy('komoditas.name')
@@ -191,6 +191,10 @@ class MarketDataController extends Controller
         $reference = $row->reference_price ? (int) $row->reference_price : null;
         $indicator = 'belum_dikaji';
 
+        // Normal: harga rata-rata pasar di bawah HET/HAP.
+        // Waspada: harga rata-rata pasar mulai dari HET/HAP sampai 110% HET/HAP.
+        // Intervensi: harga rata-rata pasar lebih dari 110% HET/HAP.
+
         if ($reference) {
             if ($hargaSekarang <= $reference) {
                 $indicator = 'aman';
@@ -206,7 +210,7 @@ class MarketDataController extends Controller
             'nama_komoditas' => $row->name,
             'unit' => $row->unit,
             'image' => $row->image,
-            'url_gambar' => asset('assets/images/komoditas/'.($row->image ?: 'default.png')),
+            'url_gambar' => asset('assets/images/komoditas/' . ($row->image ?: 'default.png')),
             'harga_sekarang' => $hargaSekarang,
             'harga_sebelumnya' => $hargaSebelumnya,
             'selisih' => $diff,

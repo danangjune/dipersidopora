@@ -74,6 +74,7 @@ Route::post('/prices/bulk', [AdminCrudController::class, 'bulkPrices']);
 Route::patch('/prices/{price}', [AdminCrudController::class, 'updatePrice']);
 Route::delete('/prices/{price}', [AdminCrudController::class, 'destroyPrice']);
 Route::get('/prices/export', [AdminCrudController::class, 'exportPrices']);
+Route::get('/prices/export-avg', [AdminCrudController::class, 'exportPricesAggregated']);
 
 Route::match(['get', 'post'], '/het-hap', [AdminCrudController::class, 'hetHap']);
 Route::patch('/het-hap/{setting}', [AdminCrudController::class, 'updateHetHap']);

@@ -6,6 +6,9 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use DatePeriod;
+use DateInterval;
+use DateTime;
 
 class DemoDataSeeder extends Seeder
 {
@@ -102,19 +105,66 @@ class DemoDataSeeder extends Seeder
 
         $markets = DB::table('pasars')->where('category', 'Pasar Rakyat')->where('is_active', true)->pluck('id', 'slug');
         $commodityRows = DB::table('komoditas')->get();
-        foreach ($markets as $marketSlug => $marketId) {
-            foreach ($commodityRows as $idx => $commodity) {
-                $base = $commodities[$idx % count($commodities)][2] ?? 10000;
-                for ($d = 0; $d < 7; $d++) {
-                    $date = now()->subDays(6 - $d)->toDateString();
-                    $price = max(1000, (int) ($base + (($idx % 4) * 250) + ($d * 100) + (strlen($marketSlug) % 5 * 75)));
-                    $prev = max(1000, $price - ((($idx + $d) % 3) * 150));
-                    DB::table('commodity_price_records')->updateOrInsert(
-                        ['pasar_id' => $marketId, 'komoditas_id' => $commodity->id, 'price_date' => $date],
-                        ['price' => $price, 'previous_price' => $prev, 'unit' => $commodity->unit, 'status_validasi' => 'true', 'indicator_status' => 'belum_dikaji', 'created_at' => now(), 'updated_at' => now()]
-                    );
+
+        // Base prices per commodity (index) — rough real-world reference
+        $basePrices = [
+            13000, 12000, 18000, 17000, 22000, 20000, 15000,  // beras-gula-minyak
+            130000, 35000, 60000, 30000, 45000,                // daging-telur
+            14000, 13000, 55000, 50000,                        // SKM-susu
+            12000, 5000, 10000, 12000,                         // jagung-garam-terigu
+            18000, 16000, 5000,                                 // kedelai-indomie
+            50000, 45000, 60000, 40000, 45000,                 // cabe-bawang-ikanasin
+            25000, 28000, 6000, 5000, 18000, 15000, 12000, 15000, // kacang-ketela-sayur
+            35000, 35000, 45000, 40000, 45000,                 // ikan
+            22000,                                              // LPG
+        ];
+
+        $marketIds = $markets->values()->toArray();
+
+        $start = '2026-07-01';
+        $end = '2026-07-16';
+        $period = new DatePeriod(new DateTime($start), new DateInterval('P1D'), (new DateTime($end))->modify('+1 day'));
+
+        $records = [];
+        foreach ($period as $dateObj) {
+            $date = $dateObj->format('Y-m-d');
+            $dayOfPeriod = (int) $dateObj->diff(new DateTime('2026-07-01'))->format('%a');
+
+            foreach ($marketIds as $midx => $marketId) {
+                foreach ($commodityRows as $cidx => $commodity) {
+                    $base = $basePrices[$cidx % count($basePrices)] ?? 10000;
+
+                    // Deterministic price variation based on indices
+                    $variation = (($midx * 7 + $cidx * 13 + $dayOfPeriod * 3) % 21 - 10) / 100;
+                    $marketOffset = (($midx + 1) * ($cidx + 1) % 7 - 3) * 0.015;
+                    $price = (int) round($base * (1 + $variation + $marketOffset));
+                    $price = max(500, $price);
+
+                    $previous_price = max(500, $price - (($dayOfPeriod % 5) * 200) + (($cidx * 5 + $midx * 3) % 2000 - 1000));
+
+                    $records[] = [
+                        'pasar_id' => $marketId,
+                        'komoditas_id' => $commodity->id,
+                        'price_date' => $date,
+                        'price' => $price,
+                        'previous_price' => $previous_price,
+                        'unit' => $commodity->unit,
+                        'status_validasi' => 'true',
+                        'indicator_status' => 'belum_dikaji',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+
+                    // Insert in batches of 500
+                    if (count($records) >= 500) {
+                        DB::table('commodity_price_records')->upsert($records, ['pasar_id', 'komoditas_id', 'price_date']);
+                        $records = [];
+                    }
                 }
             }
+        }
+        if (count($records) > 0) {
+            DB::table('commodity_price_records')->upsert($records, ['pasar_id', 'komoditas_id', 'price_date']);
         }
 
         foreach ($commodityRows as $commodity) {

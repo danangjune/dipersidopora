@@ -1091,6 +1091,94 @@ class AdminCrudController extends Controller
         ]);
     }
 
+    public function exportPricesAggregated(Request $request)
+    {
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date', now()->format('Y-m-d'));
+
+        // Get daily average price per commodity across all Pasar Rakyat
+        $dailyAvgs = CommodityPriceRecord::query()
+            ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
+            ->join('komoditas', 'komoditas.id', '=', 'commodity_price_records.komoditas_id')
+            ->where('pasars.category', 'Pasar Rakyat')
+            ->whereBetween('price_date', [$startDate ?? '1900-01-01', $endDate])
+            ->select(
+                'commodity_price_records.komoditas_id',
+                'komoditas.name as komoditas',
+                'komoditas.unit',
+                'price_date',
+                DB::raw('ROUND(AVG(commodity_price_records.price)) as avg_price')
+            )
+            ->groupBy('commodity_price_records.komoditas_id', 'price_date', 'komoditas.name', 'komoditas.unit')
+            ->orderBy('komoditas.name')
+            ->orderBy('price_date')
+            ->get();
+
+        // Get reference prices (HET/HAP) for indicator logic
+        $references = DB::table('het_hap_settings')
+            ->whereNull('pasar_id')
+            ->where('is_active', true)
+            ->pluck('price', 'komoditas_id');
+
+        $grouped = $dailyAvgs->groupBy('komoditas_id');
+        $rows = [];
+
+        foreach ($grouped as $komoditasId => $items) {
+            $sortedItems = $items->sortBy('price_date')->values();
+            $rataRataPeriode = (int) round($items->avg('avg_price'));
+            $reference = isset($references[$komoditasId]) ? (int) $references[$komoditasId] : null;
+            $dates = [];
+
+            foreach ($sortedItems as $idx => $item) {
+                $hargaSekarang = (int) $item->avg_price;
+                // Previous price: use the previous day's avg for this commodity
+                $prev = ($idx > 0) ? (int) $sortedItems[$idx - 1]->avg_price : 0;
+                $selisih = $hargaSekarang - $prev;
+
+                // Indicator: compare current average price to HET/HAP reference
+                $indikator = 'Belum Dikaji';
+                if ($reference) {
+                    if ($hargaSekarang <= $reference) {
+                        $indikator = 'Aman';
+                    } elseif ($hargaSekarang <= round($reference * 1.10)) {
+                        $indikator = 'Waspada';
+                    } else {
+                        $indikator = 'Intervensi';
+                    }
+                }
+
+                $dates[] = (object) [
+                    'price_date' => $item->price_date,
+                    'komoditas' => $item->komoditas,
+                    'unit' => $item->unit,
+                    'harga_sekarang' => $hargaSekarang,
+                    'harga_kemarin' => $prev,
+                    'selisih' => $selisih,
+                    'rata_rata' => $rataRataPeriode,
+                    'indikator' => $indikator,
+                ];
+            }
+
+            $rows = array_merge($rows, $dates);
+        }
+
+        // Sort by commodity name, then by date
+        usort($rows, fn ($a, $b) => $a->komoditas === $b->komoditas
+            ? strcmp($a->price_date, $b->price_date)
+            : strcmp($a->komoditas, $b->komoditas));
+
+        $filename = 'harga-komoditas-rekap-'.now()->format('Ymd-His').'.xls';
+        $html = view('exports.prices-avg', [
+            'rows' => $rows,
+            'dateFrom' => $startDate,
+            'dateTo' => $endDate,
+        ])->render();
+        return response($html, 200, [
+            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
+    }
+
     private function marketRules(bool $partial = false): array
     {
         $req = $partial ? 'sometimes' : 'required';

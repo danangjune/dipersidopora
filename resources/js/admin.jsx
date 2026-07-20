@@ -1089,7 +1089,19 @@ function PriceMonitoring() {
           <p>Admin</p>
           <h1>Pemantauan Harga Komoditas</h1>
         </div>
-        <a className="btn" href={`/api/admin/prices/export?${chartQuery}`}>Download Excel</a>
+        <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}>
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
+            style={{padding:"8px 10px",border:"1.5px solid var(--border)",borderRadius:"var(--radius-sm)",font:"inherit",fontSize:13,background:"var(--surface)"}}
+            title="Tanggal Awal" />
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
+            style={{padding:"8px 10px",border:"1.5px solid var(--border)",borderRadius:"var(--radius-sm)",font:"inherit",fontSize:13,background:"var(--surface)"}}
+            title="Tanggal Akhir" />
+          {/* <a className="btn" href={`/api/admin/prices/export?${chartQuery}`}>Download Excel</a> */}
+          <button className="btn" style={{background:"#108879",border:"none",cursor:"pointer",fontSize:14}} onClick={() => {
+            if (!startDate || !endDate) { alert("Silakan pilih tanggal awal dan tanggal akhir terlebih dahulu."); return; }
+            window.location.href = `/api/admin/prices/export-avg?start_date=${startDate}&end_date=${endDate}`;
+          }}>Download Rekap</button>
+        </div>
       </div>
 
       <div className="admin-card">
