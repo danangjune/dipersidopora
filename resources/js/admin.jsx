@@ -2259,7 +2259,7 @@ function ZonaIntegritasAdmin() {
 
 function IkmAdmin() {
   const [items, setItems] = useState([]);
-  const [form, setForm] = useState({ name: "", category: "fashion", owner: "", description: "", address: "", kelurahan: "", contact: "", location: "", image: "", is_active: true, sort_order: 0 });
+  const [form, setForm] = useState({ name: "", category: "fashion", owner: "", description: "", address: "", kelurahan: "", contact: "", location: "", image: "", is_active: true, show_contact: true, show_address: true, sort_order: 0 });
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -2287,7 +2287,7 @@ function IkmAdmin() {
   useEffect(() => { load(); }, []);
 
   const resetForm = () => {
-    setForm({ name: "", category: "fashion", owner: "", description: "", address: "", kelurahan: "", contact: "", location: "", image: "", is_active: true, sort_order: 0 });
+    setForm({ name: "", category: "fashion", owner: "", description: "", address: "", kelurahan: "", contact: "", location: "", image: "", is_active: true, show_contact: true, show_address: true, sort_order: 0 });
     setEditing(null);
   };
 
@@ -2363,8 +2363,16 @@ function IkmAdmin() {
             </label>
             <label><span>Pemilik</span><input value={form.owner || ""} onChange={(e) => setForm((p) => ({ ...p, owner: e.target.value }))} /></label>
             <label><span>No. HP</span><input value={form.contact || ""} onChange={(e) => setForm((p) => ({ ...p, contact: e.target.value }))} /></label>
+            <label className="checkbox">
+              <input type="checkbox" checked={!form.show_contact} onChange={(e) => setForm((p) => ({ ...p, show_contact: !e.target.checked }))} />
+              <span>Sembunyikan No. HP</span>
+            </label>
             <label><span>Kelurahan</span><input value={form.kelurahan || ""} onChange={(e) => setForm((p) => ({ ...p, kelurahan: e.target.value }))} /></label>
             <label className="wide"><span>Alamat</span><input value={form.address || ""} onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))} /></label>
+            <label className="checkbox wide">
+              <input type="checkbox" checked={!form.show_address} onChange={(e) => setForm((p) => ({ ...p, show_address: !e.target.checked }))} />
+              <span>Sembunyikan Alamat</span>
+            </label>
             <label className="wide"><span>Lokasi (Link Maps)</span><input value={form.location || ""} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} /></label>
             <label className="wide"><span>Deskripsi</span><textarea value={form.description || ""} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} /></label>
             <label><span>Gambar</span><input value={form.image || ""} onChange={(e) => setForm((p) => ({ ...p, image: e.target.value }))} /></label>
@@ -2394,6 +2402,7 @@ function IkmAdmin() {
                 <th>Alamat</th>
                 <th>Kelurahan</th>
                 <th>No. HP</th>
+                <th>Detail</th>
                 <th>Aktif</th>
                 <th>Aksi</th>
               </tr>
@@ -2407,6 +2416,10 @@ function IkmAdmin() {
                   <td style={{ maxWidth: 220, whiteSpace: "normal", lineHeight: 1.3 }}>{item.address || "-"}</td>
                   <td>{item.kelurahan || "-"}</td>
                   <td>{item.contact || "-"}</td>
+                  <td style={{ whiteSpace: "normal", fontSize: 12, lineHeight: 1.4 }}>
+                    {item.show_contact ? "HP Tampil" : "HP Tersembunyi"}{" | "}
+                    {item.show_address ? "Alamat Tampil" : "Alamat Tersembunyi"}
+                  </td>
                   <td>{item.is_active ? "Ya" : "Tidak"}</td>
                   <td>
                     <div className="table-actions">
@@ -2417,7 +2430,7 @@ function IkmAdmin() {
                 </tr>
               ))}
               {items.length === 0 && (
-                <tr><td colSpan={8} style={{ textAlign: "center", padding: 24, color: "#667085" }}>Belum ada data IKM.</td></tr>
+                <tr><td colSpan={9} style={{ textAlign: "center", padding: 24, color: "#667085" }}>Belum ada data IKM.</td></tr>
               )}
             </tbody>
           </table>

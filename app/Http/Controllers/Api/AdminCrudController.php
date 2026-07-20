@@ -1293,6 +1293,8 @@ class AdminCrudController extends Controller
             'location' => ['nullable', 'string', 'max:255'],
             'image' => ['nullable', 'string', 'max:255'],
             'is_active' => ['nullable', 'boolean'],
+            'show_contact' => ['nullable', 'boolean'],
+            'show_address' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ];
     }

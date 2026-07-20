@@ -295,9 +295,9 @@ class SiteContentController extends Controller
                 'category' => $item->category,
                 'owner' => $item->owner,
                 'description' => $item->description,
-                'address' => $item->address,
+                'address' => $item->show_address ? $item->address : null,
                 'kelurahan' => $item->kelurahan,
-                'contact' => $item->contact,
+                'contact' => $item->show_contact ? $item->contact : null,
                 'location' => $item->location,
                 'image' => $item->image,
             ]);
