@@ -10,6 +10,7 @@ class User extends Authenticatable
 {
     const ROLE_ADMIN = 'admin';
     const ROLE_SURVEYOR = 'surveyor';
+    const ROLE_VERIFIKATOR = 'verifikator';
 
     use HasFactory, Notifiable;
 

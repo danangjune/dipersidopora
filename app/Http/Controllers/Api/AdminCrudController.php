@@ -171,6 +171,7 @@ class AdminCrudController extends Controller
             ->value('price') ?? ($data['previous_price'] ?? 0);
         $data['previous_price'] = $data['previous_price'] ?? $previous;
         $data['indicator_status'] = $data['indicator_status'] ?? 'belum_dikaji';
+        $data['status_validasi'] = $data['status_validasi'] ?? 'false';
         $record = CommodityPriceRecord::updateOrCreate(
             ['pasar_id' => $data['pasar_id'], 'komoditas_id' => $data['komoditas_id'], 'price_date' => $data['price_date']],
             $data
@@ -204,7 +205,7 @@ class AdminCrudController extends Controller
                 ?? 0;
             $record = CommodityPriceRecord::updateOrCreate(
                 ['pasar_id' => $data['pasar_id'], 'komoditas_id' => $item['komoditas_id'], 'price_date' => $data['price_date']],
-                ['price' => $item['price'], 'previous_price' => $previous, 'indicator_status' => 'belum_dikaji']
+                ['price' => $item['price'], 'previous_price' => $previous, 'indicator_status' => 'belum_dikaji', 'status_validasi' => 'false']
             );
             $saved[] = $record;
         }
@@ -1014,7 +1015,7 @@ class AdminCrudController extends Controller
             'username' => ['required', 'string', 'max:255', 'unique:users,username'],
             'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:6'],
-            'user_role' => ['required', Rule::in([User::ROLE_ADMIN, User::ROLE_SURVEYOR])],
+            'user_role' => ['required', Rule::in([User::ROLE_ADMIN, User::ROLE_SURVEYOR, User::ROLE_VERIFIKATOR])],
         ]);
 
         $data['password'] = Hash::make($data['password']);
@@ -1039,7 +1040,7 @@ class AdminCrudController extends Controller
             'username' => ['sometimes', 'string', 'max:255', Rule::unique('users', 'username')->ignore($user->user_id, 'user_id')],
             'email' => ['nullable', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->user_id, 'user_id')],
             'password' => ['nullable', 'string', 'min:6'],
-            'user_role' => ['sometimes', Rule::in([User::ROLE_ADMIN, User::ROLE_SURVEYOR])],
+            'user_role' => ['sometimes', Rule::in([User::ROLE_ADMIN, User::ROLE_SURVEYOR, User::ROLE_VERIFIKATOR])],
         ]);
 
         if (!empty($data['password'])) {
@@ -1069,6 +1070,53 @@ class AdminCrudController extends Controller
         }
         $user->delete();
         return response()->json(['status' => 'success']);
+    }
+
+    public function verificationList(Request $request)
+    {
+        $rows = CommodityPriceRecord::query()
+            ->with(['pasar:id,name', 'komoditas:id,name,unit,image'])
+            ->where('status_validasi', 'false')
+            ->when($request->integer('market_id'), fn ($q, $id) => $q->where('pasar_id', $id))
+            ->when($request->integer('commodity_id'), fn ($q, $id) => $q->where('komoditas_id', $id))
+            ->when($request->query('start_date'), fn ($q, $date) => $q->whereDate('price_date', '>=', $date))
+            ->when($request->query('end_date'), fn ($q, $date) => $q->whereDate('price_date', '<=', $date))
+            ->orderByDesc('price_date')
+            ->limit((int) $request->query('limit', 200))
+            ->get()
+            ->each(function ($row) {
+                $row->pasar_name = $row->pasar?->name;
+                $row->komoditas_name = $row->komoditas?->name;
+            });
+        return response()->json(['status' => 'success', 'data' => $rows, 'count' => $rows->count()]);
+    }
+
+    public function verificationCount()
+    {
+        $count = CommodityPriceRecord::query()
+            ->where('status_validasi', 'false')
+            ->count();
+        return response()->json(['status' => 'success', 'data' => ['pending_count' => $count]]);
+    }
+
+    public function verificationApprove(Request $request, CommodityPriceRecord $price)
+    {
+        $price->update(['status_validasi' => 'true']);
+        return response()->json(['status' => 'success', 'data' => $price->fresh()->load(['pasar:id,name', 'komoditas:id,name'])]);
+    }
+
+    public function verificationReject(Request $request, CommodityPriceRecord $price)
+    {
+        $price->update(['status_validasi' => 'false']);
+        return response()->json(['status' => 'success', 'data' => $price->fresh()->load(['pasar:id,name', 'komoditas:id,name'])]);
+    }
+
+    public function verificationApproveAll()
+    {
+        $count = CommodityPriceRecord::query()
+            ->where('status_validasi', 'false')
+            ->update(['status_validasi' => 'true']);
+        return response()->json(['status' => 'success', 'data' => ['updated_count' => $count]]);
     }
 
     public function exportPrices(Request $request)

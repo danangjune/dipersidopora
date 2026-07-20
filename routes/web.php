@@ -45,6 +45,12 @@ Route::middleware(['auth'])->prefix('api/admin')->name('admin.api.')->group(func
     Route::get('/prices/export', [AdminCrudController::class, 'exportPrices']);
 Route::get('/prices/export-avg', [AdminCrudController::class, 'exportPricesAggregated']);
 
+    Route::get('/prices/verification', [AdminCrudController::class, 'verificationList']);
+    Route::get('/prices/verification/count', [AdminCrudController::class, 'verificationCount']);
+    Route::patch('/prices/verification/{price}/approve', [AdminCrudController::class, 'verificationApprove'])->whereNumber('price');
+    Route::patch('/prices/verification/{price}/reject', [AdminCrudController::class, 'verificationReject'])->whereNumber('price');
+    Route::post('/prices/verification/approve-all', [AdminCrudController::class, 'verificationApproveAll']);
+
     Route::post('/upload', [AdminCrudController::class, 'upload']);
 });
 

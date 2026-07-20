@@ -10,17 +10,9 @@ use Illuminate\Validation\Rule;
 
 class MarketPriceController extends Controller
 {
-    private array $tables = [
-        'bandar' => 'data_barang_bandar',
-        'pahing' => 'data_barang_pahing',
-        'setonobetek' => 'data_barang_setonobetek',
-    ];
+    
 
-    private array $locations = [
-        'Pasar Bandar' => 'data_barang_bandar',
-        'Pasar Pahing' => 'data_barang_pahing',
-        'Pasar Setono Betek' => 'data_barang_setonobetek',
-    ];
+    
 
     public function latest(Request $request)
     {

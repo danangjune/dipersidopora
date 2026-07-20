@@ -193,7 +193,7 @@ const resources = {
       { name: "username", label: "Username", required: true },
       { name: "email", label: "Email" },
       { name: "password", label: "Password", type: "password" },
-      { name: "user_role", label: "Role", type: "select", required: true, options: [["admin", "Admin"], ["surveyor", "Surveyor Pasar"]] },
+      { name: "user_role", label: "Role", type: "select", required: true, options: [["admin", "Admin"], ["surveyor", "Surveyor Pasar"], ["verifikator", "Verifikator"]] },
     ],
     columns: ["name", "username", "email", "user_role"],
     defaults: {
@@ -226,9 +226,9 @@ const resources = {
 };
 
 const menuGroups = [
-  { key: "dashboard", label: "Dashboard", href: "/admin", roles: ["admin", "surveyor"] },
+  { key: "dashboard", label: "Dashboard", href: "/admin", roles: ["admin", "surveyor", "verifikator"] },
   {
-    label: "Master Data", roles: ["admin"],
+    label: "Master Data", roles: ["admin", "verifikator"],
     items: [
       { key: "markets", label: "Pasar", href: "/admin/markets" },
       { key: "commodities", label: "Komoditas", href: "/admin/commodities" },
@@ -238,13 +238,14 @@ const menuGroups = [
     ],
   },
   {
-    label: "Harga", roles: ["admin", "surveyor"],
+    label: "Harga", roles: ["admin", "surveyor", "verifikator"],
     items: [
       { key: "prices", label: "Input Harga", href: "/admin/prices" },
       { key: "prices-monitor", label: "Pemantauan Harga", href: "/admin/prices-monitor" },
     ],
     extra: [
       { key: "het-hap", label: "HET / HAP", href: "/admin/het-hap", roles: ["admin"] },
+      { key: "prices-verification", label: "Verifikasi Harga", href: "/admin/prices-verification", roles: ["verifikator", "admin"] },
     ],
   },
   {
@@ -2907,6 +2908,227 @@ function PricesAdmin() {
   );
 }
 
+function VerificationPage() {
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState(null);
+  const [sortDir, setSortDir] = useState(null);
+  const [page, setPage] = useState(1);
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const perPage = 20;
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const res = await api("/api/admin/prices/verification");
+      setRows(res.data || []);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const approveOne = async (row) => {
+    if (!confirm(`Setujui data harga ${row.komoditas_name} di ${row.pasar_name} tanggal ${row.price_date}?`)) return;
+    await api(`/api/admin/prices/verification/${row.id}/approve`, { method: "PATCH" });
+    setMessage(`Harga ${row.komoditas_name} berhasil divalidasi.`);
+    setSelectedIds([]);
+    setSelectAll(false);
+    await load();
+  };
+
+  const rejectOne = async (row) => {
+    if (!confirm(`Tolak data harga ${row.komoditas_name} di ${row.pasar_name} tanggal ${row.price_date}?`)) return;
+    await api(`/api/admin/prices/verification/${row.id}/reject`, { method: "PATCH" });
+    setMessage(`Harga ${row.komoditas_name} ditolak.`);
+    setSelectedIds([]);
+    setSelectAll(false);
+    await load();
+  };
+
+  const approveSelected = async () => {
+    if (selectedIds.length === 0) { alert("Pilih data yang akan divalidasi terlebih dahulu."); return; }
+    if (!confirm(`Setujui ${selectedIds.length} data harga yang dipilih?`)) return;
+    let count = 0;
+    for (const id of selectedIds) {
+      try {
+        await api(`/api/admin/prices/verification/${id}/approve`, { method: "PATCH" });
+        count++;
+      } catch { /* skip */ }
+    }
+    setMessage(`${count} data berhasil divalidasi.`);
+    setSelectedIds([]);
+    setSelectAll(false);
+    await load();
+  };
+
+  const approveAll = async () => {
+    if (!confirm(`Setujui SEMUA data harga yang belum divalidasi (${rows.length} data)?`)) return;
+    const res = await api("/api/admin/prices/verification/approve-all", { method: "POST" });
+    setMessage(`Semua data berhasil divalidasi (${res.data?.updated_count || 0} data).`);
+    setSelectedIds([]);
+    setSelectAll(false);
+    await load();
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  useEffect(() => {
+    if (selectAll) {
+      setSelectedIds(filtered.map((r) => r.id));
+    } else {
+      setSelectedIds([]);
+    }
+  }, [selectAll]);
+
+  const filtered = useMemo(() => {
+    let data = rows;
+    if (search) {
+      const q = search.toLowerCase();
+      data = rows.filter((r) =>
+        [r.pasar_name, r.komoditas_name, r.price_date]
+          .some((v) => v != null && String(v).toLowerCase().includes(q))
+      );
+    }
+    if (sortKey && sortDir) {
+      data = [...data].sort((a, b) => {
+        const va = a[sortKey];
+        const vb = b[sortKey];
+        if (va == null) return 1; if (vb == null) return -1;
+        const cmp = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb));
+        return sortDir === "asc" ? cmp : -cmp;
+      });
+    }
+    return data;
+  }, [rows, search, sortKey, sortDir]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const safePage = Math.min(page, totalPages);
+  const paginated = filtered.slice((safePage - 1) * perPage, safePage * perPage);
+
+  const toggleSort = (col) => {
+    if (sortKey === col) {
+      if (sortDir === "asc") setSortDir("desc");
+      else if (sortDir === "desc") { setSortKey(null); setSortDir(null); }
+      else { setSortDir("asc"); setSortKey(col); }
+    } else { setSortKey(col); setSortDir("asc"); }
+  };
+
+  return (
+    <div>
+      <div className="admin-header">
+        <div>
+          <p>Verifikasi</p>
+          <h1>Verifikasi Harga Komoditas</h1>
+        </div>
+      </div>
+
+      <div className="admin-card">
+        <div className="admin-table-header">
+          <h2>Data Menunggu Verifikasi ({rows.length})</h2>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            {selectedIds.length > 0 && (
+              <button className="btn" onClick={approveSelected}
+                style={{ background: "#108879" }}>
+                Setujui Terpilih ({selectedIds.length})
+              </button>
+            )}
+            <button className="btn" onClick={approveAll}
+              style={{ background: "#076797" }}>
+              Setujui Semua
+            </button>
+          </div>
+        </div>
+
+        {message && <p className="admin-message">{message}</p>}
+        {loading && <p>Memuat data...</p>}
+        {!loading && paginated.length === 0 && <p>Semua data sudah divalidasi.</p>}
+
+        {!loading && paginated.length > 0 && (
+          <>
+            <div className="tableToolbar">
+              <input className="searchInput" type="text" placeholder="Cari..." value={search}
+                onChange={(e) => setSearch(e.target.value)} />
+              <span className="recordCount">{filtered.length} / {rows.length} data</span>
+            </div>
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th style={{ width: 40 }}>
+                      <input type="checkbox" checked={selectAll}
+                        onChange={() => setSelectAll(!selectAll)} />
+                    </th>
+                    <th>No</th>
+                    <th className={sortKey === "price_date" ? sortDir : ""}
+                      onClick={() => toggleSort("price_date")}>
+                      Tanggal <span className="sortIcon">{sortKey === "price_date" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span>
+                    </th>
+                    <th className={sortKey === "pasar_name" ? sortDir : ""}
+                      onClick={() => toggleSort("pasar_name")}>
+                      Pasar <span className="sortIcon">{sortKey === "pasar_name" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span>
+                    </th>
+                    <th className={sortKey === "komoditas_name" ? sortDir : ""}
+                      onClick={() => toggleSort("komoditas_name")}>
+                      Komoditas <span className="sortIcon">{sortKey === "komoditas_name" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span>
+                    </th>
+                    <th className={sortKey === "price" ? sortDir : ""}
+                      onClick={() => toggleSort("price")}>
+                      Harga <span className="sortIcon">{sortKey === "price" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span>
+                    </th>
+                    <th>Sebelumnya</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.map((r, i) => (
+                    <tr key={r.id}>
+                      <td>
+                        <input type="checkbox" checked={selectedIds.includes(r.id)}
+                          onChange={() => toggleSelect(r.id)} />
+                      </td>
+                      <td>{(safePage - 1) * perPage + i + 1}</td>
+                      <td>{r.price_date}</td>
+                      <td>{r.pasar_name}</td>
+                      <td><strong>{r.komoditas_name}</strong> {r.unit && <span style={{ fontSize: 12, color: "#64748b" }}>/ {r.unit}</span>}</td>
+                      <td style={{ fontWeight: 600 }}>Rp {Number(r.price).toLocaleString()}</td>
+                      <td style={{ color: "#64748b" }}>Rp {Number(r.previous_price).toLocaleString()}</td>
+                      <td>
+                        <div className="table-actions">
+                          <button type="button" onClick={() => approveOne(r)}
+                            style={{ background: "#108879", color: "#fff" }}>Setujui</button>
+                          <button type="button" className="danger" onClick={() => rejectOne(r)}>Tolak</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button disabled={safePage <= 1} onClick={() => setPage(safePage - 1)}>‹ Prev</button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <button key={p} className={safePage === p ? "active" : ""} onClick={() => setPage(p)}>{p}</button>
+                ))}
+                <button disabled={safePage >= totalPages} onClick={() => setPage(safePage + 1)}>Next ›</button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function AdminApp() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -2977,6 +3199,8 @@ function AdminApp() {
         <IkmAdmin />
       ) : activeKey === "prices" ? (
         <PricesAdmin />
+      ) : activeKey === "prices-verification" ? (
+        <VerificationPage />
       ) : config ? (
         <CrudPage config={config} />
       ) : (

@@ -26,16 +26,17 @@ class DemoDataSeeder extends Seeder
             'password' => Hash::make('Surveyor#12345'), 'user_password' => Hash::make('Surveyor#12345'), 'user_role' => 'surveyor', 'created_at' => now(), 'updated_at' => now(),
         ]);
 
+        DB::table('users')->updateOrInsert(['username' => 'verifikator'], [
+            'name' => 'Verifikator Harga', 'user_firstname' => 'Verifikator', 'user_lastname' => 'Disperdagin', 'email' => 'verifikator@example.test',
+            'password' => Hash::make('Verifikator#12345'), 'user_password' => Hash::make('Verifikator#12345'), 'user_role' => 'verifikator', 'created_at' => now(), 'updated_at' => now(),
+        ]);
+
 
         $marketSeeds = [
             // Pasar Rakyat
             ['Pasar Bandar', 'Pasar Rakyat', 'images/pasar/pasar bandar.jpg', 'Jl. Dhoho, Bandar Lor, Kec. Mojoroto', -7.8173, 112.0169],
             ['Pasar Pahing', 'Pasar Rakyat', 'images/pasar/pahing.jpg', 'Jl. Pahing, Setono Pande, Kec. Kediri', -7.8145, 112.0105],
             ['Pasar Setono Betek', 'Pasar Rakyat', 'images/pasar/pasar setonobetek.jpg', 'Jl. Setono Betek, Kec. Kediri', -7.8189, 112.0142],
-            ['Pasar Banjaran', 'Pasar Rakyat', 'images/pasar/pasar banjaran.jpg', 'Jl. Banjaran, Kec. Kota Kediri', -7.8210, 112.0185],
-            ['Pasar Grosir Ngronggo', 'Pasar Rakyat', 'images/pasar/Pasar Grosir Ngronggo.jpg', 'Jl. Raya Ngronggo, Kec. Kediri', -7.8102, 112.0089],
-            ['Pasar Mojoroto', 'Pasar Rakyat', 'images/pasar/Pasar Mojoroto.jpg', 'Jl. Mojoroto, Kec. Mojoroto', -7.8255, 112.0210],
-            ['Pasar Campurejo', 'Pasar Rakyat', 'images/pasar/Pasar Campurejo.jpg', 'Jl. Campurejo, Kec. Mojoroto', -7.8230, 112.0195],
             // Minimarket
             ['Indomaret Bandar Lor', 'Minimarket', null, 'Jl. Penanggungan No. 10, Bandar Lor, Kec. Mojoroto', -7.8160, 112.0175],
             ['Indomaret Mojoroto', 'Minimarket', null, 'Jl. Mojoroto No. 25, Mojoroto, Kec. Mojoroto', -7.8260, 112.0205],
@@ -149,7 +150,7 @@ class DemoDataSeeder extends Seeder
                         'price' => $price,
                         'previous_price' => $previous_price,
                         'unit' => $commodity->unit,
-                        'status_validasi' => 'true',
+                        'status_validasi' => 'false',
                         'indicator_status' => 'belum_dikaji',
                         'created_at' => now(),
                         'updated_at' => now(),

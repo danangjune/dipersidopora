@@ -88,7 +88,7 @@ export const menu = [
     title: "Layanan",
     items: [
       {
-        label: "Bantuan Modal",
+        label: "Bantuan Modal & Pelatihan",
         href: "https://sultan.kedirikota.go.id/",
         external: true,
       },
