@@ -55,7 +55,10 @@ function getBrand(name) {
 
 const categoryLabels = {
   Minimarket: "Minimarket",
-  "Pusat Perbelanjaan": "Supermarket",
+  Supermarket: "Supermarket",
+  "Department Store": "Department Store",
+  Hypermarket: "Hypermarket",
+  "Pusat Perbelanjaan": "Pusat Perbelanjaan",
 };
 
 export default function PasarModernPage() {

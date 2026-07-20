@@ -47,6 +47,14 @@ class DemoDataSeeder extends Seeder
             ['Alfamidi Kediri', 'Minimarket', null, 'Jl. Dhoho No. 88, Bandar Lor, Kec. Mojoroto', -7.8178, 112.0162],
             ['Tsamania Supermarket', 'Minimarket', null, 'Jl. Panglima Sudirman, Kec. Kediri', -7.8135, 112.0130],
             ['Mekarmart Kediri', 'Minimarket', null, 'Jl. Veteran No. 15, Kec. Mojoroto', -7.8200, 112.0155],
+            // Supermarket
+            ['Super Indo Kediri', 'Supermarket', null, 'Jl. Dhoho No. 45, Bandar Lor, Kec. Mojoroto', -7.8175, 112.0175],
+            ['Luwes Supermarket', 'Supermarket', null, 'Jl. Panglima Sudirman No. 88, Kec. Kediri', -7.8140, 112.0115],
+            // Department Store
+            ['Matahari Department Store Kediri', 'Department Store', null, 'Jl. Veteran No. 100, Kec. Mojoroto', -7.8208, 112.0158],
+            // Hypermarket
+            ['Transmart Kediri', 'Hypermarket', null, 'Jl. Penanggungan No. 200, Bandar Lor, Kec. Mojoroto', -7.8155, 112.0185],
+            ['Hypermart Kediri Mall', 'Hypermarket', null, 'Jl. Veteran No. 100, Kec. Mojoroto', -7.8202, 112.0155],
             // Pusat Perbelanjaan
             ['Pusat Perbelanjaan Dhoho Plaza', 'Pusat Perbelanjaan', null, 'Jl. Dhoho No. 1, Bandar Lor, Kec. Mojoroto', -7.8170, 112.0170],
             ['Pusat Perbelanjaan Kediri Mall', 'Pusat Perbelanjaan', null, 'Jl. Veteran No. 100, Kec. Mojoroto', -7.8205, 112.0160],

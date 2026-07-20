@@ -14,6 +14,9 @@ class Pasar extends Model
         'Pasar Rakyat',
         'Pasar Modern',
         'Minimarket',
+        'Supermarket',
+        'Department Store',
+        'Hypermarket',
         'Pusat Perbelanjaan',
     ];
 

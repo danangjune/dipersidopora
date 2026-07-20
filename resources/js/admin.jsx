@@ -47,7 +47,7 @@ const resources = {
     endpoint: "/api/admin/markets",
     fields: [
       { name: "name", label: "Nama Pasar", required: true },
-      { name: "category", label: "Kategori", type: "select", options: [["Pasar Rakyat", "Pasar Rakyat"], ["Pasar Modern", "Pasar Modern"], ["Minimarket", "Minimarket"], ["Pusat Perbelanjaan", "Pusat Perbelanjaan"]] },
+      { name: "category", label: "Kategori", type: "select", options: [["Pasar Rakyat", "Pasar Rakyat"], ["Pasar Modern", "Pasar Modern"], ["Minimarket", "Minimarket"], ["Supermarket", "Supermarket"], ["Department Store", "Department Store"], ["Hypermarket", "Hypermarket"], ["Pusat Perbelanjaan", "Pusat Perbelanjaan"]] },
       { name: "address", label: "Alamat", type: "textarea" },
       { name: "image", label: "Gambar", type: "file" },
       { name: "latitude", label: "Latitude", type: "number" },

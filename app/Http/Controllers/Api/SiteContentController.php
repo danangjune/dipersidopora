@@ -224,7 +224,7 @@ class SiteContentController extends Controller
 
         $markets = Pasar::query()
             ->where('is_active', true)
-            ->whereIn('category', ['Minimarket', 'Pusat Perbelanjaan'])
+            ->whereIn('category', ['Minimarket', 'Supermarket', 'Department Store', 'Hypermarket', 'Pusat Perbelanjaan'])
             ->orderBy('category')
             ->orderBy('sort_order')
             ->orderBy('name')
