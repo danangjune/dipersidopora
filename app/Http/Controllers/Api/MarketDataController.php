@@ -42,7 +42,7 @@ class MarketDataController extends Controller
         }
         $internal = $request->boolean('internal', false);
 
-        // Default ke data hari terbaru di Pasar Rakyat
+        // Default ke data 7 hari terbaru di Pasar Rakyat
         if (!$request->query('start_date') && !$request->query('end_date')) {
             $latestPasarRakyat = CommodityPriceRecord::query()
                 ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
@@ -52,8 +52,8 @@ class MarketDataController extends Controller
                 ->max('commodity_price_records.price_date');
             if ($latestPasarRakyat) {
                 $end = Carbon::parse($latestPasarRakyat);
+                $start = $end->copy()->subDays(6);
             }
-            $start = $end->copy();
         }
 
         $query = CommodityPriceRecord::query()

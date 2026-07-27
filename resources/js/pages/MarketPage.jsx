@@ -126,6 +126,23 @@ export default function MarketPage() {
     return () => { if (chartRef.current) chartRef.current.destroy(); };
   }, [chartData]);
 
+  const marketInfo = {
+    "Pasar Bandar": { kecamatan: "Mojoroto", kodeWilayah: "3571010" },
+    "Pasar Setono Betek": { kecamatan: "Kota", kodeWilayah: "3571020" },
+    "Pasar Pahing": { kecamatan: "Pesantren", kodeWilayah: "3571030" },
+  };
+
+  const selectedMarket = filters.markets.find((m) => m.id === Number(marketId));
+  const activeMarketInfo = selectedMarket ? marketInfo[selectedMarket.name] : null;
+
+  const tableTitle = selectedMarket
+    ? `Tabel Harga Komoditas ${selectedMarket.name}`
+    : "Tabel Harga Komoditas";
+
+  const tableSubtitle = activeMarketInfo
+    ? `Berada di Kecamatan ${activeMarketInfo.kecamatan} - Kode Wilayah ${activeMarketInfo.kodeWilayah}`
+    : "Tabel lengkap harga terkini komoditas.";
+
   return (
     <section className="section marketPage">
       <div className="marketHero" style={{ backgroundImage: "url(/assets/images/komoditas/SIKAD.png)" }}>
@@ -230,8 +247,8 @@ export default function MarketPage() {
       </div>
 
       <div className="sectionSubhead" style={{marginTop:40}}>
-        <h2>Tabel Harga Komoditas</h2>
-        <p>Tabel lengkap harga terkini komoditas.</p>
+        <h2>{tableTitle}</h2>
+        <h4 >{tableSubtitle}</h4>
       </div>
       <div className="tableWrap">
         <table>
