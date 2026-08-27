@@ -2,8 +2,16 @@ import "./bootstrap";
 import { createRoot } from "react-dom/client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Chart, LineController, LineElement, PointElement,
-  LinearScale, CategoryScale, Title, Tooltip, Legend, Filler,
+  Chart,
+  LineController,
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
 } from "chart.js";
 import BuildingStorefrontIcon from "@heroicons/react/24/outline/BuildingStorefrontIcon";
 import CubeIcon from "@heroicons/react/24/outline/CubeIcon";
@@ -14,7 +22,17 @@ import ArrowTrendingUpIcon from "@heroicons/react/24/outline/ArrowTrendingUpIcon
 import ArrowTrendingDownIcon from "@heroicons/react/24/outline/ArrowTrendingDownIcon";
 import MinusIcon from "@heroicons/react/24/outline/MinusIcon";
 
-Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Legend, Filler);
+Chart.register(
+  LineController,
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+);
 
 const csrf = document
   .querySelector('meta[name="csrf-token"]')
@@ -47,7 +65,20 @@ const resources = {
     endpoint: "/api/admin/markets",
     fields: [
       { name: "name", label: "Nama Pasar", required: true },
-      { name: "category", label: "Kategori", type: "select", options: [["Pasar Rakyat", "Pasar Rakyat"], ["Pasar Modern", "Pasar Modern"], ["Minimarket", "Minimarket"], ["Supermarket", "Supermarket"], ["Department Store", "Department Store"], ["Hypermarket", "Hypermarket"], ["Pusat Perbelanjaan", "Pusat Perbelanjaan"]] },
+      {
+        name: "category",
+        label: "Kategori",
+        type: "select",
+        options: [
+          ["Pasar Rakyat", "Pasar Rakyat"],
+          ["Pasar Modern", "Pasar Modern"],
+          ["Minimarket", "Minimarket"],
+          ["Supermarket", "Supermarket"],
+          ["Department Store", "Department Store"],
+          ["Hypermarket", "Hypermarket"],
+          ["Pusat Perbelanjaan", "Pusat Perbelanjaan"],
+        ],
+      },
       { name: "address", label: "Alamat", type: "textarea" },
       { name: "image", label: "Gambar", type: "file" },
       { name: "latitude", label: "Latitude", type: "number" },
@@ -132,8 +163,21 @@ const resources = {
     endpoint: "/api/admin/downloads",
     fields: [
       { name: "title", label: "Judul", required: true },
-      { name: "category", label: "Kategori", type: "select", required: true, optionsUrl: "/api/admin/download-categories", optionValue: "slug" },
-      { name: "file_path", label: "File", type: "file", accept: ".pdf,.doc,.docx,.xls,.xlsx", required: true },
+      {
+        name: "category",
+        label: "Kategori",
+        type: "select",
+        required: true,
+        optionsUrl: "/api/admin/download-categories",
+        optionValue: "slug",
+      },
+      {
+        name: "file_path",
+        label: "File",
+        type: "file",
+        accept: ".pdf,.doc,.docx,.xls,.xlsx",
+        required: true,
+      },
       { name: "sort_order", label: "Urutan", type: "number" },
       { name: "is_published", label: "Publish", type: "checkbox" },
     ],
@@ -149,8 +193,20 @@ const resources = {
     title: "Input Harga Komoditas",
     endpoint: "/api/admin/prices",
     fields: [
-      { name: "pasar_id", label: "Pasar", type: "select", required: true, optionsUrl: "/api/admin/markets" },
-      { name: "komoditas_id", label: "Komoditas", type: "select", required: true, optionsUrl: "/api/admin/commodities" },
+      {
+        name: "pasar_id",
+        label: "Pasar",
+        type: "select",
+        required: true,
+        optionsUrl: "/api/admin/markets",
+      },
+      {
+        name: "komoditas_id",
+        label: "Komoditas",
+        type: "select",
+        required: true,
+        optionsUrl: "/api/admin/commodities",
+      },
       { name: "price_date", label: "Tanggal", type: "date", required: true },
       { name: "price", label: "Harga", type: "number", required: true },
     ],
@@ -166,14 +222,31 @@ const resources = {
     title: "HET / HAP",
     endpoint: "/api/admin/het-hap",
     fields: [
-      { name: "komoditas_id", label: "Komoditas", type: "select", required: true, optionsUrl: "/api/admin/commodities" },
-      { name: "pasar_id", label: "Pasar (Opsional)", type: "select", optionsUrl: "/api/admin/markets" },
+      {
+        name: "komoditas_id",
+        label: "Komoditas",
+        type: "select",
+        required: true,
+        optionsUrl: "/api/admin/commodities",
+      },
+      {
+        name: "pasar_id",
+        label: "Pasar (Opsional)",
+        type: "select",
+        optionsUrl: "/api/admin/markets",
+      },
       { name: "price", label: "Harga", type: "number", required: true },
       { name: "effective_date", label: "Tanggal Berlaku", type: "date" },
       { name: "is_active", label: "Aktif", type: "checkbox" },
       { name: "notes", label: "Catatan", type: "textarea" },
     ],
-    columns: ["komoditas_name", "pasar_name", "price", "effective_date", "is_active"],
+    columns: [
+      "komoditas_name",
+      "pasar_name",
+      "price",
+      "effective_date",
+      "is_active",
+    ],
     defaults: {
       komoditas_id: "",
       pasar_id: "",
@@ -194,7 +267,13 @@ const resources = {
       { name: "is_active", label: "Aktif", type: "checkbox" },
     ],
     columns: ["title", "image", "is_active"],
-    defaults: { title: "", image: "", link_url: "", sort_order: 0, is_active: true },
+    defaults: {
+      title: "",
+      image: "",
+      link_url: "",
+      sort_order: 0,
+      is_active: true,
+    },
   },
   users: {
     title: "Manajemen User",
@@ -204,7 +283,17 @@ const resources = {
       { name: "username", label: "Username", required: true },
       { name: "email", label: "Email" },
       { name: "password", label: "Password", type: "password" },
-      { name: "user_role", label: "Role", type: "select", required: true, options: [["admin", "Admin"], ["surveyor", "Surveyor Pasar"], ["verifikator", "Verifikator"]] },
+      {
+        name: "user_role",
+        label: "Role",
+        type: "select",
+        required: true,
+        options: [
+          ["admin", "Admin"],
+          ["surveyor", "Surveyor Pasar"],
+          ["verifikator", "Verifikator"],
+        ],
+      },
     ],
     columns: ["name", "username", "email", "user_role"],
     defaults: {
@@ -237,58 +326,132 @@ const resources = {
 };
 
 const menuGroups = [
-  { key: "dashboard", label: "Dashboard", href: "/admin", roles: ["admin", "surveyor", "verifikator"] },
   {
-    label: "Master Data", roles: ["admin", "verifikator"],
+    key: "dashboard",
+    label: "Dashboard",
+    href: "/admin",
+    roles: ["admin", "surveyor", "verifikator"],
+  },
+  {
+    label: "Master Data",
+    roles: ["admin", "verifikator"],
     items: [
       { key: "markets", label: "Pasar", href: "/admin/markets" },
       { key: "commodities", label: "Komoditas", href: "/admin/commodities" },
       { key: "pages", label: "Halaman", href: "/admin/pages" },
-      { key: "download-categories", label: "Kategori Unduhan", href: "/admin/download-categories" },
+      {
+        key: "download-categories",
+        label: "Kategori Unduhan",
+        href: "/admin/download-categories",
+      },
       { key: "downloads", label: "Dokumen", href: "/admin/downloads" },
-      { key: "survey-settings", label: "Survey", href: "/admin/survey-settings" },
+      {
+        key: "survey-settings",
+        label: "Survey",
+        href: "/admin/survey-settings",
+      },
     ],
   },
   {
-    label: "Harga", roles: ["admin", "surveyor", "verifikator"],
+    label: "Harga",
+    roles: ["admin", "surveyor", "verifikator"],
     items: [
       { key: "prices", label: "Input Harga", href: "/admin/prices" },
-      { key: "prices-monitor", label: "Pemantauan Harga", href: "/admin/prices-monitor" },
+      {
+        key: "prices-monitor",
+        label: "Pemantauan Harga",
+        href: "/admin/prices-monitor",
+      },
     ],
     extra: [
-      { key: "het-hap", label: "HET / HAP", href: "/admin/het-hap", roles: ["admin", "verifikator"] },
-      { key: "prices-verification", label: "Verifikasi Harga", href: "/admin/prices-verification", roles: ["verifikator", "admin"] },
+      {
+        key: "het-hap",
+        label: "HET / HAP",
+        href: "/admin/het-hap",
+        roles: ["admin", "verifikator"],
+      },
+      {
+        key: "prices-verification",
+        label: "Verifikasi Harga",
+        href: "/admin/prices-verification",
+        roles: ["verifikator", "admin"],
+      },
     ],
   },
   {
-    label: "Konten", roles: ["admin"],
+    label: "Konten",
+    roles: ["admin"],
     items: [
       { key: "tentang", label: "Halaman Tentang", href: "/admin/tentang" },
-      { key: "program-kegiatan", label: "Program Kegiatan", href: "/admin/program-kegiatan" },
+      {
+        key: "program-kegiatan",
+        label: "Program Kegiatan",
+        href: "/admin/program-kegiatan",
+      },
       { key: "banners", label: "Banner Slider", href: "/admin/banners" },
       { key: "ikm", label: "Data IKM", href: "/admin/ikm" },
-      { key: "zona-integritas", label: "Zona Integritas", href: "/admin/zona-integritas" },
+      {
+        key: "zona-integritas",
+        label: "Zona Integritas",
+        href: "/admin/zona-integritas",
+      },
     ],
   },
   {
-    label: "Layanan", roles: ["admin"],
+    label: "Layanan",
+    roles: ["admin"],
     items: [
-      { key: "layanan-halal", label: "Sertifikasi Halal", href: "/admin/layanan-halal" },
-      { key: "layanan-merk", label: "Legalitas Merk", href: "/admin/layanan-merk" },
+      {
+        key: "layanan-halal",
+        label: "Sertifikasi Halal",
+        href: "/admin/layanan-halal",
+      },
+      {
+        key: "layanan-merk",
+        label: "Legalitas Merk",
+        href: "/admin/layanan-merk",
+      },
       { key: "layanan-sinas", label: "SIINas", href: "/admin/layanan-sinas" },
-      { key: "layanan-tera", label: "Tera / Tera Ulang", href: "/admin/layanan-tera" },
-      { key: "layanan-tdg", label: "Tanda Daftar Gudang", href: "/admin/layanan-tdg" },
-      { key: "layanan-minhol", label: "Perpanjangan Minuman Beralkohol", href: "/admin/layanan-minhol" },
+      {
+        key: "layanan-tera",
+        label: "Tera / Tera Ulang",
+        href: "/admin/layanan-tera",
+      },
+      {
+        key: "layanan-tdg",
+        label: "Tanda Daftar Gudang",
+        href: "/admin/layanan-tdg",
+      },
+      {
+        key: "layanan-minhol",
+        label: "Perpanjangan Minuman Beralkohol",
+        href: "/admin/layanan-minhol",
+      },
     ],
   },
-  { key: "users", label: "Manajemen User", href: "/admin/users", roles: ["admin"] },
+  {
+    key: "users",
+    label: "Manajemen User",
+    href: "/admin/users",
+    roles: ["admin"],
+  },
 ];
 
 const allMenus = [];
 menuGroups.forEach((g) => {
-  if (g.items) { g.items.forEach((i) => { allMenus.push({ ...i, roles: g.roles }); }); }
-  if (g.extra) { g.extra.forEach((i) => { allMenus.push(i); }); }
-  if (!g.items && !g.extra) { allMenus.push({ key: g.key, label: g.label, href: g.href, roles: g.roles }); }
+  if (g.items) {
+    g.items.forEach((i) => {
+      allMenus.push({ ...i, roles: g.roles });
+    });
+  }
+  if (g.extra) {
+    g.extra.forEach((i) => {
+      allMenus.push(i);
+    });
+  }
+  if (!g.items && !g.extra) {
+    allMenus.push({ key: g.key, label: g.label, href: g.href, roles: g.roles });
+  }
 });
 
 function getActiveKey() {
@@ -328,18 +491,30 @@ function AdminLayout({ children, menus, groups }) {
   const toggle = (label) => setExpanded((p) => ({ ...p, [label]: !p[label] }));
 
   const flatKeys = {};
-  menus.forEach((m) => { flatKeys[m.key] = true; });
+  menus.forEach((m) => {
+    flatKeys[m.key] = true;
+  });
 
   const isGroupVisible = (g) => {
     if (g.key) return flatKeys[g.key];
-    if (g.extra) return (g.items || []).some((i) => flatKeys[i.key]) || g.extra.some((i) => flatKeys[i.key]);
+    if (g.extra)
+      return (
+        (g.items || []).some((i) => flatKeys[i.key]) ||
+        g.extra.some((i) => flatKeys[i.key])
+      );
     return (g.items || []).some((i) => flatKeys[i.key]);
   };
 
   const hasItemInGroup = (g) => (g.items || []).some((i) => flatKeys[i.key]);
 
   const renderItem = (item) => (
-    <a key={item.key} href={item.href} className={activeKey === item.key ? "active" : ""}>{item.label}</a>
+    <a
+      key={item.key}
+      href={item.href}
+      className={activeKey === item.key ? "active" : ""}
+    >
+      {item.label}
+    </a>
   );
 
   return (
@@ -351,21 +526,44 @@ function AdminLayout({ children, menus, groups }) {
         </div>
 
         <nav className="admin-menu">
-          {groups.filter(isGroupVisible).map((g) => (
-            g.key ? renderItem({ key: g.key, label: g.label, href: g.href }) : (
+          {groups.filter(isGroupVisible).map((g) =>
+            g.key ? (
+              renderItem({ key: g.key, label: g.label, href: g.href })
+            ) : (
               <div key={g.label} className="admin-menuGroup">
-                <button type="button" className={expanded[g.label] ? "admin-menuGroupBtn open" : "admin-menuGroupBtn"}
-                  onClick={() => toggle(g.label)}>
+                <button
+                  type="button"
+                  className={
+                    expanded[g.label]
+                      ? "admin-menuGroupBtn open"
+                      : "admin-menuGroupBtn"
+                  }
+                  onClick={() => toggle(g.label)}
+                >
                   <span>{g.label}</span>
-                  <svg className="admin-menuArrow" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M6 8l4 4 4-4" /></svg>
+                  <svg
+                    className="admin-menuArrow"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path d="M6 8l4 4 4-4" />
+                  </svg>
                 </button>
-                <div className={expanded[g.label] ? "admin-menuSub open" : "admin-menuSub"}>
+                <div
+                  className={
+                    expanded[g.label] ? "admin-menuSub open" : "admin-menuSub"
+                  }
+                >
                   {g.items.filter((i) => flatKeys[i.key]).map(renderItem)}
-                  {hasItemInGroup(g) && g.extra && g.extra.filter((i) => flatKeys[i.key]).map(renderItem)}
+                  {hasItemInGroup(g) &&
+                    g.extra &&
+                    g.extra.filter((i) => flatKeys[i.key]).map(renderItem)}
                 </div>
               </div>
-            )
-          ))}
+            ),
+          )}
         </nav>
 
         <form method="POST" action="/logout" className="admin-logout">
@@ -380,31 +578,79 @@ function AdminLayout({ children, menus, groups }) {
 }
 
 const statCards = [
-  { key: "markets", label: "Pasar", icon: BuildingStorefrontIcon, color: "#076797" },
+  {
+    key: "markets",
+    label: "Pasar",
+    icon: BuildingStorefrontIcon,
+    color: "#076797",
+  },
   { key: "commodities", label: "Komoditas", icon: CubeIcon, color: "#108879" },
   { key: "ikm", label: "IKM", icon: BuildingOffice2Icon, color: "#16a34a" },
 ];
 
-const ikmColorMap = { fashion: "#076797", kerajinan: "#108879", makanan_minuman: "#d97706", lainnya: "#6d28d9" };
-const ikmLabelMap = { fashion: "Fashion", kerajinan: "Kerajinan", makanan_minuman: "Makanan & Minuman", lainnya: "Lainnya" };
+const ikmColorMap = {
+  fashion: "#076797",
+  kerajinan: "#108879",
+  makanan_minuman: "#d97706",
+  lainnya: "#6d28d9",
+};
+const ikmLabelMap = {
+  fashion: "Fashion",
+  kerajinan: "Kerajinan",
+  makanan_minuman: "Makanan & Minuman",
+  lainnya: "Lainnya",
+};
 
-const marketColorMap = { "Pasar Rakyat": "#076797", "Pasar Modern": "#108879", Minimarket: "#d97706", "Pusat Perbelanjaan": "#6d28d9" };
+const marketColorMap = {
+  "Pasar Rakyat": "#076797",
+  "Pasar Modern": "#108879",
+  Minimarket: "#d97706",
+  "Pusat Perbelanjaan": "#6d28d9",
+};
 
 function Dashboard() {
   const [data, setData] = useState(null);
-  useEffect(() => { api("/api/admin/dashboard").then((r) => setData(r.data || {})).catch(() => setData({})); }, []);
+  useEffect(() => {
+    api("/api/admin/dashboard")
+      .then((r) => setData(r.data || {}))
+      .catch(() => setData({}));
+  }, []);
 
-  if (!data) return (<><div className="admin-header"><div><p>Dashboard</p><h1>Ringkasan Admin</h1></div></div><div className="admin-card"><p>Memuat data...</p></div></>);
+  if (!data)
+    return (
+      <>
+        <div className="admin-header">
+          <div>
+            <p>Dashboard</p>
+            <h1>Ringkasan Admin</h1>
+          </div>
+        </div>
+        <div className="admin-card">
+          <p>Memuat data...</p>
+        </div>
+      </>
+    );
 
   const maxIkm = Math.max(...Object.values(data.ikm_categories || {}), 1);
   const maxMarket = Math.max(...Object.values(data.market_categories || {}), 1);
   const priceTrend = data.price_trend || 0;
-  const TrendIcon = priceTrend > 0 ? ArrowTrendingUpIcon : priceTrend < 0 ? ArrowTrendingDownIcon : MinusIcon;
-  const trendColor = priceTrend > 0 ? "#dc2626" : priceTrend < 0 ? "#16a34a" : "#64748b";
+  const TrendIcon =
+    priceTrend > 0
+      ? ArrowTrendingUpIcon
+      : priceTrend < 0
+        ? ArrowTrendingDownIcon
+        : MinusIcon;
+  const trendColor =
+    priceTrend > 0 ? "#dc2626" : priceTrend < 0 ? "#16a34a" : "#64748b";
 
   return (
     <>
-      <div className="admin-header"><div><p>Dashboard</p><h1>Ringkasan Admin</h1></div></div>
+      <div className="admin-header">
+        <div>
+          <p>Dashboard</p>
+          <h1>Ringkasan Admin</h1>
+        </div>
+      </div>
 
       <div className="dashGrid">
         {statCards.map((card) => {
@@ -412,12 +658,17 @@ function Dashboard() {
           const Icon = card.icon;
           return (
             <div key={card.key} className="dashCard">
-              <div className="dashCardIcon" style={{ background: `${card.color}18`, color: card.color }}>
+              <div
+                className="dashCardIcon"
+                style={{ background: `${card.color}18`, color: card.color }}
+              >
                 <Icon style={{ width: 24, height: 24 }} />
               </div>
               <div className="dashCardBody">
                 <span className="dashCardLabel">{card.label}</span>
-                <strong className="dashCardValue">{typeof val === "number" ? val.toLocaleString() : val}</strong>
+                <strong className="dashCardValue">
+                  {typeof val === "number" ? val.toLocaleString() : val}
+                </strong>
               </div>
             </div>
           );
@@ -433,19 +684,31 @@ function Dashboard() {
           <div className="dashPriceRow">
             <div className="dashPriceBox">
               <span className="dashPriceLabel">Hari Ini</span>
-              <strong className="dashPriceValue">Rp {(data.price_avg_today || 0).toLocaleString()}</strong>
+              <strong className="dashPriceValue">
+                Rp {(data.price_avg_today || 0).toLocaleString()}
+              </strong>
             </div>
             <div className="dashPriceDivider" />
             <div className="dashPriceBox">
               <span className="dashPriceLabel">Kemarin</span>
-              <strong className="dashPriceValue">Rp {(data.price_avg_yesterday || 0).toLocaleString()}</strong>
+              <strong className="dashPriceValue">
+                Rp {(data.price_avg_yesterday || 0).toLocaleString()}
+              </strong>
             </div>
             <div className="dashPriceDivider" />
             <div className="dashPriceBox">
               <span className="dashPriceLabel">Trend</span>
               <strong className="dashPriceValue" style={{ color: trendColor }}>
-                <TrendIcon style={{ width: 18, height: 18, verticalAlign: -3, marginRight: 2 }} />
-                {priceTrend > 0 ? "+" : ""}{priceTrend}%
+                <TrendIcon
+                  style={{
+                    width: 18,
+                    height: 18,
+                    verticalAlign: -3,
+                    marginRight: 2,
+                  }}
+                />
+                {priceTrend > 0 ? "+" : ""}
+                {priceTrend}%
               </strong>
             </div>
           </div>
@@ -461,12 +724,22 @@ function Dashboard() {
               <div key={cat} className="dashBarRow">
                 <span className="dashBarLabel">{ikmLabelMap[cat] || cat}</span>
                 <div className="dashBarTrack">
-                  <div className="dashBarFill" style={{ width: `${(count / maxIkm) * 100}%`, background: ikmColorMap[cat] || "#076797" }} />
+                  <div
+                    className="dashBarFill"
+                    style={{
+                      width: `${(count / maxIkm) * 100}%`,
+                      background: ikmColorMap[cat] || "#076797",
+                    }}
+                  />
                 </div>
                 <span className="dashBarCount">{count}</span>
               </div>
             ))}
-            {Object.keys(data.ikm_categories || {}).length === 0 && <p style={{ color: "#64748b", fontSize: 13 }}>Belum ada data IKM.</p>}
+            {Object.keys(data.ikm_categories || {}).length === 0 && (
+              <p style={{ color: "#64748b", fontSize: 13 }}>
+                Belum ada data IKM.
+              </p>
+            )}
           </div>
         </div>
 
@@ -476,16 +749,28 @@ function Dashboard() {
             <h3>Pasar per Kategori</h3>
           </div>
           <div className="dashBarList">
-            {Object.entries(data.market_categories || {}).map(([cat, count]) => (
-              <div key={cat} className="dashBarRow">
-                <span className="dashBarLabel">{cat}</span>
-                <div className="dashBarTrack">
-                  <div className="dashBarFill" style={{ width: `${(count / maxMarket) * 100}%`, background: marketColorMap[cat] || "#076797" }} />
+            {Object.entries(data.market_categories || {}).map(
+              ([cat, count]) => (
+                <div key={cat} className="dashBarRow">
+                  <span className="dashBarLabel">{cat}</span>
+                  <div className="dashBarTrack">
+                    <div
+                      className="dashBarFill"
+                      style={{
+                        width: `${(count / maxMarket) * 100}%`,
+                        background: marketColorMap[cat] || "#076797",
+                      }}
+                    />
+                  </div>
+                  <span className="dashBarCount">{count}</span>
                 </div>
-                <span className="dashBarCount">{count}</span>
-              </div>
-            ))}
-            {Object.keys(data.market_categories || {}).length === 0 && <p style={{ color: "#64748b", fontSize: 13 }}>Belum ada data pasar.</p>}
+              ),
+            )}
+            {Object.keys(data.market_categories || {}).length === 0 && (
+              <p style={{ color: "#64748b", fontSize: 13 }}>
+                Belum ada data pasar.
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -496,7 +781,9 @@ function Dashboard() {
           <h3>Harga Terbaru Hari Ini</h3>
         </div>
         {(data.recent_prices || []).length === 0 ? (
-          <p style={{ color: "#64748b", fontSize: 13, padding: 12 }}>Belum ada harga yang diinput hari ini.</p>
+          <p style={{ color: "#64748b", fontSize: 13, padding: 12 }}>
+            Belum ada harga yang diinput hari ini.
+          </p>
         ) : (
           <div className="dashTableWrap">
             <table className="admin-table" style={{ margin: 0 }}>
@@ -515,11 +802,33 @@ function Dashboard() {
                   return (
                     <tr key={p.id}>
                       <td>{p.pasar}</td>
-                      <td>{p.komoditas} {p.unit && <span style={{ color: "#64748b", fontSize: 12 }}>/ {p.unit}</span>}</td>
-                      <td style={{ textAlign: "right", fontWeight: 600 }}>Rp {p.price.toLocaleString()}</td>
-                      <td style={{ textAlign: "right", color: "#64748b" }}>Rp {p.previous_price.toLocaleString()}</td>
-                      <td style={{ textAlign: "center", color: diff > 0 ? "#dc2626" : diff < 0 ? "#16a34a" : "#64748b" }}>
-                        {diff > 0 ? "+" : ""}{diff.toLocaleString()}
+                      <td>
+                        {p.komoditas}{" "}
+                        {p.unit && (
+                          <span style={{ color: "#64748b", fontSize: 12 }}>
+                            / {p.unit}
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ textAlign: "right", fontWeight: 600 }}>
+                        Rp {p.price.toLocaleString()}
+                      </td>
+                      <td style={{ textAlign: "right", color: "#64748b" }}>
+                        Rp {p.previous_price.toLocaleString()}
+                      </td>
+                      <td
+                        style={{
+                          textAlign: "center",
+                          color:
+                            diff > 0
+                              ? "#dc2626"
+                              : diff < 0
+                                ? "#16a34a"
+                                : "#64748b",
+                        }}
+                      >
+                        {diff > 0 ? "+" : ""}
+                        {diff.toLocaleString()}
                       </td>
                     </tr>
                   );
@@ -682,9 +991,7 @@ function CrudPage({ config }) {
         <input
           type="checkbox"
           checked={Boolean(value)}
-          onChange={(e) =>
-            setForm({ ...form, [field.name]: e.target.checked })
-          }
+          onChange={(e) => setForm({ ...form, [field.name]: e.target.checked })}
         />
       );
     }
@@ -702,14 +1009,30 @@ function CrudPage({ config }) {
             {uploading[field.name] && <span>Uploading...</span>}
           </div>
           {value && (
-            <div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: "#344054" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                alignItems: "center",
+                fontSize: 13,
+                color: "#344054",
+              }}
+            >
               <span>{value}</span>
               {isImage && (
                 <img
                   src={`/assets/${value}`}
                   alt="preview"
-                  style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 8, border: "1px solid #d0d5dd" }}
-                  onError={(e) => { e.currentTarget.style.display = "none"; }}
+                  style={{
+                    width: 48,
+                    height: 48,
+                    objectFit: "cover",
+                    borderRadius: 8,
+                    border: "1px solid #d0d5dd",
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
                 />
               )}
             </div>
@@ -724,7 +1047,7 @@ function CrudPage({ config }) {
       const allOptions =
         options.length > 0
           ? options
-          : loaded.map((item) => [item[field.optionValue || 'id'], item.name]);
+          : loaded.map((item) => [item[field.optionValue || "id"], item.name]);
 
       return (
         <select
@@ -760,7 +1083,7 @@ function CrudPage({ config }) {
         config.columns.some((col) => {
           const v = row[col];
           return v != null && String(v).toLowerCase().includes(q);
-        })
+        }),
       );
     }
     if (sortKey && sortDir) {
@@ -769,7 +1092,10 @@ function CrudPage({ config }) {
         const vb = b[sortKey];
         if (va == null) return 1;
         if (vb == null) return -1;
-        const cmp = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb));
+        const cmp =
+          typeof va === "number"
+            ? va - vb
+            : String(va).localeCompare(String(vb));
         return sortDir === "asc" ? cmp : -cmp;
       });
     }
@@ -778,9 +1104,15 @@ function CrudPage({ config }) {
 
   const toggleSort = (col) => {
     if (sortKey === col) {
-      if (sortDir === "asc") { setSortDir("desc"); }
-      else if (sortDir === "desc") { setSortKey(null); setSortDir(null); }
-      else { setSortDir("asc"); setSortKey(col); }
+      if (sortDir === "asc") {
+        setSortDir("desc");
+      } else if (sortDir === "desc") {
+        setSortKey(null);
+        setSortDir(null);
+      } else {
+        setSortDir("asc");
+        setSortKey(col);
+      }
     } else {
       setSortKey(col);
       setSortDir("asc");
@@ -789,7 +1121,10 @@ function CrudPage({ config }) {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
   const safePage = Math.min(page, totalPages);
-  const paginated = filtered.slice((safePage - 1) * perPage, safePage * perPage);
+  const paginated = filtered.slice(
+    (safePage - 1) * perPage,
+    safePage * perPage,
+  );
 
   return (
     <>
@@ -805,12 +1140,22 @@ function CrudPage({ config }) {
           <h2>Data</h2>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             {loading && <span>Memuat...</span>}
-            <button className="btn" onClick={() => openForm(null)}>+ Tambah</button>
+            <button className="btn" onClick={() => openForm(null)}>
+              + Tambah
+            </button>
           </div>
         </div>
 
         {showForm && (
-          <form onSubmit={submit} className="admin-form" style={{ marginBottom: 20, paddingTop: 16, borderTop: "1px solid #eaecf0" }}>
+          <form
+            onSubmit={submit}
+            className="admin-form"
+            style={{
+              marginBottom: 20,
+              paddingTop: 16,
+              borderTop: "1px solid #eaecf0",
+            }}
+          >
             <h2>{editing ? "Edit Data" : "Tambah Data"}</h2>
 
             <div className="admin-form-grid">
@@ -831,7 +1176,14 @@ function CrudPage({ config }) {
 
             <div className="admin-actions">
               <button type="submit">{editing ? "Update" : "Simpan"}</button>
-              <button type="button" className="secondary" onClick={() => { resetForm(); setShowForm(false); }}>
+              <button
+                type="button"
+                className="secondary"
+                onClick={() => {
+                  resetForm();
+                  setShowForm(false);
+                }}
+              >
                 Batal
               </button>
             </div>
@@ -848,7 +1200,9 @@ function CrudPage({ config }) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <span className="recordCount">{filtered.length} / {rows.length} data</span>
+          <span className="recordCount">
+            {filtered.length} / {rows.length} data
+          </span>
         </div>
 
         <div className="admin-table-wrap">
@@ -863,7 +1217,13 @@ function CrudPage({ config }) {
                     onClick={() => toggleSort(column)}
                   >
                     {column.replaceAll("_", " ")}
-                    <span className="sortIcon">{sortKey === column ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span>
+                    <span className="sortIcon">
+                      {sortKey === column
+                        ? sortDir === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "⇅"}
+                    </span>
                   </th>
                 ))}
                 <th>Aksi</th>
@@ -911,11 +1271,27 @@ function CrudPage({ config }) {
 
         {totalPages > 1 && (
           <div className="pagination">
-            <button disabled={safePage <= 1} onClick={() => setPage(safePage - 1)}>‹ Prev</button>
+            <button
+              disabled={safePage <= 1}
+              onClick={() => setPage(safePage - 1)}
+            >
+              ‹ Prev
+            </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button key={p} className={safePage === p ? "active" : ""} onClick={() => setPage(p)}>{p}</button>
+              <button
+                key={p}
+                className={safePage === p ? "active" : ""}
+                onClick={() => setPage(p)}
+              >
+                {p}
+              </button>
             ))}
-            <button disabled={safePage >= totalPages} onClick={() => setPage(safePage + 1)}>Next ›</button>
+            <button
+              disabled={safePage >= totalPages}
+              onClick={() => setPage(safePage + 1)}
+            >
+              Next ›
+            </button>
           </div>
         )}
       </div>
@@ -932,7 +1308,13 @@ const rupiah = (value) =>
 
 function IndicatorBadge({ status }) {
   if (!status) return null;
-  const label = ({ aman: "Aman", waspada: "Waspada", intervensi: "Intervensi", belum_dikaji: "Belum Dikaji" }[status]) || status;
+  const label =
+    {
+      aman: "Aman",
+      waspada: "Waspada",
+      intervensi: "Intervensi",
+      belum_dikaji: "Belum Dikaji",
+    }[status] || status;
   return <span className={`indicator ${status}`}>{label}</span>;
 }
 
@@ -954,18 +1336,35 @@ function PriceMonitoring() {
   const [page, setPage] = useState(1);
   const perPage = 10;
 
-  const COLORS = ["#076797", "#108879", "#e2a200", "#dc2626", "#7c3aed", "#0891b2", "#84cc16", "#f97316", "#ec4899", "#6366f1"];
+  const COLORS = [
+    "#076797",
+    "#108879",
+    "#e2a200",
+    "#dc2626",
+    "#7c3aed",
+    "#0891b2",
+    "#84cc16",
+    "#f97316",
+    "#ec4899",
+    "#6366f1",
+  ];
 
   const toggleCommodity = (id) => {
     setCommodityIds((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]);
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
+    );
   };
 
   const setDatePreset = (days) => {
     const now = new Date();
     const e = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const s = new Date(e.getTime() - (days - 1) * 86400000);
-    const fmt = (d) => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    const fmt = (d) =>
+      d.getFullYear() +
+      "-" +
+      String(d.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(d.getDate()).padStart(2, "0");
     setStartDate(fmt(s));
     setEndDate(fmt(e));
   };
@@ -1007,7 +1406,9 @@ function PriceMonitoring() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, [summaryQuery, chartQuery]);
+  useEffect(() => {
+    load();
+  }, [summaryQuery, chartQuery]);
 
   useEffect(() => {
     if (!chartCanvasRef.current || chartData.dates.length === 0) return;
@@ -1035,27 +1436,44 @@ function PriceMonitoring() {
         maintainAspectRatio: false,
         interaction: { intersect: false, mode: "index" },
         plugins: {
-          legend: { position: "bottom", labels: { padding: 20, usePointStyle: true, font: { size: 12, family: "Inter, sans-serif" } } },
+          legend: {
+            position: "bottom",
+            labels: {
+              padding: 20,
+              usePointStyle: true,
+              font: { size: 12, family: "Inter, sans-serif" },
+            },
+          },
           tooltip: {
             backgroundColor: "#0f2d52",
             titleFont: { size: 13, family: "Inter, sans-serif" },
             bodyFont: { size: 12, family: "Inter, sans-serif" },
             padding: 12,
             cornerRadius: 12,
-            callbacks: { label: (ctx) => ` ${ctx.dataset.label}: ${rupiah(ctx.parsed.y)}` },
+            callbacks: {
+              label: (ctx) => ` ${ctx.dataset.label}: ${rupiah(ctx.parsed.y)}`,
+            },
           },
         },
         scales: {
-          x: { grid: { display: false }, ticks: { font: { size: 11, family: "Inter, sans-serif" } } },
+          x: {
+            grid: { display: false },
+            ticks: { font: { size: 11, family: "Inter, sans-serif" } },
+          },
           y: {
             grid: { color: "#eef2f7" },
-            ticks: { font: { size: 11, family: "Inter, sans-serif" }, callback: (v) => rupiah(v).replace(",00", "") },
+            ticks: {
+              font: { size: 11, family: "Inter, sans-serif" },
+              callback: (v) => rupiah(v).replace(",00", ""),
+            },
           },
         },
       },
     });
 
-    return () => { if (chartInstanceRef.current) chartInstanceRef.current.destroy(); };
+    return () => {
+      if (chartInstanceRef.current) chartInstanceRef.current.destroy();
+    };
   }, [chartData]);
 
   const filteredRows = useMemo(() => {
@@ -1063,8 +1481,13 @@ function PriceMonitoring() {
     if (search) {
       const q = search.toLowerCase();
       data = rows.filter((r) =>
-        [r.nama_komoditas, r.harga_sekarang, r.harga_sebelumnya, r.indicator_status, r.latest_date]
-          .some((v) => v != null && String(v).toLowerCase().includes(q))
+        [
+          r.nama_komoditas,
+          r.harga_sekarang,
+          r.harga_sebelumnya,
+          r.indicator_status,
+          r.latest_date,
+        ].some((v) => v != null && String(v).toLowerCase().includes(q)),
       );
     }
     if (sortKey && sortDir) {
@@ -1073,7 +1496,10 @@ function PriceMonitoring() {
         const vb = b[sortKey];
         if (va == null) return 1;
         if (vb == null) return -1;
-        const cmp = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb));
+        const cmp =
+          typeof va === "number"
+            ? va - vb
+            : String(va).localeCompare(String(vb));
         return sortDir === "asc" ? cmp : -cmp;
       });
     }
@@ -1082,9 +1508,15 @@ function PriceMonitoring() {
 
   const toggleSort = (col) => {
     if (sortKey === col) {
-      if (sortDir === "asc") { setSortDir("desc"); }
-      else if (sortDir === "desc") { setSortKey(null); setSortDir(null); }
-      else { setSortDir("asc"); setSortKey(col); }
+      if (sortDir === "asc") {
+        setSortDir("desc");
+      } else if (sortDir === "desc") {
+        setSortKey(null);
+        setSortDir(null);
+      } else {
+        setSortDir("asc");
+        setSortKey(col);
+      }
     } else {
       setSortKey(col);
       setSortDir("asc");
@@ -1093,7 +1525,10 @@ function PriceMonitoring() {
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / perPage));
   const safePage = Math.min(page, totalPages);
-  const paginated = filteredRows.slice((safePage - 1) * perPage, safePage * perPage);
+  const paginated = filteredRows.slice(
+    (safePage - 1) * perPage,
+    safePage * perPage,
+  );
 
   return (
     <div>
@@ -1102,18 +1537,63 @@ function PriceMonitoring() {
           <p>Admin</p>
           <h1>Pemantauan Harga Komoditas</h1>
         </div>
-        <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}>
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
-            style={{padding:"8px 10px",border:"1.5px solid var(--border)",borderRadius:"var(--radius-sm)",font:"inherit",fontSize:13,background:"var(--surface)"}}
-            title="Tanggal Awal" />
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
-            style={{padding:"8px 10px",border:"1.5px solid var(--border)",borderRadius:"var(--radius-sm)",font:"inherit",fontSize:13,background:"var(--surface)"}}
-            title="Tanggal Akhir" />
+        <div
+          style={{
+            display: "flex",
+            gap: 10,
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            style={{
+              padding: "8px 10px",
+              border: "1.5px solid var(--border)",
+              borderRadius: "var(--radius-sm)",
+              font: "inherit",
+              fontSize: 13,
+              background: "var(--surface)",
+            }}
+            title="Tanggal Awal"
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            style={{
+              padding: "8px 10px",
+              border: "1.5px solid var(--border)",
+              borderRadius: "var(--radius-sm)",
+              font: "inherit",
+              fontSize: 13,
+              background: "var(--surface)",
+            }}
+            title="Tanggal Akhir"
+          />
           {/* <a className="btn" href={`/api/admin/prices/export?${chartQuery}`}>Download Excel</a> */}
-          <button className="btn" style={{background:"#108879",border:"none",cursor:"pointer",fontSize:14}} onClick={() => {
-            if (!startDate || !endDate) { alert("Silakan pilih tanggal awal dan tanggal akhir terlebih dahulu."); return; }
-            window.location.href = `/api/admin/prices/export-avg?start_date=${startDate}&end_date=${endDate}`;
-          }}>Download Rekap</button>
+          <button
+            className="btn"
+            style={{
+              background: "#108879",
+              border: "none",
+              cursor: "pointer",
+              fontSize: 14,
+            }}
+            onClick={() => {
+              if (!startDate || !endDate) {
+                alert(
+                  "Silakan pilih tanggal awal dan tanggal akhir terlebih dahulu.",
+                );
+                return;
+              }
+              window.location.href = `/api/admin/prices/export-avg?start_date=${startDate}&end_date=${endDate}`;
+            }}
+          >
+            Download Rekap
+          </button>
         </div>
       </div>
 
@@ -1121,8 +1601,16 @@ function PriceMonitoring() {
         <h2>Tabel Harga Komoditas</h2>
 
         <div className="tableToolbar">
-          <input className="searchInput" type="text" placeholder="Cari komoditas..." value={search} onChange={(e) => setSearch(e.target.value)} />
-          <span className="recordCount">{filteredRows.length} / {rows.length} data</span>
+          <input
+            className="searchInput"
+            type="text"
+            placeholder="Cari komoditas..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <span className="recordCount">
+            {filteredRows.length} / {rows.length} data
+          </span>
         </div>
 
         {loading && <p>Memuat data...</p>}
@@ -1133,15 +1621,63 @@ function PriceMonitoring() {
               <thead>
                 <tr>
                   <th>No</th>
-                  <th className={sortKey === "nama_komoditas" ? sortDir : ""} onClick={() => toggleSort("nama_komoditas")}>Komoditas <span className="sortIcon">{sortKey === "nama_komoditas" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
+                  <th
+                    className={sortKey === "nama_komoditas" ? sortDir : ""}
+                    onClick={() => toggleSort("nama_komoditas")}
+                  >
+                    Komoditas{" "}
+                    <span className="sortIcon">
+                      {sortKey === "nama_komoditas"
+                        ? sortDir === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "⇅"}
+                    </span>
+                  </th>
                   <th>Satuan</th>
                   <th>HET/HAP</th>
-                  <th className={sortKey === "harga_sekarang" ? sortDir : ""} onClick={() => toggleSort("harga_sekarang")}>Harga Terkini <span className="sortIcon">{sortKey === "harga_sekarang" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
+                  <th
+                    className={sortKey === "harga_sekarang" ? sortDir : ""}
+                    onClick={() => toggleSort("harga_sekarang")}
+                  >
+                    Harga Terkini{" "}
+                    <span className="sortIcon">
+                      {sortKey === "harga_sekarang"
+                        ? sortDir === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "⇅"}
+                    </span>
+                  </th>
                   <th>Harga Sebelumnya</th>
                   <th>Rata-rata</th>
                   <th>Selisih</th>
-                  <th className={sortKey === "market_count" ? sortDir : ""} onClick={() => toggleSort("market_count")}>Jumlah Pasar <span className="sortIcon">{sortKey === "market_count" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
-                  <th className={sortKey === "indicator_status" ? sortDir : ""} onClick={() => toggleSort("indicator_status")}>Indikator <span className="sortIcon">{sortKey === "indicator_status" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span></th>
+                  <th
+                    className={sortKey === "market_count" ? sortDir : ""}
+                    onClick={() => toggleSort("market_count")}
+                  >
+                    Jumlah Pasar{" "}
+                    <span className="sortIcon">
+                      {sortKey === "market_count"
+                        ? sortDir === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "⇅"}
+                    </span>
+                  </th>
+                  <th
+                    className={sortKey === "indicator_status" ? sortDir : ""}
+                    onClick={() => toggleSort("indicator_status")}
+                  >
+                    Indikator{" "}
+                    <span className="sortIcon">
+                      {sortKey === "indicator_status"
+                        ? sortDir === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "⇅"}
+                    </span>
+                  </th>
                   <th>Tanggal Update</th>
                 </tr>
               </thead>
@@ -1149,16 +1685,41 @@ function PriceMonitoring() {
                 {paginated.map((r, i) => (
                   <tr key={r.commodity_id}>
                     <td>{(safePage - 1) * perPage + i + 1}</td>
-                    <td><strong>{r.nama_komoditas}</strong></td>
+                    <td>
+                      <strong>{r.nama_komoditas}</strong>
+                    </td>
                     <td>{r.unit || "-"}</td>
-                    <td>{r.reference_price ? rupiah(r.reference_price) : "-"}</td>
-                    <td><strong style={{color:"var(--primary)"}}>{rupiah(r.harga_sekarang)}</strong></td>
+                    <td>
+                      {r.reference_price ? rupiah(r.reference_price) : "-"}
+                    </td>
+                    <td>
+                      <strong style={{ color: "var(--primary)" }}>
+                        {rupiah(r.harga_sekarang)}
+                      </strong>
+                    </td>
                     <td>{rupiah(r.harga_sebelumnya)}</td>
                     <td>{rupiah(r.rata_rata)}</td>
-                    <td style={{ color: r.tren === "naik" ? "#dc2626" : r.tren === "turun" ? "#16a34a" : "#64748b" }}>{rupiah(Math.abs(r.selisih))}</td>
-                    <td><span className="badgeMarket">{r.market_count}</span></td>
-                    <td><IndicatorBadge status={r.indicator_status} /></td>
-                    <td style={{fontSize:13, color:"var(--text-muted)"}}>{r.latest_date || "-"}</td>
+                    <td
+                      style={{
+                        color:
+                          r.tren === "naik"
+                            ? "#dc2626"
+                            : r.tren === "turun"
+                              ? "#16a34a"
+                              : "#64748b",
+                      }}
+                    >
+                      {rupiah(Math.abs(r.selisih))}
+                    </td>
+                    <td>
+                      <span className="badgeMarket">{r.market_count}</span>
+                    </td>
+                    <td>
+                      <IndicatorBadge status={r.indicator_status} />
+                    </td>
+                    <td style={{ fontSize: 13, color: "var(--text-muted)" }}>
+                      {r.latest_date || "-"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -1168,94 +1729,262 @@ function PriceMonitoring() {
 
         {totalPages > 1 && (
           <div className="pagination">
-            <button disabled={safePage <= 1} onClick={() => setPage(safePage - 1)}>‹ Prev</button>
+            <button
+              disabled={safePage <= 1}
+              onClick={() => setPage(safePage - 1)}
+            >
+              ‹ Prev
+            </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button key={p} className={safePage === p ? "active" : ""} onClick={() => setPage(p)}>{p}</button>
+              <button
+                key={p}
+                className={safePage === p ? "active" : ""}
+                onClick={() => setPage(p)}
+              >
+                {p}
+              </button>
             ))}
-            <button disabled={safePage >= totalPages} onClick={() => setPage(safePage + 1)}>Next ›</button>
+            <button
+              disabled={safePage >= totalPages}
+              onClick={() => setPage(safePage + 1)}
+            >
+              Next ›
+            </button>
           </div>
         )}
       </div>
 
       <div className="admin-card">
-
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:24}}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 24,
+          }}
+        >
           <div>
-            <h2 style={{margin:0,fontSize:20,color:"var(--text)"}}>Grafik Harga</h2>
-            <p style={{margin:"4px 0 0",fontSize:14,color:"var(--text-muted)"}}>Visualisasi tren harga komoditas</p>
+            <h2 style={{ margin: 0, fontSize: 20, color: "var(--text)" }}>
+              Grafik Harga
+            </h2>
+            <p
+              style={{
+                margin: "4px 0 0",
+                fontSize: 14,
+                color: "var(--text-muted)",
+              }}
+            >
+              Visualisasi tren harga komoditas
+            </p>
           </div>
         </div>
 
-        <div style={{
-          background:"var(--bg)", borderRadius:"var(--radius-lg)", padding:20, marginBottom:20,
-          display:"flex", flexDirection:"column", gap:16
-        }}>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,alignItems:"end"}}>
+        <div
+          style={{
+            background: "var(--bg)",
+            borderRadius: "var(--radius-lg)",
+            padding: 20,
+            marginBottom: 20,
+            display: "flex",
+            flexDirection: "column",
+            gap: 16,
+          }}
+        >
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))",
+              gap: 12,
+              alignItems: "end",
+            }}
+          >
             <div>
-              <label style={{display:"grid",gap:6,fontSize:12,fontWeight:700,color:"var(--text)",textTransform:"uppercase",letterSpacing:".04em"}}>
+              <label
+                style={{
+                  display: "grid",
+                  gap: 6,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "var(--text)",
+                  textTransform: "uppercase",
+                  letterSpacing: ".04em",
+                }}
+              >
                 Pasar
-                <select value={marketId} onChange={(e) => setMarketId(e.target.value)}
-                  style={{width:"100%",border:"1.5px solid var(--border)",borderRadius:"var(--radius-sm)",padding:"10px 12px",font:"inherit",background:"var(--surface)",outline:"none",transition:"var(--transition)"}}
-                  onFocus={e=>e.target.style.borderColor="var(--accent)"}
-                  onBlur={e=>e.target.style.borderColor="var(--border)"}>
+                <select
+                  value={marketId}
+                  onChange={(e) => setMarketId(e.target.value)}
+                  style={{
+                    width: "100%",
+                    border: "1.5px solid var(--border)",
+                    borderRadius: "var(--radius-sm)",
+                    padding: "10px 12px",
+                    font: "inherit",
+                    background: "var(--surface)",
+                    outline: "none",
+                    transition: "var(--transition)",
+                  }}
+                  onFocus={(e) =>
+                    (e.target.style.borderColor = "var(--accent)")
+                  }
+                  onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
+                >
                   <option value="">Semua Pasar</option>
-                  {filters.markets.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+                  {filters.markets.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))}
                 </select>
               </label>
             </div>
             <div>
-              <label style={{display:"grid",gap:6,fontSize:12,fontWeight:700,color:"var(--text)",textTransform:"uppercase",letterSpacing:".04em"}}>
+              <label
+                style={{
+                  display: "grid",
+                  gap: 6,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "var(--text)",
+                  textTransform: "uppercase",
+                  letterSpacing: ".04em",
+                }}
+              >
                 Dari
-                <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
-                  style={{width:"100%",border:"1.5px solid var(--border)",borderRadius:"var(--radius-sm)",padding:"10px 12px",font:"inherit",background:"var(--surface)",outline:"none",transition:"var(--transition)"}}
-                  onFocus={e=>e.target.style.borderColor="var(--accent)"}
-                  onBlur={e=>e.target.style.borderColor="var(--border)"} />
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  style={{
+                    width: "100%",
+                    border: "1.5px solid var(--border)",
+                    borderRadius: "var(--radius-sm)",
+                    padding: "10px 12px",
+                    font: "inherit",
+                    background: "var(--surface)",
+                    outline: "none",
+                    transition: "var(--transition)",
+                  }}
+                  onFocus={(e) =>
+                    (e.target.style.borderColor = "var(--accent)")
+                  }
+                  onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
+                />
               </label>
             </div>
             <div>
-              <label style={{display:"grid",gap:6,fontSize:12,fontWeight:700,color:"var(--text)",textTransform:"uppercase",letterSpacing:".04em"}}>
+              <label
+                style={{
+                  display: "grid",
+                  gap: 6,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "var(--text)",
+                  textTransform: "uppercase",
+                  letterSpacing: ".04em",
+                }}
+              >
                 Sampai
-                <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
-                  style={{width:"100%",border:"1.5px solid var(--border)",borderRadius:"var(--radius-sm)",padding:"10px 12px",font:"inherit",background:"var(--surface)",outline:"none",transition:"var(--transition)"}}
-                  onFocus={e=>e.target.style.borderColor="var(--accent)"}
-                  onBlur={e=>e.target.style.borderColor="var(--border)"} />
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  style={{
+                    width: "100%",
+                    border: "1.5px solid var(--border)",
+                    borderRadius: "var(--radius-sm)",
+                    padding: "10px 12px",
+                    font: "inherit",
+                    background: "var(--surface)",
+                    outline: "none",
+                    transition: "var(--transition)",
+                  }}
+                  onFocus={(e) =>
+                    (e.target.style.borderColor = "var(--accent)")
+                  }
+                  onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
+                />
               </label>
             </div>
-            <div style={{display:"flex",gap:8,alignItems:"end"}}>
+            <div style={{ display: "flex", gap: 8, alignItems: "end" }}>
               {[7, 14, 30].map((n) => (
-                <button key={n} onClick={() => setDatePreset(n)}
+                <button
+                  key={n}
+                  onClick={() => setDatePreset(n)}
                   style={{
-                    flex:1, padding:"10px 12px", border:"1.5px solid var(--border)", borderRadius:"var(--radius-sm)",
-                    background:"var(--surface)", color:"var(--text-muted)", fontSize:13, fontWeight:700,
-                    cursor:"pointer", transition:"var(--transition)", fontFamily:"inherit"
+                    flex: 1,
+                    padding: "10px 12px",
+                    border: "1.5px solid var(--border)",
+                    borderRadius: "var(--radius-sm)",
+                    background: "var(--surface)",
+                    color: "var(--text-muted)",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    transition: "var(--transition)",
+                    fontFamily: "inherit",
                   }}
-                  onMouseEnter={e=>{e.target.style.borderColor="var(--accent)";e.target.style.color="var(--accent)"}}
-                  onMouseLeave={e=>{e.target.style.borderColor="var(--border)";e.target.style.color="var(--text-muted)"}}>
+                  onMouseEnter={(e) => {
+                    e.target.style.borderColor = "var(--accent)";
+                    e.target.style.color = "var(--accent)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.borderColor = "var(--border)";
+                    e.target.style.color = "var(--text-muted)";
+                  }}
+                >
                   {n}H
                 </button>
               ))}
             </div>
           </div>
 
-          <div style={{borderTop:"1px solid var(--border)",paddingTop:14}}>
-            <p style={{margin:"0 0 10px",fontSize:12,fontWeight:700,color:"var(--text)",textTransform:"uppercase",letterSpacing:".04em"}}>
+          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 14 }}>
+            <p
+              style={{
+                margin: "0 0 10px",
+                fontSize: 12,
+                fontWeight: 700,
+                color: "var(--text)",
+                textTransform: "uppercase",
+                letterSpacing: ".04em",
+              }}
+            >
               Komoditas
             </p>
-            <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {filters.commodities.map((c, i) => {
                 const checked = commodityIds.includes(c.id);
                 return (
-                  <label key={c.id} style={{
-                    display:"inline-flex",alignItems:"center",gap:6,
-                    padding:"7px 14px", borderRadius:999,
-                    border:"1.5px solid", cursor:"pointer", transition:"var(--transition)",
-                    userSelect:"none", fontSize:13, fontWeight:600,
-                    background: checked ? COLORS[i%COLORS.length] : "var(--surface)",
-                    borderColor: checked ? COLORS[i%COLORS.length] : "var(--border)",
-                    color: checked ? "#fff" : "var(--text)",
-                  }}>
-                    <input type="checkbox" checked={checked} onChange={() => toggleCommodity(c.id)}
-                      style={{display:"none"}} />
+                  <label
+                    key={c.id}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "7px 14px",
+                      borderRadius: 999,
+                      border: "1.5px solid",
+                      cursor: "pointer",
+                      transition: "var(--transition)",
+                      userSelect: "none",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      background: checked
+                        ? COLORS[i % COLORS.length]
+                        : "var(--surface)",
+                      borderColor: checked
+                        ? COLORS[i % COLORS.length]
+                        : "var(--border)",
+                      color: checked ? "#fff" : "var(--text)",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleCommodity(c.id)}
+                      style={{ display: "none" }}
+                    />
                     {c.name}
                   </label>
                 );
@@ -1264,30 +1993,57 @@ function PriceMonitoring() {
           </div>
         </div>
 
-        <div className="chartContainer" style={{margin:0}}>
+        <div className="chartContainer" style={{ margin: 0 }}>
           {loading && <p className="blank">Memuat grafik...</p>}
-          {!loading && chartData.dates.length === 0 && <p className="blank">Belum ada data grafik.</p>}
+          {!loading && chartData.dates.length === 0 && (
+            <p className="blank">Belum ada data grafik.</p>
+          )}
           {!loading && chartData.dates.length > 0 && (
             <div className="chartWrapper">
               <canvas ref={chartCanvasRef} />
             </div>
           )}
         </div>
-
       </div>
 
       <div className="admin-card">
         <h2>Ringkasan Rata-rata</h2>
         {adminAverages && (
-          <div className="avgGrid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 16, marginTop: 12 }}>
+          <div
+            className="avgGrid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+              gap: 16,
+              marginTop: 12,
+            }}
+          >
             {Object.entries(adminAverages).map(([period, data]) => (
-              <div key={period} style={{ background: "#f9fafb", borderRadius: 12, padding: 16 }}>
-                <h3 style={{ margin: "0 0 10px", fontSize: 16, color: "#0f2d52" }}>
-                  {period === "weekly" ? "Mingguan" : period === "monthly" ? "Bulanan" : "Tahunan"}
+              <div
+                key={period}
+                style={{ background: "#f9fafb", borderRadius: 12, padding: 16 }}
+              >
+                <h3
+                  style={{ margin: "0 0 10px", fontSize: 16, color: "#0f2d52" }}
+                >
+                  {period === "weekly"
+                    ? "Mingguan"
+                    : period === "monthly"
+                      ? "Bulanan"
+                      : "Tahunan"}
                 </h3>
                 {data.slice(0, 10).map((row) => (
-                  <p key={`${period}-${row.id}`} style={{ margin: "4px 0", fontSize: 13, display: "flex", justifyContent: "space-between" }}>
-                    <strong>{row.name}</strong> <span>{rupiah(row.average_price)}</span>
+                  <p
+                    key={`${period}-${row.id}`}
+                    style={{
+                      margin: "4px 0",
+                      fontSize: 13,
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <strong>{row.name}</strong>{" "}
+                    <span>{rupiah(row.average_price)}</span>
                   </p>
                 ))}
               </div>
@@ -1331,7 +2087,9 @@ function ProgramKegiatanAdmin() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const updateProgram = (index, field, value) => {
     setForm((prev) => {
@@ -1344,7 +2102,10 @@ function ProgramKegiatanAdmin() {
   const addProgram = () => {
     setForm((prev) => {
       const programs = [...(prev.program_data.programs || [])];
-      const nextNum = programs.length > 0 ? Math.max(...programs.map((p) => p.number || 0)) + 1 : 1;
+      const nextNum =
+        programs.length > 0
+          ? Math.max(...programs.map((p) => p.number || 0)) + 1
+          : 1;
       programs.push({ number: nextNum, title: "", desc: "" });
       return { ...prev, program_data: { ...prev.program_data, programs } };
     });
@@ -1382,8 +2143,15 @@ function ProgramKegiatanAdmin() {
   if (loading) {
     return (
       <>
-        <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman Program Kegiatan</h1></div></div>
-        <div className="admin-card"><p>Memuat data...</p></div>
+        <div className="admin-header">
+          <div>
+            <p>Pengaturan</p>
+            <h1>Halaman Program Kegiatan</h1>
+          </div>
+        </div>
+        <div className="admin-card">
+          <p>Memuat data...</p>
+        </div>
       </>
     );
   }
@@ -1401,30 +2169,118 @@ function ProgramKegiatanAdmin() {
         <form onSubmit={submit} className="admin-form">
           <h2>Hero Section</h2>
           <div className="admin-form-grid">
-            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
-            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+            <label>
+              <span>Judul Hero</span>
+              <input
+                value={form.title}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, title: e.target.value }))
+                }
+              />
+            </label>
+            <label>
+              <span>Subtitle (Eyebrow)</span>
+              <input
+                value={form.eyebrow}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, eyebrow: e.target.value }))
+                }
+              />
+            </label>
           </div>
 
           <h2 style={{ marginTop: 28 }}>Teks Intro</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Teks Pengantar</span><textarea value={form.program_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, program_data: { ...p.program_data, intro: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Teks Pengantar</span>
+              <textarea
+                value={form.program_data.intro || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    program_data: { ...p.program_data, intro: e.target.value },
+                  }))
+                }
+              />
+            </label>
           </div>
 
           <h2 style={{ marginTop: 28 }}>Daftar Program</h2>
           {(form.program_data.programs || []).map((prog, i) => (
-            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
-              <button type="button" onClick={() => removeProgram(i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
-              <label><span>Nomor</span><input type="number" value={prog.number || ""} onChange={(e) => updateProgram(i, "number", Number(e.target.value))} /></label>
-              <label><span>Judul Program</span><input value={prog.title || ""} onChange={(e) => updateProgram(i, "title", e.target.value)} /></label>
-              <label className="wide"><span>Deskripsi</span><textarea value={prog.desc || ""} onChange={(e) => updateProgram(i, "desc", e.target.value)} /></label>
+            <div
+              key={i}
+              className="admin-form-grid"
+              style={{
+                border: "1px solid #eaecf0",
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 12,
+                position: "relative",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => removeProgram(i)}
+                style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#dc2626",
+                  fontSize: 13,
+                }}
+              >
+                Hapus
+              </button>
+              <label>
+                <span>Nomor</span>
+                <input
+                  type="number"
+                  value={prog.number || ""}
+                  onChange={(e) =>
+                    updateProgram(i, "number", Number(e.target.value))
+                  }
+                />
+              </label>
+              <label>
+                <span>Judul Program</span>
+                <input
+                  value={prog.title || ""}
+                  onChange={(e) => updateProgram(i, "title", e.target.value)}
+                />
+              </label>
+              <label className="wide">
+                <span>Deskripsi</span>
+                <textarea
+                  value={prog.desc || ""}
+                  onChange={(e) => updateProgram(i, "desc", e.target.value)}
+                />
+              </label>
             </div>
           ))}
-          <button type="button" onClick={addProgram} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467" }}>
+          <button
+            type="button"
+            onClick={addProgram}
+            style={{
+              background: "none",
+              border: "1px dashed #d0d5dd",
+              borderRadius: 8,
+              padding: "10px 16px",
+              cursor: "pointer",
+              width: "100%",
+              fontSize: 13,
+              color: "#475467",
+            }}
+          >
             + Tambah Program
           </button>
 
           <div className="admin-actions" style={{ marginTop: 28 }}>
-            <button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button>
+            <button type="submit" disabled={saving}>
+              {saving ? "Menyimpan..." : "Simpan"}
+            </button>
           </div>
 
           {message && <p className="admin-message">{message}</p>}
@@ -1506,20 +2362,28 @@ function LayananHalalAdmin() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const updateReq = (index, value) => {
     setForm((prev) => {
       const reqs = [...(prev.halal_data.requirements || [])];
       reqs[index] = value;
-      return { ...prev, halal_data: { ...prev.halal_data, requirements: reqs } };
+      return {
+        ...prev,
+        halal_data: { ...prev.halal_data, requirements: reqs },
+      };
     });
   };
 
   const addReq = () => {
     setForm((prev) => ({
       ...prev,
-      halal_data: { ...prev.halal_data, requirements: [...(prev.halal_data.requirements || []), ""] },
+      halal_data: {
+        ...prev.halal_data,
+        requirements: [...(prev.halal_data.requirements || []), ""],
+      },
     }));
   };
 
@@ -1527,7 +2391,10 @@ function LayananHalalAdmin() {
     setForm((prev) => {
       const reqs = [...(prev.halal_data.requirements || [])];
       reqs.splice(index, 1);
-      return { ...prev, halal_data: { ...prev.halal_data, requirements: reqs } };
+      return {
+        ...prev,
+        halal_data: { ...prev.halal_data, requirements: reqs },
+      };
     });
   };
 
@@ -1555,8 +2422,15 @@ function LayananHalalAdmin() {
   if (loading) {
     return (
       <>
-        <div className="admin-header"><div><p>Pengaturan</p><h1>Sertifikasi Halal</h1></div></div>
-        <div className="admin-card"><p>Memuat data...</p></div>
+        <div className="admin-header">
+          <div>
+            <p>Pengaturan</p>
+            <h1>Sertifikasi Halal</h1>
+          </div>
+        </div>
+        <div className="admin-card">
+          <p>Memuat data...</p>
+        </div>
       </>
     );
   }
@@ -1574,55 +2448,207 @@ function LayananHalalAdmin() {
         <form onSubmit={submit} className="admin-form">
           <h2>Hero Section</h2>
           <div className="admin-form-grid">
-            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
-            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+            <label>
+              <span>Judul Hero</span>
+              <input
+                value={form.title}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, title: e.target.value }))
+                }
+              />
+            </label>
+            <label>
+              <span>Subtitle (Eyebrow)</span>
+              <input
+                value={form.eyebrow}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, eyebrow: e.target.value }))
+                }
+              />
+            </label>
           </div>
 
           <h2 style={{ marginTop: 28 }}>Konten</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Judul Intro</span><input value={form.halal_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, halal_data: { ...p.halal_data, intro: e.target.value } }))} /></label>
-            <label className="wide"><span>Deskripsi</span><textarea value={form.halal_data.description || ""} onChange={(e) => setForm((p) => ({ ...p, halal_data: { ...p.halal_data, description: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Judul Intro</span>
+              <input
+                value={form.halal_data.intro || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    halal_data: { ...p.halal_data, intro: e.target.value },
+                  }))
+                }
+              />
+            </label>
+            <label className="wide">
+              <span>Deskripsi</span>
+              <textarea
+                value={form.halal_data.description || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    halal_data: {
+                      ...p.halal_data,
+                      description: e.target.value,
+                    },
+                  }))
+                }
+              />
+            </label>
           </div>
 
           <h2 style={{ marginTop: 28 }}>Persyaratan</h2>
           {(form.halal_data.requirements || []).map((req, i) => (
-            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
-              <button type="button" onClick={() => removeReq(i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
-              <label className="wide"><span>Syarat {i + 1}</span><input value={req} onChange={(e) => updateReq(i, e.target.value)} /></label>
+            <div
+              key={i}
+              className="admin-form-grid"
+              style={{
+                border: "1px solid #eaecf0",
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 12,
+                position: "relative",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => removeReq(i)}
+                style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#dc2626",
+                  fontSize: 13,
+                }}
+              >
+                Hapus
+              </button>
+              <label className="wide">
+                <span>Syarat {i + 1}</span>
+                <input
+                  value={req}
+                  onChange={(e) => updateReq(i, e.target.value)}
+                />
+              </label>
             </div>
           ))}
-          <button type="button" onClick={addReq} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467" }}>
+          <button
+            type="button"
+            onClick={addReq}
+            style={{
+              background: "none",
+              border: "1px dashed #d0d5dd",
+              borderRadius: 8,
+              padding: "10px 16px",
+              cursor: "pointer",
+              width: "100%",
+              fontSize: 13,
+              color: "#475467",
+            }}
+          >
             + Tambah Syarat
           </button>
 
           <h2 style={{ marginTop: 28 }}>Download & Flowchart</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Label Tombol Download</span><input value={form.halal_data.download_label || ""} onChange={(e) => setForm((p) => ({ ...p, halal_data: { ...p.halal_data, download_label: e.target.value } }))} /></label>
-            <label className="wide"><span>File Download (PDF)</span>
+            <label className="wide">
+              <span>Label Tombol Download</span>
+              <input
+                value={form.halal_data.download_label || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    halal_data: {
+                      ...p.halal_data,
+                      download_label: e.target.value,
+                    },
+                  }))
+                }
+              />
+            </label>
+            <label className="wide">
+              <span>File Download (PDF)</span>
               <div>
-                <input type="file" accept=".pdf" onChange={(e) => uploadFile("download_file", e.target.files[0])} />
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) =>
+                    uploadFile("download_file", e.target.files[0])
+                  }
+                />
                 {uploading.download_file && <span>Uploading...</span>}
-                {form.halal_data.download_file && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.halal_data.download_file}</p>}
+                {form.halal_data.download_file && (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#344054",
+                      margin: "4px 0 0",
+                    }}
+                  >
+                    {form.halal_data.download_file}
+                  </p>
+                )}
               </div>
             </label>
-            <label className="wide"><span>Flowchart Reguler (gambar)</span>
+            <label className="wide">
+              <span>Flowchart Reguler (gambar)</span>
               <div>
-                <input type="file" accept="image/*" onChange={(e) => uploadFile("flowchart_reguler", e.target.files[0])} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    uploadFile("flowchart_reguler", e.target.files[0])
+                  }
+                />
                 {uploading.flowchart_reguler && <span>Uploading...</span>}
-                {form.halal_data.flowchart_reguler && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.halal_data.flowchart_reguler}</p>}
+                {form.halal_data.flowchart_reguler && (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#344054",
+                      margin: "4px 0 0",
+                    }}
+                  >
+                    {form.halal_data.flowchart_reguler}
+                  </p>
+                )}
               </div>
             </label>
-            <label className="wide"><span>Flowchart Gratis / SEHATI (gambar)</span>
+            <label className="wide">
+              <span>Flowchart Gratis / SEHATI (gambar)</span>
               <div>
-                <input type="file" accept="image/*" onChange={(e) => uploadFile("flowchart_gratis", e.target.files[0])} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    uploadFile("flowchart_gratis", e.target.files[0])
+                  }
+                />
                 {uploading.flowchart_gratis && <span>Uploading...</span>}
-                {form.halal_data.flowchart_gratis && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.halal_data.flowchart_gratis}</p>}
+                {form.halal_data.flowchart_gratis && (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#344054",
+                      margin: "4px 0 0",
+                    }}
+                  >
+                    {form.halal_data.flowchart_gratis}
+                  </p>
+                )}
               </div>
             </label>
           </div>
 
           <div className="admin-actions" style={{ marginTop: 28 }}>
-            <button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button>
+            <button type="submit" disabled={saving}>
+              {saving ? "Menyimpan..." : "Simpan"}
+            </button>
           </div>
 
           {message && <p className="admin-message">{message}</p>}
@@ -1708,7 +2734,9 @@ function LayananMerkAdmin() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const updateArr = (key, index, value) => {
     setForm((prev) => {
@@ -1721,7 +2749,10 @@ function LayananMerkAdmin() {
   const addArr = (key) => {
     setForm((prev) => ({
       ...prev,
-      merk_data: { ...prev.merk_data, [key]: [...(prev.merk_data[key] || []), ""] },
+      merk_data: {
+        ...prev.merk_data,
+        [key]: [...(prev.merk_data[key] || []), ""],
+      },
     }));
   };
 
@@ -1757,8 +2788,15 @@ function LayananMerkAdmin() {
   if (loading) {
     return (
       <>
-        <div className="admin-header"><div><p>Pengaturan</p><h1>Legalitas Merk</h1></div></div>
-        <div className="admin-card"><p>Memuat data...</p></div>
+        <div className="admin-header">
+          <div>
+            <p>Pengaturan</p>
+            <h1>Legalitas Merk</h1>
+          </div>
+        </div>
+        <div className="admin-card">
+          <p>Memuat data...</p>
+        </div>
       </>
     );
   }
@@ -1766,16 +2804,76 @@ function LayananMerkAdmin() {
   const renderReqGroup = (title, key) => (
     <>
       <div className="admin-form-grid">
-        <label className="wide"><span>Judul Grup</span><input value={form.merk_data[key + "_title"] || ""} onChange={(e) => setForm((p) => ({ ...p, merk_data: { ...p.merk_data, [key + "_title"]: e.target.value } }))} /></label>
+        <label className="wide">
+          <span>Judul Grup</span>
+          <input
+            value={form.merk_data[key + "_title"] || ""}
+            onChange={(e) =>
+              setForm((p) => ({
+                ...p,
+                merk_data: { ...p.merk_data, [key + "_title"]: e.target.value },
+              }))
+            }
+          />
+        </label>
       </div>
-      <h4 style={{ margin: "12px 0 8px", fontSize: 14, color: "#344054" }}>Daftar Syarat</h4>
+      <h4 style={{ margin: "12px 0 8px", fontSize: 14, color: "#344054" }}>
+        Daftar Syarat
+      </h4>
       {(form.merk_data[key + "_requirements"] || []).map((req, i) => (
-        <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
-          <button type="button" onClick={() => removeArr(key + "_requirements", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
-          <label className="wide"><span>Syarat {i + 1}</span><input value={req} onChange={(e) => updateArr(key + "_requirements", i, e.target.value)} /></label>
+        <div
+          key={i}
+          className="admin-form-grid"
+          style={{
+            border: "1px solid #eaecf0",
+            borderRadius: 8,
+            padding: 16,
+            marginBottom: 12,
+            position: "relative",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => removeArr(key + "_requirements", i)}
+            style={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#dc2626",
+              fontSize: 13,
+            }}
+          >
+            Hapus
+          </button>
+          <label className="wide">
+            <span>Syarat {i + 1}</span>
+            <input
+              value={req}
+              onChange={(e) =>
+                updateArr(key + "_requirements", i, e.target.value)
+              }
+            />
+          </label>
         </div>
       ))}
-      <button type="button" onClick={() => addArr(key + "_requirements")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467", marginBottom: 16 }}>
+      <button
+        type="button"
+        onClick={() => addArr(key + "_requirements")}
+        style={{
+          background: "none",
+          border: "1px dashed #d0d5dd",
+          borderRadius: 8,
+          padding: "10px 16px",
+          cursor: "pointer",
+          width: "100%",
+          fontSize: 13,
+          color: "#475467",
+          marginBottom: 16,
+        }}
+      >
         + Tambah Syarat
       </button>
     </>
@@ -1785,9 +2883,17 @@ function LayananMerkAdmin() {
     <label className="wide">
       <span>{label}</span>
       <div>
-        <input type="file" accept={accept} onChange={(e) => uploadFile(field, e.target.files[0])} />
+        <input
+          type="file"
+          accept={accept}
+          onChange={(e) => uploadFile(field, e.target.files[0])}
+        />
         {uploading[field] && <span>Uploading...</span>}
-        {form.merk_data[field] && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.merk_data[field]}</p>}
+        {form.merk_data[field] && (
+          <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>
+            {form.merk_data[field]}
+          </p>
+        )}
       </div>
     </label>
   );
@@ -1805,14 +2911,52 @@ function LayananMerkAdmin() {
         <form onSubmit={submit} className="admin-form">
           <h2>Hero Section</h2>
           <div className="admin-form-grid">
-            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
-            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+            <label>
+              <span>Judul Hero</span>
+              <input
+                value={form.title}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, title: e.target.value }))
+                }
+              />
+            </label>
+            <label>
+              <span>Subtitle (Eyebrow)</span>
+              <input
+                value={form.eyebrow}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, eyebrow: e.target.value }))
+                }
+              />
+            </label>
           </div>
 
           <h2 style={{ marginTop: 28 }}>Konten</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Judul Intro</span><input value={form.merk_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, merk_data: { ...p.merk_data, intro: e.target.value } }))} /></label>
-            <label className="wide"><span>Deskripsi</span><textarea value={form.merk_data.description || ""} onChange={(e) => setForm((p) => ({ ...p, merk_data: { ...p.merk_data, description: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Judul Intro</span>
+              <input
+                value={form.merk_data.intro || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    merk_data: { ...p.merk_data, intro: e.target.value },
+                  }))
+                }
+              />
+            </label>
+            <label className="wide">
+              <span>Deskripsi</span>
+              <textarea
+                value={form.merk_data.description || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    merk_data: { ...p.merk_data, description: e.target.value },
+                  }))
+                }
+              />
+            </label>
           </div>
 
           <h2 style={{ marginTop: 28 }}>Persyaratan Mandiri</h2>
@@ -1823,13 +2967,29 @@ function LayananMerkAdmin() {
 
           <h2 style={{ marginTop: 28 }}>Download & Flowchart</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Label Tombol Download</span><input value={form.merk_data.download_label || ""} onChange={(e) => setForm((p) => ({ ...p, merk_data: { ...p.merk_data, download_label: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Label Tombol Download</span>
+              <input
+                value={form.merk_data.download_label || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    merk_data: {
+                      ...p.merk_data,
+                      download_label: e.target.value,
+                    },
+                  }))
+                }
+              />
+            </label>
             {fileUploadField("download_file", "File Download (PDF)", ".pdf")}
             {fileUploadField("flowchart", "Flowchart (gambar)", "image/*")}
           </div>
 
           <div className="admin-actions" style={{ marginTop: 28 }}>
-            <button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button>
+            <button type="submit" disabled={saving}>
+              {saving ? "Menyimpan..." : "Simpan"}
+            </button>
           </div>
 
           {message && <p className="admin-message">{message}</p>}
@@ -1840,7 +3000,21 @@ function LayananMerkAdmin() {
 }
 
 function LayananSinasAdmin() {
-  const [form, setForm] = useState({ title: "", eyebrow: "", sinas_data: { intro: "", description: "", registrasi_title: "", registrasi_requirements: [""], dokumen_title: "", dokumen_requirements: [""], download_label: "", download_file: "", flowchart: "" } });
+  const [form, setForm] = useState({
+    title: "",
+    eyebrow: "",
+    sinas_data: {
+      intro: "",
+      description: "",
+      registrasi_title: "",
+      registrasi_requirements: [""],
+      dokumen_title: "",
+      dokumen_requirements: [""],
+      download_label: "",
+      download_file: "",
+      flowchart: "",
+    },
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -1852,10 +3026,23 @@ function LayananSinasAdmin() {
     try {
       const body = new FormData();
       body.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf }, credentials: "same-origin", body });
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf },
+        credentials: "same-origin",
+        body,
+      });
       const r = await res.json();
-      if (r?.data?.path) setForm((p) => ({ ...p, sinas_data: { ...p.sinas_data, [field]: r.data.path } }));
-    } catch { /* ignore */ } finally { setUploading((p) => ({ ...p, [field]: false })); }
+      if (r?.data?.path)
+        setForm((p) => ({
+          ...p,
+          sinas_data: { ...p.sinas_data, [field]: r.data.path },
+        }));
+    } catch {
+      /* ignore */
+    } finally {
+      setUploading((p) => ({ ...p, [field]: false }));
+    }
   };
 
   useEffect(() => {
@@ -1863,54 +3050,241 @@ function LayananSinasAdmin() {
       try {
         const res = await api("/api/admin/layanan-sinas");
         const d = res.data || {};
-        setForm({ title: d.title || "", eyebrow: d.eyebrow || "", sinas_data: d.sinas_data || { intro: "", description: "", registrasi_title: "", registrasi_requirements: [""], dokumen_title: "", dokumen_requirements: [""], download_label: "", download_file: "", flowchart: "" } });
-      } catch { setMessage("Gagal memuat data."); } finally { setLoading(false); }
+        setForm({
+          title: d.title || "",
+          eyebrow: d.eyebrow || "",
+          sinas_data: d.sinas_data || {
+            intro: "",
+            description: "",
+            registrasi_title: "",
+            registrasi_requirements: [""],
+            dokumen_title: "",
+            dokumen_requirements: [""],
+            download_label: "",
+            download_file: "",
+            flowchart: "",
+          },
+        });
+      } catch {
+        setMessage("Gagal memuat data.");
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
-  const arr = (key, i, v) => setForm((p) => { const a = [...(p.sinas_data[key] || [])]; a[i] = v; return { ...p, sinas_data: { ...p.sinas_data, [key]: a } }; });
-  const addArr = (key) => setForm((p) => ({ ...p, sinas_data: { ...p.sinas_data, [key]: [...(p.sinas_data[key] || []), ""] } }));
-  const delArr = (key, i) => setForm((p) => { const a = [...(p.sinas_data[key] || [])]; a.splice(i, 1); return { ...p, sinas_data: { ...p.sinas_data, [key]: a } }; });
+  const arr = (key, i, v) =>
+    setForm((p) => {
+      const a = [...(p.sinas_data[key] || [])];
+      a[i] = v;
+      return { ...p, sinas_data: { ...p.sinas_data, [key]: a } };
+    });
+  const addArr = (key) =>
+    setForm((p) => ({
+      ...p,
+      sinas_data: {
+        ...p.sinas_data,
+        [key]: [...(p.sinas_data[key] || []), ""],
+      },
+    }));
+  const delArr = (key, i) =>
+    setForm((p) => {
+      const a = [...(p.sinas_data[key] || [])];
+      a.splice(i, 1);
+      return { ...p, sinas_data: { ...p.sinas_data, [key]: a } };
+    });
 
   const submit = async (e) => {
     e.preventDefault();
-    setSaving(true); setMessage("");
-    try { await api("/api/admin/layanan-sinas", { method: "POST", body: JSON.stringify({ title: form.title, eyebrow: form.eyebrow, sinas_data: form.sinas_data }) }); setMessage("Data berhasil disimpan."); } catch (err) { setMessage("Gagal: " + err.message); } finally { setSaving(false); }
+    setSaving(true);
+    setMessage("");
+    try {
+      await api("/api/admin/layanan-sinas", {
+        method: "POST",
+        body: JSON.stringify({
+          title: form.title,
+          eyebrow: form.eyebrow,
+          sinas_data: form.sinas_data,
+        }),
+      });
+      setMessage("Data berhasil disimpan.");
+    } catch (err) {
+      setMessage("Gagal: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  if (loading) return (<><div className="admin-header"><div><p>Pengaturan</p><h1>SIINas</h1></div></div><div className="admin-card"><p>Memuat data...</p></div></>);
+  if (loading)
+    return (
+      <>
+        <div className="admin-header">
+          <div>
+            <p>Pengaturan</p>
+            <h1>SIINas</h1>
+          </div>
+        </div>
+        <div className="admin-card">
+          <p>Memuat data...</p>
+        </div>
+      </>
+    );
 
   const reqGroup = (title, key) => (
     <>
-      <div className="admin-form-grid"><label className="wide"><span>Judul Grup</span><input value={form.sinas_data[`${key}_title`] || ""} onChange={(e) => setForm((p) => ({ ...p, sinas_data: { ...p.sinas_data, [`${key}_title`]: e.target.value } }))} /></label></div>
+      <div className="admin-form-grid">
+        <label className="wide">
+          <span>Judul Grup</span>
+          <input
+            value={form.sinas_data[`${key}_title`] || ""}
+            onChange={(e) =>
+              setForm((p) => ({
+                ...p,
+                sinas_data: {
+                  ...p.sinas_data,
+                  [`${key}_title`]: e.target.value,
+                },
+              }))
+            }
+          />
+        </label>
+      </div>
       {(form.sinas_data[`${key}_requirements`] || []).map((r, i) => (
-        <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
-          <button type="button" onClick={() => delArr(`${key}_requirements`, i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
-          <label className="wide"><span>Syarat {i + 1}</span><input value={r} onChange={(e) => arr(`${key}_requirements`, i, e.target.value)} /></label>
+        <div
+          key={i}
+          className="admin-form-grid"
+          style={{
+            border: "1px solid #eaecf0",
+            borderRadius: 8,
+            padding: 16,
+            marginBottom: 12,
+            position: "relative",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => delArr(`${key}_requirements`, i)}
+            style={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#dc2626",
+              fontSize: 13,
+            }}
+          >
+            Hapus
+          </button>
+          <label className="wide">
+            <span>Syarat {i + 1}</span>
+            <input
+              value={r}
+              onChange={(e) => arr(`${key}_requirements`, i, e.target.value)}
+            />
+          </label>
         </div>
       ))}
-      <button type="button" onClick={() => addArr(`${key}_requirements`)} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467", marginBottom: 16 }}>+ Tambah Syarat</button>
+      <button
+        type="button"
+        onClick={() => addArr(`${key}_requirements`)}
+        style={{
+          background: "none",
+          border: "1px dashed #d0d5dd",
+          borderRadius: 8,
+          padding: "10px 16px",
+          cursor: "pointer",
+          width: "100%",
+          fontSize: 13,
+          color: "#475467",
+          marginBottom: 16,
+        }}
+      >
+        + Tambah Syarat
+      </button>
     </>
   );
 
   const fileField = (field, label, accept) => (
-    <label className="wide"><span>{label}</span><div><input type="file" accept={accept} onChange={(e) => uploadFile(field, e.target.files[0])} />{uploading[field] && <span>Uploading...</span>}{form.sinas_data[field] && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.sinas_data[field]}</p>}</div></label>
+    <label className="wide">
+      <span>{label}</span>
+      <div>
+        <input
+          type="file"
+          accept={accept}
+          onChange={(e) => uploadFile(field, e.target.files[0])}
+        />
+        {uploading[field] && <span>Uploading...</span>}
+        {form.sinas_data[field] && (
+          <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>
+            {form.sinas_data[field]}
+          </p>
+        )}
+      </div>
+    </label>
   );
 
   return (
     <>
-      <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman SIINas</h1></div></div>
+      <div className="admin-header">
+        <div>
+          <p>Pengaturan</p>
+          <h1>Halaman SIINas</h1>
+        </div>
+      </div>
       <div className="admin-card">
         <form onSubmit={submit} className="admin-form">
           <h2>Hero Section</h2>
           <div className="admin-form-grid">
-            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
-            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+            <label>
+              <span>Judul Hero</span>
+              <input
+                value={form.title}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, title: e.target.value }))
+                }
+              />
+            </label>
+            <label>
+              <span>Subtitle (Eyebrow)</span>
+              <input
+                value={form.eyebrow}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, eyebrow: e.target.value }))
+                }
+              />
+            </label>
           </div>
           <h2 style={{ marginTop: 28 }}>Konten</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Judul Intro</span><input value={form.sinas_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, sinas_data: { ...p.sinas_data, intro: e.target.value } }))} /></label>
-            <label className="wide"><span>Deskripsi</span><textarea value={form.sinas_data.description || ""} onChange={(e) => setForm((p) => ({ ...p, sinas_data: { ...p.sinas_data, description: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Judul Intro</span>
+              <input
+                value={form.sinas_data.intro || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    sinas_data: { ...p.sinas_data, intro: e.target.value },
+                  }))
+                }
+              />
+            </label>
+            <label className="wide">
+              <span>Deskripsi</span>
+              <textarea
+                value={form.sinas_data.description || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    sinas_data: {
+                      ...p.sinas_data,
+                      description: e.target.value,
+                    },
+                  }))
+                }
+              />
+            </label>
           </div>
           <h2 style={{ marginTop: 28 }}>Persyaratan Registrasi</h2>
           {reqGroup("registrasi", "registrasi")}
@@ -1918,11 +3292,29 @@ function LayananSinasAdmin() {
           {reqGroup("dokumen", "dokumen")}
           <h2 style={{ marginTop: 28 }}>Download & Flowchart</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Label Tombol Download</span><input value={form.sinas_data.download_label || ""} onChange={(e) => setForm((p) => ({ ...p, sinas_data: { ...p.sinas_data, download_label: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Label Tombol Download</span>
+              <input
+                value={form.sinas_data.download_label || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    sinas_data: {
+                      ...p.sinas_data,
+                      download_label: e.target.value,
+                    },
+                  }))
+                }
+              />
+            </label>
             {fileField("download_file", "File Download (PDF)", ".pdf")}
             {fileField("flowchart", "Flowchart (gambar)", "image/*")}
           </div>
-          <div className="admin-actions" style={{ marginTop: 28 }}><button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button></div>
+          <div className="admin-actions" style={{ marginTop: 28 }}>
+            <button type="submit" disabled={saving}>
+              {saving ? "Menyimpan..." : "Simpan"}
+            </button>
+          </div>
           {message && <p className="admin-message">{message}</p>}
         </form>
       </div>
@@ -1931,7 +3323,23 @@ function LayananSinasAdmin() {
 }
 
 function LayananTeraAdmin() {
-  const [form, setForm] = useState({ title: "", eyebrow: "", tera_data: { intro: "", description: "", requirements: [""], download_label: "", download_file: "", booking_label: "", booking_url: "", flowchart1_title: "", flowchart1: "", flowchart2_title: "", flowchart2: "" } });
+  const [form, setForm] = useState({
+    title: "",
+    eyebrow: "",
+    tera_data: {
+      intro: "",
+      description: "",
+      requirements: [""],
+      download_label: "",
+      download_file: "",
+      booking_label: "",
+      booking_url: "",
+      flowchart1_title: "",
+      flowchart1: "",
+      flowchart2_title: "",
+      flowchart2: "",
+    },
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -1943,10 +3351,23 @@ function LayananTeraAdmin() {
     try {
       const body = new FormData();
       body.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf }, credentials: "same-origin", body });
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf },
+        credentials: "same-origin",
+        body,
+      });
       const r = await res.json();
-      if (r?.data?.path) setForm((p) => ({ ...p, tera_data: { ...p.tera_data, [field]: r.data.path } }));
-    } catch { /* ignore */ } finally { setUploading((p) => ({ ...p, [field]: false })); }
+      if (r?.data?.path)
+        setForm((p) => ({
+          ...p,
+          tera_data: { ...p.tera_data, [field]: r.data.path },
+        }));
+    } catch {
+      /* ignore */
+    } finally {
+      setUploading((p) => ({ ...p, [field]: false }));
+    }
   };
 
   useEffect(() => {
@@ -1954,65 +3375,303 @@ function LayananTeraAdmin() {
       try {
         const res = await api("/api/admin/layanan-tera");
         const d = res.data || {};
-        setForm({ title: d.title || "", eyebrow: d.eyebrow || "", tera_data: d.tera_data || { intro: "", description: "", requirements: [""], download_label: "", download_file: "", booking_label: "", booking_url: "", flowchart1_title: "", flowchart1: "", flowchart2_title: "", flowchart2: "" } });
-      } catch { setMessage("Gagal memuat data."); } finally { setLoading(false); }
+        setForm({
+          title: d.title || "",
+          eyebrow: d.eyebrow || "",
+          tera_data: d.tera_data || {
+            intro: "",
+            description: "",
+            requirements: [""],
+            download_label: "",
+            download_file: "",
+            booking_label: "",
+            booking_url: "",
+            flowchart1_title: "",
+            flowchart1: "",
+            flowchart2_title: "",
+            flowchart2: "",
+          },
+        });
+      } catch {
+        setMessage("Gagal memuat data.");
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
-  const arr = (key, i, v) => setForm((p) => { const a = [...(p.tera_data[key] || [])]; a[i] = v; return { ...p, tera_data: { ...p.tera_data, [key]: a } }; });
-  const addArr = (key) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, [key]: [...(p.tera_data[key] || []), ""] } }));
-  const delArr = (key, i) => setForm((p) => { const a = [...(p.tera_data[key] || [])]; a.splice(i, 1); return { ...p, tera_data: { ...p.tera_data, [key]: a } }; });
+  const arr = (key, i, v) =>
+    setForm((p) => {
+      const a = [...(p.tera_data[key] || [])];
+      a[i] = v;
+      return { ...p, tera_data: { ...p.tera_data, [key]: a } };
+    });
+  const addArr = (key) =>
+    setForm((p) => ({
+      ...p,
+      tera_data: { ...p.tera_data, [key]: [...(p.tera_data[key] || []), ""] },
+    }));
+  const delArr = (key, i) =>
+    setForm((p) => {
+      const a = [...(p.tera_data[key] || [])];
+      a.splice(i, 1);
+      return { ...p, tera_data: { ...p.tera_data, [key]: a } };
+    });
 
   const submit = async (e) => {
     e.preventDefault();
-    setSaving(true); setMessage("");
-    try { await api("/api/admin/layanan-tera", { method: "POST", body: JSON.stringify({ title: form.title, eyebrow: form.eyebrow, tera_data: form.tera_data }) }); setMessage("Data berhasil disimpan."); } catch (err) { setMessage("Gagal: " + err.message); } finally { setSaving(false); }
+    setSaving(true);
+    setMessage("");
+    try {
+      await api("/api/admin/layanan-tera", {
+        method: "POST",
+        body: JSON.stringify({
+          title: form.title,
+          eyebrow: form.eyebrow,
+          tera_data: form.tera_data,
+        }),
+      });
+      setMessage("Data berhasil disimpan.");
+    } catch (err) {
+      setMessage("Gagal: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  if (loading) return (<><div className="admin-header"><div><p>Pengaturan</p><h1>Tera / Tera Ulang</h1></div></div><div className="admin-card"><p>Memuat data...</p></div></>);
+  if (loading)
+    return (
+      <>
+        <div className="admin-header">
+          <div>
+            <p>Pengaturan</p>
+            <h1>Tera / Tera Ulang</h1>
+          </div>
+        </div>
+        <div className="admin-card">
+          <p>Memuat data...</p>
+        </div>
+      </>
+    );
 
   const fileField = (field, label, accept) => (
-    <label className="wide"><span>{label}</span><div><input type="file" accept={accept} onChange={(e) => uploadFile(field, e.target.files[0])} />{uploading[field] && <span>Uploading...</span>}{form.tera_data[field] && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.tera_data[field]}</p>}</div></label>
+    <label className="wide">
+      <span>{label}</span>
+      <div>
+        <input
+          type="file"
+          accept={accept}
+          onChange={(e) => uploadFile(field, e.target.files[0])}
+        />
+        {uploading[field] && <span>Uploading...</span>}
+        {form.tera_data[field] && (
+          <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>
+            {form.tera_data[field]}
+          </p>
+        )}
+      </div>
+    </label>
   );
 
   return (
     <>
-      <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman Tera / Tera Ulang</h1></div></div>
+      <div className="admin-header">
+        <div>
+          <p>Pengaturan</p>
+          <h1>Halaman Tera / Tera Ulang</h1>
+        </div>
+      </div>
       <div className="admin-card">
         <form onSubmit={submit} className="admin-form">
           <h2>Hero Section</h2>
           <div className="admin-form-grid">
-            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
-            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+            <label>
+              <span>Judul Hero</span>
+              <input
+                value={form.title}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, title: e.target.value }))
+                }
+              />
+            </label>
+            <label>
+              <span>Subtitle (Eyebrow)</span>
+              <input
+                value={form.eyebrow}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, eyebrow: e.target.value }))
+                }
+              />
+            </label>
           </div>
           <h2 style={{ marginTop: 28 }}>Konten</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Judul Intro</span><input value={form.tera_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, intro: e.target.value } }))} /></label>
-            <label className="wide"><span>Deskripsi</span><textarea value={form.tera_data.description || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, description: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Judul Intro</span>
+              <input
+                value={form.tera_data.intro || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    tera_data: { ...p.tera_data, intro: e.target.value },
+                  }))
+                }
+              />
+            </label>
+            <label className="wide">
+              <span>Deskripsi</span>
+              <textarea
+                value={form.tera_data.description || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    tera_data: { ...p.tera_data, description: e.target.value },
+                  }))
+                }
+              />
+            </label>
           </div>
           <h2 style={{ marginTop: 28 }}>Persyaratan</h2>
           {(form.tera_data.requirements || []).map((r, i) => (
-            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
-              <button type="button" onClick={() => delArr("requirements", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
-              <label className="wide"><span>Syarat {i + 1}</span><input value={r} onChange={(e) => arr("requirements", i, e.target.value)} /></label>
+            <div
+              key={i}
+              className="admin-form-grid"
+              style={{
+                border: "1px solid #eaecf0",
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 12,
+                position: "relative",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => delArr("requirements", i)}
+                style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#dc2626",
+                  fontSize: 13,
+                }}
+              >
+                Hapus
+              </button>
+              <label className="wide">
+                <span>Syarat {i + 1}</span>
+                <input
+                  value={r}
+                  onChange={(e) => arr("requirements", i, e.target.value)}
+                />
+              </label>
             </div>
           ))}
-          <button type="button" onClick={() => addArr("requirements")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467", marginBottom: 16 }}>+ Tambah Syarat</button>
+          <button
+            type="button"
+            onClick={() => addArr("requirements")}
+            style={{
+              background: "none",
+              border: "1px dashed #d0d5dd",
+              borderRadius: 8,
+              padding: "10px 16px",
+              cursor: "pointer",
+              width: "100%",
+              fontSize: 13,
+              color: "#475467",
+              marginBottom: 16,
+            }}
+          >
+            + Tambah Syarat
+          </button>
           <h2 style={{ marginTop: 28 }}>Download & Booking</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Label Tombol Download</span><input value={form.tera_data.download_label || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, download_label: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Label Tombol Download</span>
+              <input
+                value={form.tera_data.download_label || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    tera_data: {
+                      ...p.tera_data,
+                      download_label: e.target.value,
+                    },
+                  }))
+                }
+              />
+            </label>
             {fileField("download_file", "File Download (PDF)", ".pdf")}
-            <label className="wide"><span>Label Tombol Booking</span><input value={form.tera_data.booking_label || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, booking_label: e.target.value } }))} /></label>
-            <label className="wide"><span>URL Booking</span><input value={form.tera_data.booking_url || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, booking_url: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Label Tombol Booking</span>
+              <input
+                value={form.tera_data.booking_label || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    tera_data: {
+                      ...p.tera_data,
+                      booking_label: e.target.value,
+                    },
+                  }))
+                }
+              />
+            </label>
+            <label className="wide">
+              <span>URL Booking</span>
+              <input
+                value={form.tera_data.booking_url || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    tera_data: { ...p.tera_data, booking_url: e.target.value },
+                  }))
+                }
+              />
+            </label>
           </div>
           <h2 style={{ marginTop: 28 }}>Flowchart</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Judul Flowchart 1</span><input value={form.tera_data.flowchart1_title || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, flowchart1_title: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Judul Flowchart 1</span>
+              <input
+                value={form.tera_data.flowchart1_title || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    tera_data: {
+                      ...p.tera_data,
+                      flowchart1_title: e.target.value,
+                    },
+                  }))
+                }
+              />
+            </label>
             {fileField("flowchart1", "Gambar Flowchart 1", "image/*")}
-            <label className="wide"><span>Judul Flowchart 2</span><input value={form.tera_data.flowchart2_title || ""} onChange={(e) => setForm((p) => ({ ...p, tera_data: { ...p.tera_data, flowchart2_title: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Judul Flowchart 2</span>
+              <input
+                value={form.tera_data.flowchart2_title || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    tera_data: {
+                      ...p.tera_data,
+                      flowchart2_title: e.target.value,
+                    },
+                  }))
+                }
+              />
+            </label>
             {fileField("flowchart2", "Gambar Flowchart 2", "image/*")}
           </div>
-          <div className="admin-actions" style={{ marginTop: 28 }}><button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button></div>
+          <div className="admin-actions" style={{ marginTop: 28 }}>
+            <button type="submit" disabled={saving}>
+              {saving ? "Menyimpan..." : "Simpan"}
+            </button>
+          </div>
           {message && <p className="admin-message">{message}</p>}
         </form>
       </div>
@@ -2021,7 +3680,18 @@ function LayananTeraAdmin() {
 }
 
 function LayananTdgAdmin() {
-  const [form, setForm] = useState({ title: "", eyebrow: "", tdg_data: { intro: "", description: "", requirements: [""], download_label: "", download_file: "", flowchart: "" } });
+  const [form, setForm] = useState({
+    title: "",
+    eyebrow: "",
+    tdg_data: {
+      intro: "",
+      description: "",
+      requirements: [""],
+      download_label: "",
+      download_file: "",
+      flowchart: "",
+    },
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -2033,10 +3703,23 @@ function LayananTdgAdmin() {
     try {
       const body = new FormData();
       body.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf }, credentials: "same-origin", body });
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf },
+        credentials: "same-origin",
+        body,
+      });
       const r = await res.json();
-      if (r?.data?.path) setForm((p) => ({ ...p, tdg_data: { ...p.tdg_data, [field]: r.data.path } }));
-    } catch { /* ignore */ } finally { setUploading((p) => ({ ...p, [field]: false })); }
+      if (r?.data?.path)
+        setForm((p) => ({
+          ...p,
+          tdg_data: { ...p.tdg_data, [field]: r.data.path },
+        }));
+    } catch {
+      /* ignore */
+    } finally {
+      setUploading((p) => ({ ...p, [field]: false }));
+    }
   };
 
   useEffect(() => {
@@ -2044,59 +3727,236 @@ function LayananTdgAdmin() {
       try {
         const res = await api("/api/admin/layanan-tdg");
         const d = res.data || {};
-        setForm({ title: d.title || "", eyebrow: d.eyebrow || "", tdg_data: d.tdg_data || { intro: "", description: "", requirements: [""], download_label: "", download_file: "", flowchart: "" } });
-      } catch { setMessage("Gagal memuat data."); } finally { setLoading(false); }
+        setForm({
+          title: d.title || "",
+          eyebrow: d.eyebrow || "",
+          tdg_data: d.tdg_data || {
+            intro: "",
+            description: "",
+            requirements: [""],
+            download_label: "",
+            download_file: "",
+            flowchart: "",
+          },
+        });
+      } catch {
+        setMessage("Gagal memuat data.");
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
-  const arr = (key, i, v) => setForm((p) => { const a = [...(p.tdg_data[key] || [])]; a[i] = v; return { ...p, tdg_data: { ...p.tdg_data, [key]: a } }; });
-  const addArr = (key) => setForm((p) => ({ ...p, tdg_data: { ...p.tdg_data, [key]: [...(p.tdg_data[key] || []), ""] } }));
-  const delArr = (key, i) => setForm((p) => { const a = [...(p.tdg_data[key] || [])]; a.splice(i, 1); return { ...p, tdg_data: { ...p.tdg_data, [key]: a } }; });
+  const arr = (key, i, v) =>
+    setForm((p) => {
+      const a = [...(p.tdg_data[key] || [])];
+      a[i] = v;
+      return { ...p, tdg_data: { ...p.tdg_data, [key]: a } };
+    });
+  const addArr = (key) =>
+    setForm((p) => ({
+      ...p,
+      tdg_data: { ...p.tdg_data, [key]: [...(p.tdg_data[key] || []), ""] },
+    }));
+  const delArr = (key, i) =>
+    setForm((p) => {
+      const a = [...(p.tdg_data[key] || [])];
+      a.splice(i, 1);
+      return { ...p, tdg_data: { ...p.tdg_data, [key]: a } };
+    });
 
   const submit = async (e) => {
     e.preventDefault();
-    setSaving(true); setMessage("");
-    try { await api("/api/admin/layanan-tdg", { method: "POST", body: JSON.stringify({ title: form.title, eyebrow: form.eyebrow, tdg_data: form.tdg_data }) }); setMessage("Data berhasil disimpan."); } catch (err) { setMessage("Gagal: " + err.message); } finally { setSaving(false); }
+    setSaving(true);
+    setMessage("");
+    try {
+      await api("/api/admin/layanan-tdg", {
+        method: "POST",
+        body: JSON.stringify({
+          title: form.title,
+          eyebrow: form.eyebrow,
+          tdg_data: form.tdg_data,
+        }),
+      });
+      setMessage("Data berhasil disimpan.");
+    } catch (err) {
+      setMessage("Gagal: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  if (loading) return (<><div className="admin-header"><div><p>Pengaturan</p><h1>Tanda Daftar Gudang</h1></div></div><div className="admin-card"><p>Memuat data...</p></div></>);
+  if (loading)
+    return (
+      <>
+        <div className="admin-header">
+          <div>
+            <p>Pengaturan</p>
+            <h1>Tanda Daftar Gudang</h1>
+          </div>
+        </div>
+        <div className="admin-card">
+          <p>Memuat data...</p>
+        </div>
+      </>
+    );
 
   const fileField = (field, label, accept) => (
-    <label className="wide"><span>{label}</span><div><input type="file" accept={accept} onChange={(e) => uploadFile(field, e.target.files[0])} />{uploading[field] && <span>Uploading...</span>}{form.tdg_data[field] && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.tdg_data[field]}</p>}</div></label>
+    <label className="wide">
+      <span>{label}</span>
+      <div>
+        <input
+          type="file"
+          accept={accept}
+          onChange={(e) => uploadFile(field, e.target.files[0])}
+        />
+        {uploading[field] && <span>Uploading...</span>}
+        {form.tdg_data[field] && (
+          <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>
+            {form.tdg_data[field]}
+          </p>
+        )}
+      </div>
+    </label>
   );
 
   return (
     <>
-      <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman Tanda Daftar Gudang</h1></div></div>
+      <div className="admin-header">
+        <div>
+          <p>Pengaturan</p>
+          <h1>Halaman Tanda Daftar Gudang</h1>
+        </div>
+      </div>
       <div className="admin-card">
         <form onSubmit={submit} className="admin-form">
           <h2>Hero Section</h2>
           <div className="admin-form-grid">
-            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
-            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+            <label>
+              <span>Judul Hero</span>
+              <input
+                value={form.title}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, title: e.target.value }))
+                }
+              />
+            </label>
+            <label>
+              <span>Subtitle (Eyebrow)</span>
+              <input
+                value={form.eyebrow}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, eyebrow: e.target.value }))
+                }
+              />
+            </label>
           </div>
           <h2 style={{ marginTop: 28 }}>Konten</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Judul Intro</span><input value={form.tdg_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, tdg_data: { ...p.tdg_data, intro: e.target.value } }))} /></label>
-            <label className="wide"><span>Deskripsi</span><textarea value={form.tdg_data.description || ""} onChange={(e) => setForm((p) => ({ ...p, tdg_data: { ...p.tdg_data, description: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Judul Intro</span>
+              <input
+                value={form.tdg_data.intro || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    tdg_data: { ...p.tdg_data, intro: e.target.value },
+                  }))
+                }
+              />
+            </label>
+            <label className="wide">
+              <span>Deskripsi</span>
+              <textarea
+                value={form.tdg_data.description || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    tdg_data: { ...p.tdg_data, description: e.target.value },
+                  }))
+                }
+              />
+            </label>
           </div>
           <h2 style={{ marginTop: 28 }}>Persyaratan</h2>
           {(form.tdg_data.requirements || []).map((r, i) => (
-            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
-              <button type="button" onClick={() => delArr("requirements", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
-              <label className="wide"><span>Syarat {i + 1}</span><input value={r} onChange={(e) => arr("requirements", i, e.target.value)} /></label>
+            <div
+              key={i}
+              className="admin-form-grid"
+              style={{
+                border: "1px solid #eaecf0",
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 12,
+                position: "relative",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => delArr("requirements", i)}
+                style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#dc2626",
+                  fontSize: 13,
+                }}
+              >
+                Hapus
+              </button>
+              <label className="wide">
+                <span>Syarat {i + 1}</span>
+                <input
+                  value={r}
+                  onChange={(e) => arr("requirements", i, e.target.value)}
+                />
+              </label>
             </div>
           ))}
-          <button type="button" onClick={() => addArr("requirements")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467", marginBottom: 16 }}>+ Tambah Syarat</button>
+          <button
+            type="button"
+            onClick={() => addArr("requirements")}
+            style={{
+              background: "none",
+              border: "1px dashed #d0d5dd",
+              borderRadius: 8,
+              padding: "10px 16px",
+              cursor: "pointer",
+              width: "100%",
+              fontSize: 13,
+              color: "#475467",
+              marginBottom: 16,
+            }}
+          >
+            + Tambah Syarat
+          </button>
           <h2 style={{ marginTop: 28 }}>Download & Flowchart</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Label Tombol Download</span><input value={form.tdg_data.download_label || ""} onChange={(e) => setForm((p) => ({ ...p, tdg_data: { ...p.tdg_data, download_label: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Label Tombol Download</span>
+              <input
+                value={form.tdg_data.download_label || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    tdg_data: { ...p.tdg_data, download_label: e.target.value },
+                  }))
+                }
+              />
+            </label>
             {fileField("download_file", "File Download (PDF)", ".pdf")}
           </div>
           <div className="admin-form-grid">
             {fileField("flowchart", "Gambar Flowchart", "image/*")}
           </div>
-          <div className="admin-actions" style={{ marginTop: 28 }}><button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button></div>
+          <div className="admin-actions" style={{ marginTop: 28 }}>
+            <button type="submit" disabled={saving}>
+              {saving ? "Menyimpan..." : "Simpan"}
+            </button>
+          </div>
           {message && <p className="admin-message">{message}</p>}
         </form>
       </div>
@@ -2105,7 +3965,18 @@ function LayananTdgAdmin() {
 }
 
 function LayananMinholAdmin() {
-  const [form, setForm] = useState({ title: "", eyebrow: "", minhol_data: { intro: "", description: "", requirements: [""], download_label: "", download_file: "", flowchart: "" } });
+  const [form, setForm] = useState({
+    title: "",
+    eyebrow: "",
+    minhol_data: {
+      intro: "",
+      description: "",
+      requirements: [""],
+      download_label: "",
+      download_file: "",
+      flowchart: "",
+    },
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -2117,10 +3988,23 @@ function LayananMinholAdmin() {
     try {
       const body = new FormData();
       body.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf }, credentials: "same-origin", body });
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf },
+        credentials: "same-origin",
+        body,
+      });
       const r = await res.json();
-      if (r?.data?.path) setForm((p) => ({ ...p, minhol_data: { ...p.minhol_data, [field]: r.data.path } }));
-    } catch { /* ignore */ } finally { setUploading((p) => ({ ...p, [field]: false })); }
+      if (r?.data?.path)
+        setForm((p) => ({
+          ...p,
+          minhol_data: { ...p.minhol_data, [field]: r.data.path },
+        }));
+    } catch {
+      /* ignore */
+    } finally {
+      setUploading((p) => ({ ...p, [field]: false }));
+    }
   };
 
   useEffect(() => {
@@ -2128,59 +4012,245 @@ function LayananMinholAdmin() {
       try {
         const res = await api("/api/admin/layanan-minhol");
         const d = res.data || {};
-        setForm({ title: d.title || "", eyebrow: d.eyebrow || "", minhol_data: d.minhol_data || { intro: "", description: "", requirements: [""], download_label: "", download_file: "", flowchart: "" } });
-      } catch { setMessage("Gagal memuat data."); } finally { setLoading(false); }
+        setForm({
+          title: d.title || "",
+          eyebrow: d.eyebrow || "",
+          minhol_data: d.minhol_data || {
+            intro: "",
+            description: "",
+            requirements: [""],
+            download_label: "",
+            download_file: "",
+            flowchart: "",
+          },
+        });
+      } catch {
+        setMessage("Gagal memuat data.");
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
-  const arr = (key, i, v) => setForm((p) => { const a = [...(p.minhol_data[key] || [])]; a[i] = v; return { ...p, minhol_data: { ...p.minhol_data, [key]: a } }; });
-  const addArr = (key) => setForm((p) => ({ ...p, minhol_data: { ...p.minhol_data, [key]: [...(p.minhol_data[key] || []), ""] } }));
-  const delArr = (key, i) => setForm((p) => { const a = [...(p.minhol_data[key] || [])]; a.splice(i, 1); return { ...p, minhol_data: { ...p.minhol_data, [key]: a } }; });
+  const arr = (key, i, v) =>
+    setForm((p) => {
+      const a = [...(p.minhol_data[key] || [])];
+      a[i] = v;
+      return { ...p, minhol_data: { ...p.minhol_data, [key]: a } };
+    });
+  const addArr = (key) =>
+    setForm((p) => ({
+      ...p,
+      minhol_data: {
+        ...p.minhol_data,
+        [key]: [...(p.minhol_data[key] || []), ""],
+      },
+    }));
+  const delArr = (key, i) =>
+    setForm((p) => {
+      const a = [...(p.minhol_data[key] || [])];
+      a.splice(i, 1);
+      return { ...p, minhol_data: { ...p.minhol_data, [key]: a } };
+    });
 
   const submit = async (e) => {
     e.preventDefault();
-    setSaving(true); setMessage("");
-    try { await api("/api/admin/layanan-minhol", { method: "POST", body: JSON.stringify({ title: form.title, eyebrow: form.eyebrow, minhol_data: form.minhol_data }) }); setMessage("Data berhasil disimpan."); } catch (err) { setMessage("Gagal: " + err.message); } finally { setSaving(false); }
+    setSaving(true);
+    setMessage("");
+    try {
+      await api("/api/admin/layanan-minhol", {
+        method: "POST",
+        body: JSON.stringify({
+          title: form.title,
+          eyebrow: form.eyebrow,
+          minhol_data: form.minhol_data,
+        }),
+      });
+      setMessage("Data berhasil disimpan.");
+    } catch (err) {
+      setMessage("Gagal: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  if (loading) return (<><div className="admin-header"><div><p>Pengaturan</p><h1>Perpanjangan Minuman Beralkohol</h1></div></div><div className="admin-card"><p>Memuat data...</p></div></>);
+  if (loading)
+    return (
+      <>
+        <div className="admin-header">
+          <div>
+            <p>Pengaturan</p>
+            <h1>Perpanjangan Minuman Beralkohol</h1>
+          </div>
+        </div>
+        <div className="admin-card">
+          <p>Memuat data...</p>
+        </div>
+      </>
+    );
 
   const fileField = (field, label, accept) => (
-    <label className="wide"><span>{label}</span><div><input type="file" accept={accept} onChange={(e) => uploadFile(field, e.target.files[0])} />{uploading[field] && <span>Uploading...</span>}{form.minhol_data[field] && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.minhol_data[field]}</p>}</div></label>
+    <label className="wide">
+      <span>{label}</span>
+      <div>
+        <input
+          type="file"
+          accept={accept}
+          onChange={(e) => uploadFile(field, e.target.files[0])}
+        />
+        {uploading[field] && <span>Uploading...</span>}
+        {form.minhol_data[field] && (
+          <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>
+            {form.minhol_data[field]}
+          </p>
+        )}
+      </div>
+    </label>
   );
 
   return (
     <>
-      <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman Perpanjangan Minuman Beralkohol</h1></div></div>
+      <div className="admin-header">
+        <div>
+          <p>Pengaturan</p>
+          <h1>Halaman Perpanjangan Minuman Beralkohol</h1>
+        </div>
+      </div>
       <div className="admin-card">
         <form onSubmit={submit} className="admin-form">
           <h2>Hero Section</h2>
           <div className="admin-form-grid">
-            <label><span>Judul Hero</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
-            <label><span>Subtitle (Eyebrow)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+            <label>
+              <span>Judul Hero</span>
+              <input
+                value={form.title}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, title: e.target.value }))
+                }
+              />
+            </label>
+            <label>
+              <span>Subtitle (Eyebrow)</span>
+              <input
+                value={form.eyebrow}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, eyebrow: e.target.value }))
+                }
+              />
+            </label>
           </div>
           <h2 style={{ marginTop: 28 }}>Konten</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Judul Intro</span><input value={form.minhol_data.intro || ""} onChange={(e) => setForm((p) => ({ ...p, minhol_data: { ...p.minhol_data, intro: e.target.value } }))} /></label>
-            <label className="wide"><span>Deskripsi</span><textarea value={form.minhol_data.description || ""} onChange={(e) => setForm((p) => ({ ...p, minhol_data: { ...p.minhol_data, description: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Judul Intro</span>
+              <input
+                value={form.minhol_data.intro || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    minhol_data: { ...p.minhol_data, intro: e.target.value },
+                  }))
+                }
+              />
+            </label>
+            <label className="wide">
+              <span>Deskripsi</span>
+              <textarea
+                value={form.minhol_data.description || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    minhol_data: {
+                      ...p.minhol_data,
+                      description: e.target.value,
+                    },
+                  }))
+                }
+              />
+            </label>
           </div>
           <h2 style={{ marginTop: 28 }}>Persyaratan</h2>
           {(form.minhol_data.requirements || []).map((r, i) => (
-            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
-              <button type="button" onClick={() => delArr("requirements", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
-              <label className="wide"><span>Syarat {i + 1}</span><input value={r} onChange={(e) => arr("requirements", i, e.target.value)} /></label>
+            <div
+              key={i}
+              className="admin-form-grid"
+              style={{
+                border: "1px solid #eaecf0",
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 12,
+                position: "relative",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => delArr("requirements", i)}
+                style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#dc2626",
+                  fontSize: 13,
+                }}
+              >
+                Hapus
+              </button>
+              <label className="wide">
+                <span>Syarat {i + 1}</span>
+                <input
+                  value={r}
+                  onChange={(e) => arr("requirements", i, e.target.value)}
+                />
+              </label>
             </div>
           ))}
-          <button type="button" onClick={() => addArr("requirements")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467", marginBottom: 16 }}>+ Tambah Syarat</button>
+          <button
+            type="button"
+            onClick={() => addArr("requirements")}
+            style={{
+              background: "none",
+              border: "1px dashed #d0d5dd",
+              borderRadius: 8,
+              padding: "10px 16px",
+              cursor: "pointer",
+              width: "100%",
+              fontSize: 13,
+              color: "#475467",
+              marginBottom: 16,
+            }}
+          >
+            + Tambah Syarat
+          </button>
           <h2 style={{ marginTop: 28 }}>Download & Flowchart</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>Label Tombol Download</span><input value={form.minhol_data.download_label || ""} onChange={(e) => setForm((p) => ({ ...p, minhol_data: { ...p.minhol_data, download_label: e.target.value } }))} /></label>
+            <label className="wide">
+              <span>Label Tombol Download</span>
+              <input
+                value={form.minhol_data.download_label || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    minhol_data: {
+                      ...p.minhol_data,
+                      download_label: e.target.value,
+                    },
+                  }))
+                }
+              />
+            </label>
             {fileField("download_file", "File Download (PDF)", ".pdf")}
           </div>
           <div className="admin-form-grid">
             {fileField("flowchart", "Gambar Flowchart", "image/*")}
           </div>
-          <div className="admin-actions" style={{ marginTop: 28 }}><button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button></div>
+          <div className="admin-actions" style={{ marginTop: 28 }}>
+            <button type="submit" disabled={saving}>
+              {saving ? "Menyimpan..." : "Simpan"}
+            </button>
+          </div>
           {message && <p className="admin-message">{message}</p>}
         </form>
       </div>
@@ -2189,7 +4259,18 @@ function LayananMinholAdmin() {
 }
 
 function ZonaIntegritasAdmin() {
-  const [form, setForm] = useState({ title: "", eyebrow: "", zi_data: { hero_title: "", hero_subtitle: "", about_title: "", about_text: "", about_image: "", buttons: [] } });
+  const [form, setForm] = useState({
+    title: "",
+    eyebrow: "",
+    zi_data: {
+      hero_title: "",
+      hero_subtitle: "",
+      about_title: "",
+      about_text: "",
+      about_image: "",
+      buttons: [],
+    },
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -2201,13 +4282,32 @@ function ZonaIntegritasAdmin() {
     try {
       const body = new FormData();
       body.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf }, credentials: "same-origin", body });
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf },
+        credentials: "same-origin",
+        body,
+      });
       const r = await res.json();
       if (r?.data?.path) {
-        if (field === "about_image") setForm((p) => ({ ...p, zi_data: { ...p.zi_data, about_image: r.data.path } }));
-        else setForm((p) => { const btns = [...(p.zi_data.buttons || [])]; const idx = parseInt(field); if (btns[idx]) btns[idx] = { ...btns[idx], image: r.data.path }; return { ...p, zi_data: { ...p.zi_data, buttons: btns } }; });
+        if (field === "about_image")
+          setForm((p) => ({
+            ...p,
+            zi_data: { ...p.zi_data, about_image: r.data.path },
+          }));
+        else
+          setForm((p) => {
+            const btns = [...(p.zi_data.buttons || [])];
+            const idx = parseInt(field);
+            if (btns[idx]) btns[idx] = { ...btns[idx], image: r.data.path };
+            return { ...p, zi_data: { ...p.zi_data, buttons: btns } };
+          });
       }
-    } catch { /* ignore */ } finally { setUploading((p) => ({ ...p, [field]: false })); }
+    } catch {
+      /* ignore */
+    } finally {
+      setUploading((p) => ({ ...p, [field]: false }));
+    }
   };
 
   useEffect(() => {
@@ -2215,54 +4315,283 @@ function ZonaIntegritasAdmin() {
       try {
         const res = await api("/api/admin/zona-integritas");
         const d = res.data || {};
-        setForm({ title: d.title || "", eyebrow: d.eyebrow || "", zi_data: d.zi_data || { hero_title: "", hero_subtitle: "", about_title: "", about_text: "", about_image: "", buttons: [] } });
-      } catch { setMessage("Gagal memuat data."); } finally { setLoading(false); }
+        setForm({
+          title: d.title || "",
+          eyebrow: d.eyebrow || "",
+          zi_data: d.zi_data || {
+            hero_title: "",
+            hero_subtitle: "",
+            about_title: "",
+            about_text: "",
+            about_image: "",
+            buttons: [],
+          },
+        });
+      } catch {
+        setMessage("Gagal memuat data.");
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
   const submit = async (e) => {
     e.preventDefault();
-    setSaving(true); setMessage("");
-    try { await api("/api/admin/zona-integritas", { method: "POST", body: JSON.stringify({ title: form.title, eyebrow: form.eyebrow, zi_data: form.zi_data }) }); setMessage("Data berhasil disimpan."); } catch (err) { setMessage("Gagal: " + err.message); } finally { setSaving(false); }
+    setSaving(true);
+    setMessage("");
+    try {
+      await api("/api/admin/zona-integritas", {
+        method: "POST",
+        body: JSON.stringify({
+          title: form.title,
+          eyebrow: form.eyebrow,
+          zi_data: form.zi_data,
+        }),
+      });
+      setMessage("Data berhasil disimpan.");
+    } catch (err) {
+      setMessage("Gagal: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const btnUpd = (i, k, v) => setForm((p) => { const btns = [...(p.zi_data.buttons || [])]; if (!btns[i]) btns[i] = { label: "", image: "", url: "" }; btns[i] = { ...btns[i], [k]: v }; return { ...p, zi_data: { ...p.zi_data, buttons: btns } }; });
-  const btnAdd = () => setForm((p) => ({ ...p, zi_data: { ...p.zi_data, buttons: [...(p.zi_data.buttons || []), { label: "", image: "", url: "" }] } }));
-  const btnDel = (i) => setForm((p) => { const btns = [...(p.zi_data.buttons || [])]; btns.splice(i, 1); return { ...p, zi_data: { ...p.zi_data, buttons: btns } }; });
+  const btnUpd = (i, k, v) =>
+    setForm((p) => {
+      const btns = [...(p.zi_data.buttons || [])];
+      if (!btns[i]) btns[i] = { label: "", image: "", url: "" };
+      btns[i] = { ...btns[i], [k]: v };
+      return { ...p, zi_data: { ...p.zi_data, buttons: btns } };
+    });
+  const btnAdd = () =>
+    setForm((p) => ({
+      ...p,
+      zi_data: {
+        ...p.zi_data,
+        buttons: [
+          ...(p.zi_data.buttons || []),
+          { label: "", image: "", url: "" },
+        ],
+      },
+    }));
+  const btnDel = (i) =>
+    setForm((p) => {
+      const btns = [...(p.zi_data.buttons || [])];
+      btns.splice(i, 1);
+      return { ...p, zi_data: { ...p.zi_data, buttons: btns } };
+    });
 
-  if (loading) return (<><div className="admin-header"><div><p>Pengaturan</p><h1>Zona Integritas</h1></div></div><div className="admin-card"><p>Memuat data...</p></div></>);
+  if (loading)
+    return (
+      <>
+        <div className="admin-header">
+          <div>
+            <p>Pengaturan</p>
+            <h1>Zona Integritas</h1>
+          </div>
+        </div>
+        <div className="admin-card">
+          <p>Memuat data...</p>
+        </div>
+      </>
+    );
 
   return (
     <>
-      <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman Zona Integritas</h1></div></div>
+      <div className="admin-header">
+        <div>
+          <p>Pengaturan</p>
+          <h1>Halaman Zona Integritas</h1>
+        </div>
+      </div>
       <div className="admin-card">
         <form onSubmit={submit} className="admin-form">
           <h2>Hero Section</h2>
           <div className="admin-form-grid">
-            <label><span>Judul Halaman (SEO)</span><input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></label>
-            <label><span>Eyebrow (SEO)</span><input value={form.eyebrow} onChange={(e) => setForm((p) => ({ ...p, eyebrow: e.target.value }))} /></label>
+            <label>
+              <span>Judul Halaman (SEO)</span>
+              <input
+                value={form.title}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, title: e.target.value }))
+                }
+              />
+            </label>
+            <label>
+              <span>Eyebrow (SEO)</span>
+              <input
+                value={form.eyebrow}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, eyebrow: e.target.value }))
+                }
+              />
+            </label>
           </div>
           <div className="admin-form-grid">
-            <label><span>Hero Title</span><input value={form.zi_data.hero_title || ""} onChange={(e) => setForm((p) => ({ ...p, zi_data: { ...p.zi_data, hero_title: e.target.value } }))} /></label>
-            <label><span>Hero Subtitle</span><input value={form.zi_data.hero_subtitle || ""} onChange={(e) => setForm((p) => ({ ...p, zi_data: { ...p.zi_data, hero_subtitle: e.target.value } }))} /></label>
+            <label>
+              <span>Hero Title</span>
+              <input
+                value={form.zi_data.hero_title || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    zi_data: { ...p.zi_data, hero_title: e.target.value },
+                  }))
+                }
+              />
+            </label>
+            <label>
+              <span>Hero Subtitle</span>
+              <input
+                value={form.zi_data.hero_subtitle || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    zi_data: { ...p.zi_data, hero_subtitle: e.target.value },
+                  }))
+                }
+              />
+            </label>
           </div>
           <h2 style={{ marginTop: 28 }}>About Section</h2>
           <div className="admin-form-grid">
-            <label className="wide"><span>About Title</span><input value={form.zi_data.about_title || ""} onChange={(e) => setForm((p) => ({ ...p, zi_data: { ...p.zi_data, about_title: e.target.value } }))} /></label>
-            <label className="wide"><span>About Text</span><textarea rows={4} value={form.zi_data.about_text || ""} onChange={(e) => setForm((p) => ({ ...p, zi_data: { ...p.zi_data, about_text: e.target.value } }))} /></label>
-            <label className="wide"><span>About Image (lingkaran)</span><div><input type="file" accept="image/*" onChange={(e) => uploadFile("about_image", e.target.files[0])} />{uploading["about_image"] && <span>Uploading...</span>}{form.zi_data.about_image && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{form.zi_data.about_image}</p>}</div></label>
+            <label className="wide">
+              <span>About Title</span>
+              <input
+                value={form.zi_data.about_title || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    zi_data: { ...p.zi_data, about_title: e.target.value },
+                  }))
+                }
+              />
+            </label>
+            <label className="wide">
+              <span>About Text</span>
+              <textarea
+                rows={4}
+                value={form.zi_data.about_text || ""}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    zi_data: { ...p.zi_data, about_text: e.target.value },
+                  }))
+                }
+              />
+            </label>
+            <label className="wide">
+              <span>About Image (lingkaran)</span>
+              <div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => uploadFile("about_image", e.target.files[0])}
+                />
+                {uploading["about_image"] && <span>Uploading...</span>}
+                {form.zi_data.about_image && (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#344054",
+                      margin: "4px 0 0",
+                    }}
+                  >
+                    {form.zi_data.about_image}
+                  </p>
+                )}
+              </div>
+            </label>
           </div>
           <h2 style={{ marginTop: 28 }}>Tombol Area (3x2)</h2>
           {(form.zi_data.buttons || []).map((btn, i) => (
-            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
-              <button type="button" onClick={() => btnDel(i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
-              <label><span>Label {i + 1}</span><input value={btn.label || ""} onChange={(e) => btnUpd(i, "label", e.target.value)} /></label>
-              <label><span>URL Tujuan</span><input value={btn.url || ""} onChange={(e) => btnUpd(i, "url", e.target.value)} /></label>
-              <label className="wide"><span>Gambar {i + 1}</span><div><input type="file" accept="image/*" onChange={(e) => uploadFile(String(i), e.target.files[0])} />{uploading[String(i)] && <span>Uploading...</span>}{btn.image && <p style={{ fontSize: 12, color: "#344054", margin: "4px 0 0" }}>{btn.image}</p>}</div></label>
+            <div
+              key={i}
+              className="admin-form-grid"
+              style={{
+                border: "1px solid #eaecf0",
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 12,
+                position: "relative",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => btnDel(i)}
+                style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#dc2626",
+                  fontSize: 13,
+                }}
+              >
+                Hapus
+              </button>
+              <label>
+                <span>Label {i + 1}</span>
+                <input
+                  value={btn.label || ""}
+                  onChange={(e) => btnUpd(i, "label", e.target.value)}
+                />
+              </label>
+              <label>
+                <span>URL Tujuan</span>
+                <input
+                  value={btn.url || ""}
+                  onChange={(e) => btnUpd(i, "url", e.target.value)}
+                />
+              </label>
+              <label className="wide">
+                <span>Gambar {i + 1}</span>
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => uploadFile(String(i), e.target.files[0])}
+                  />
+                  {uploading[String(i)] && <span>Uploading...</span>}
+                  {btn.image && (
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: "#344054",
+                        margin: "4px 0 0",
+                      }}
+                    >
+                      {btn.image}
+                    </p>
+                  )}
+                </div>
+              </label>
             </div>
           ))}
-          <button type="button" onClick={btnAdd} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467", marginBottom: 16 }}>+ Tambah Tombol</button>
-          <div className="admin-actions" style={{ marginTop: 28 }}><button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button></div>
+          <button
+            type="button"
+            onClick={btnAdd}
+            style={{
+              background: "none",
+              border: "1px dashed #d0d5dd",
+              borderRadius: 8,
+              padding: "10px 16px",
+              cursor: "pointer",
+              width: "100%",
+              fontSize: 13,
+              color: "#475467",
+              marginBottom: 16,
+            }}
+          >
+            + Tambah Tombol
+          </button>
+          <div className="admin-actions" style={{ marginTop: 28 }}>
+            <button type="submit" disabled={saving}>
+              {saving ? "Menyimpan..." : "Simpan"}
+            </button>
+          </div>
           {message && <p className="admin-message">{message}</p>}
         </form>
       </div>
@@ -2272,7 +4601,21 @@ function ZonaIntegritasAdmin() {
 
 function IkmAdmin() {
   const [items, setItems] = useState([]);
-  const [form, setForm] = useState({ name: "", category: "fashion", owner: "", description: "", address: "", kelurahan: "", contact: "", location: "", image: "", is_active: true, show_contact: true, show_address: true, sort_order: 0 });
+  const [form, setForm] = useState({
+    name: "",
+    category: "fashion",
+    owner: "",
+    description: "",
+    address: "",
+    kelurahan: "",
+    contact: "",
+    location: "",
+    image: "",
+    is_active: true,
+    show_contact: true,
+    show_address: true,
+    sort_order: 0,
+  });
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -2297,10 +4640,26 @@ function IkmAdmin() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const resetForm = () => {
-    setForm({ name: "", category: "fashion", owner: "", description: "", address: "", kelurahan: "", contact: "", location: "", image: "", is_active: true, show_contact: true, show_address: true, sort_order: 0 });
+    setForm({
+      name: "",
+      category: "fashion",
+      owner: "",
+      description: "",
+      address: "",
+      kelurahan: "",
+      contact: "",
+      location: "",
+      image: "",
+      is_active: true,
+      show_contact: true,
+      show_address: true,
+      sort_order: 0,
+    });
     setEditing(null);
   };
 
@@ -2349,8 +4708,15 @@ function IkmAdmin() {
   if (loading) {
     return (
       <>
-        <div className="admin-header"><div><p>Pengaturan</p><h1>Data IKM</h1></div></div>
-        <div className="admin-card"><p>Memuat data...</p></div>
+        <div className="admin-header">
+          <div>
+            <p>Pengaturan</p>
+            <h1>Data IKM</h1>
+          </div>
+        </div>
+        <div className="admin-card">
+          <p>Memuat data...</p>
+        </div>
       </>
     );
   }
@@ -2368,36 +4734,148 @@ function IkmAdmin() {
         <form onSubmit={submit} className="admin-form">
           <h2>{editing ? "Edit IKM" : "Tambah IKM Baru"}</h2>
           <div className="admin-form-grid">
-            <label><span>Nama Usaha *</span><input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} required /></label>
-            <label><span>Kategori *</span>
-              <select value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}>
-                {categoryOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            <label>
+              <span>Nama Usaha *</span>
+              <input
+                value={form.name}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, name: e.target.value }))
+                }
+                required
+              />
+            </label>
+            <label>
+              <span>Kategori *</span>
+              <select
+                value={form.category}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, category: e.target.value }))
+                }
+              >
+                {categoryOptions.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
               </select>
             </label>
-            <label><span>Pemilik</span><input value={form.owner || ""} onChange={(e) => setForm((p) => ({ ...p, owner: e.target.value }))} /></label>
-            <label><span>No. HP</span><input value={form.contact || ""} onChange={(e) => setForm((p) => ({ ...p, contact: e.target.value }))} /></label>
+            <label>
+              <span>Pemilik</span>
+              <input
+                value={form.owner || ""}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, owner: e.target.value }))
+                }
+              />
+            </label>
+            <label>
+              <span>No. HP</span>
+              <input
+                value={form.contact || ""}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, contact: e.target.value }))
+                }
+              />
+            </label>
             <label className="checkbox">
-              <input type="checkbox" checked={!form.show_contact} onChange={(e) => setForm((p) => ({ ...p, show_contact: !e.target.checked }))} />
+              <input
+                type="checkbox"
+                checked={!form.show_contact}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, show_contact: !e.target.checked }))
+                }
+              />
               <span>Sembunyikan No. HP</span>
             </label>
-            <label><span>Kelurahan</span><input value={form.kelurahan || ""} onChange={(e) => setForm((p) => ({ ...p, kelurahan: e.target.value }))} /></label>
-            <label className="wide"><span>Alamat</span><input value={form.address || ""} onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))} /></label>
+            <label>
+              <span>Kelurahan</span>
+              <input
+                value={form.kelurahan || ""}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, kelurahan: e.target.value }))
+                }
+              />
+            </label>
+            <label className="wide">
+              <span>Alamat</span>
+              <input
+                value={form.address || ""}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, address: e.target.value }))
+                }
+              />
+            </label>
             <label className="checkbox wide">
-              <input type="checkbox" checked={!form.show_address} onChange={(e) => setForm((p) => ({ ...p, show_address: !e.target.checked }))} />
+              <input
+                type="checkbox"
+                checked={!form.show_address}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, show_address: !e.target.checked }))
+                }
+              />
               <span>Sembunyikan Alamat</span>
             </label>
-            <label className="wide"><span>Lokasi (Link Maps)</span><input value={form.location || ""} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} /></label>
-            <label className="wide"><span>Deskripsi</span><textarea value={form.description || ""} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} /></label>
-            <label><span>Gambar</span><input value={form.image || ""} onChange={(e) => setForm((p) => ({ ...p, image: e.target.value }))} /></label>
-            <label><span>Urutan</span><input type="number" value={form.sort_order} onChange={(e) => setForm((p) => ({ ...p, sort_order: Number(e.target.value) }))} /></label>
+            <label className="wide">
+              <span>Lokasi (Link Maps)</span>
+              <input
+                value={form.location || ""}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, location: e.target.value }))
+                }
+              />
+            </label>
+            <label className="wide">
+              <span>Deskripsi</span>
+              <textarea
+                value={form.description || ""}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, description: e.target.value }))
+                }
+              />
+            </label>
+            <label>
+              <span>Gambar</span>
+              <input
+                value={form.image || ""}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, image: e.target.value }))
+                }
+              />
+            </label>
+            <label>
+              <span>Urutan</span>
+              <input
+                type="number"
+                value={form.sort_order}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, sort_order: Number(e.target.value) }))
+                }
+              />
+            </label>
             <label className="checkbox">
-              <input type="checkbox" checked={form.is_active} onChange={(e) => setForm((p) => ({ ...p, is_active: e.target.checked }))} />
+              <input
+                type="checkbox"
+                checked={form.is_active}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, is_active: e.target.checked }))
+                }
+              />
               <span>Aktif</span>
             </label>
           </div>
           <div className="admin-actions" style={{ marginTop: 16 }}>
-            <button type="submit" disabled={saving}>{saving ? "Menyimpan..." : editing ? "Perbarui" : "Tambah"}</button>
-            {editing && <button type="button" onClick={resetForm} style={{ background: "#eaecf0", color: "#344054" }}>Batal</button>}
+            <button type="submit" disabled={saving}>
+              {saving ? "Menyimpan..." : editing ? "Perbarui" : "Tambah"}
+            </button>
+            {editing && (
+              <button
+                type="button"
+                onClick={resetForm}
+                style={{ background: "#eaecf0", color: "#344054" }}
+              >
+                Batal
+              </button>
+            )}
           </div>
           {message && <p className="admin-message">{message}</p>}
         </form>
@@ -2425,25 +4903,59 @@ function IkmAdmin() {
                 <tr key={item.id}>
                   <td>{i + 1}</td>
                   <td>{item.name}</td>
-                  <td>{categoryOptions.find((o) => o.value === item.category)?.label || item.category}</td>
-                  <td style={{ maxWidth: 220, whiteSpace: "normal", lineHeight: 1.3 }}>{item.address || "-"}</td>
+                  <td>
+                    {categoryOptions.find((o) => o.value === item.category)
+                      ?.label || item.category}
+                  </td>
+                  <td
+                    style={{
+                      maxWidth: 220,
+                      whiteSpace: "normal",
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {item.address || "-"}
+                  </td>
                   <td>{item.kelurahan || "-"}</td>
                   <td>{item.contact || "-"}</td>
-                  <td style={{ whiteSpace: "normal", fontSize: 12, lineHeight: 1.4 }}>
-                    {item.show_contact ? "HP Tampil" : "HP Tersembunyi"}{" | "}
+                  <td
+                    style={{
+                      whiteSpace: "normal",
+                      fontSize: 12,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {item.show_contact ? "HP Tampil" : "HP Tersembunyi"}
+                    {" | "}
                     {item.show_address ? "Alamat Tampil" : "Alamat Tersembunyi"}
                   </td>
                   <td>{item.is_active ? "Ya" : "Tidak"}</td>
                   <td>
                     <div className="table-actions">
                       <button onClick={() => edit(item)}>Edit</button>
-                      <button className="danger" onClick={() => remove(item.id)}>Hapus</button>
+                      <button
+                        className="danger"
+                        onClick={() => remove(item.id)}
+                      >
+                        Hapus
+                      </button>
                     </div>
                   </td>
                 </tr>
               ))}
               {items.length === 0 && (
-                <tr><td colSpan={9} style={{ textAlign: "center", padding: 24, color: "#667085" }}>Belum ada data IKM.</td></tr>
+                <tr>
+                  <td
+                    colSpan={9}
+                    style={{
+                      textAlign: "center",
+                      padding: 24,
+                      color: "#667085",
+                    }}
+                  >
+                    Belum ada data IKM.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -2497,7 +5009,9 @@ function TentangAdmin() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const uploadFile = async (fieldName, file) => {
     if (!file) return;
@@ -2570,7 +5084,10 @@ function TentangAdmin() {
           ...(arr[Number(parts[1])] || {}),
           [parts[2]]: value,
         };
-        return { ...prev, tentang_data: { ...prev.tentang_data, [parts[0]]: arr } };
+        return {
+          ...prev,
+          tentang_data: { ...prev.tentang_data, [parts[0]]: arr },
+        };
       });
     }
   };
@@ -2580,7 +5097,8 @@ function TentangAdmin() {
       const arr = [...(prev.tentang_data[key] || [])];
       if (key === "bidang") arr.push({ title: "", desc: "" });
       else if (key === "alamat") arr.push({ title: "", address: "" });
-      else if (key === "kontak") arr.push({ label: "", value: "", href: "", icon: "" });
+      else if (key === "kontak")
+        arr.push({ label: "", value: "", href: "", icon: "" });
       return { ...prev, tentang_data: { ...prev.tentang_data, [key]: arr } };
     });
   };
@@ -2615,11 +5133,12 @@ function TentangAdmin() {
   };
 
   const fileInput = (fieldName, label) => {
-    const value = fieldName === "logo"
-      ? form.tentang_data.logo
-      : fieldName === "kadin.photo"
-        ? form.tentang_data.kadin?.photo || ""
-        : "";
+    const value =
+      fieldName === "logo"
+        ? form.tentang_data.logo
+        : fieldName === "kadin.photo"
+          ? form.tentang_data.kadin?.photo || ""
+          : "";
     const isImage = value && /\.(png|jpe?g|gif|webp|svg)$/i.test(value);
 
     return (
@@ -2635,14 +5154,30 @@ function TentangAdmin() {
             {uploading[fieldName] && <span>Uploading...</span>}
           </div>
           {value && (
-            <div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: "#344054" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                alignItems: "center",
+                fontSize: 13,
+                color: "#344054",
+              }}
+            >
               <span>{value}</span>
               {isImage && (
                 <img
                   src={`/assets/${value}`}
                   alt="preview"
-                  style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 8, border: "1px solid #d0d5dd" }}
-                  onError={(e) => { e.currentTarget.style.display = "none"; }}
+                  style={{
+                    width: 48,
+                    height: 48,
+                    objectFit: "cover",
+                    borderRadius: 8,
+                    border: "1px solid #d0d5dd",
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
                 />
               )}
             </div>
@@ -2704,8 +5239,15 @@ function TentangAdmin() {
   if (loading) {
     return (
       <>
-        <div className="admin-header"><div><p>Pengaturan</p><h1>Halaman Tentang</h1></div></div>
-        <div className="admin-card"><p>Memuat data...</p></div>
+        <div className="admin-header">
+          <div>
+            <p>Pengaturan</p>
+            <h1>Halaman Tentang</h1>
+          </div>
+        </div>
+        <div className="admin-card">
+          <p>Memuat data...</p>
+        </div>
       </>
     );
   }
@@ -2742,38 +5284,208 @@ function TentangAdmin() {
 
           <h2 style={{ marginTop: 28 }}>Bidang</h2>
           {(form.tentang_data.bidang || []).map((item, i) => (
-            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
-              <button type="button" onClick={() => removeArrayItem("bidang", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
-              <label><span>Nama Bidang</span><input value={item.title || ""} onChange={(e) => updateTentangData(`bidang.${i}.title`, e.target.value)} /></label>
-              <label className="wide"><span>Deskripsi</span><textarea value={item.desc || ""} onChange={(e) => updateTentangData(`bidang.${i}.desc`, e.target.value)} /></label>
+            <div
+              key={i}
+              className="admin-form-grid"
+              style={{
+                border: "1px solid #eaecf0",
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 12,
+                position: "relative",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => removeArrayItem("bidang", i)}
+                style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#dc2626",
+                  fontSize: 13,
+                }}
+              >
+                Hapus
+              </button>
+              <label>
+                <span>Nama Bidang</span>
+                <input
+                  value={item.title || ""}
+                  onChange={(e) =>
+                    updateTentangData(`bidang.${i}.title`, e.target.value)
+                  }
+                />
+              </label>
+              <label className="wide">
+                <span>Deskripsi</span>
+                <textarea
+                  value={item.desc || ""}
+                  onChange={(e) =>
+                    updateTentangData(`bidang.${i}.desc`, e.target.value)
+                  }
+                />
+              </label>
             </div>
           ))}
-          <button type="button" onClick={() => addArrayItem("bidang")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467" }}>
+          <button
+            type="button"
+            onClick={() => addArrayItem("bidang")}
+            style={{
+              background: "none",
+              border: "1px dashed #d0d5dd",
+              borderRadius: 8,
+              padding: "10px 16px",
+              cursor: "pointer",
+              width: "100%",
+              fontSize: 13,
+              color: "#475467",
+            }}
+          >
             + Tambah Bidang
           </button>
 
           <h2 style={{ marginTop: 28 }}>Alamat</h2>
           {(form.tentang_data.alamat || []).map((item, i) => (
-            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
-              <button type="button" onClick={() => removeArrayItem("alamat", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
-              <label><span>Nama Tempat</span><input value={item.title || ""} onChange={(e) => updateTentangData(`alamat.${i}.title`, e.target.value)} /></label>
-              <label className="wide"><span>Alamat</span><textarea value={item.address || ""} onChange={(e) => updateTentangData(`alamat.${i}.address`, e.target.value)} /></label>
+            <div
+              key={i}
+              className="admin-form-grid"
+              style={{
+                border: "1px solid #eaecf0",
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 12,
+                position: "relative",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => removeArrayItem("alamat", i)}
+                style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#dc2626",
+                  fontSize: 13,
+                }}
+              >
+                Hapus
+              </button>
+              <label>
+                <span>Nama Tempat</span>
+                <input
+                  value={item.title || ""}
+                  onChange={(e) =>
+                    updateTentangData(`alamat.${i}.title`, e.target.value)
+                  }
+                />
+              </label>
+              <label className="wide">
+                <span>Alamat</span>
+                <textarea
+                  value={item.address || ""}
+                  onChange={(e) =>
+                    updateTentangData(`alamat.${i}.address`, e.target.value)
+                  }
+                />
+              </label>
             </div>
           ))}
-          <button type="button" onClick={() => addArrayItem("alamat")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467" }}>
+          <button
+            type="button"
+            onClick={() => addArrayItem("alamat")}
+            style={{
+              background: "none",
+              border: "1px dashed #d0d5dd",
+              borderRadius: 8,
+              padding: "10px 16px",
+              cursor: "pointer",
+              width: "100%",
+              fontSize: 13,
+              color: "#475467",
+            }}
+          >
             + Tambah Alamat
           </button>
 
           <h2 style={{ marginTop: 28 }}>Kontak</h2>
           {(form.tentang_data.kontak || []).map((item, i) => (
-            <div key={i} className="admin-form-grid" style={{ border: "1px solid #eaecf0", borderRadius: 8, padding: 16, marginBottom: 12, position: "relative" }}>
-              <button type="button" onClick={() => removeArrayItem("kontak", i)} style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 13 }}>Hapus</button>
-              <label><span>Label</span><input value={item.label || ""} onChange={(e) => updateTentangData(`kontak.${i}.label`, e.target.value)} /></label>
-              <label><span>Nilai</span><input value={item.value || ""} onChange={(e) => updateTentangData(`kontak.${i}.value`, e.target.value)} /></label>
-              <label className="wide"><span>Link (href)</span><input value={item.href || ""} onChange={(e) => updateTentangData(`kontak.${i}.href`, e.target.value)} /></label>
+            <div
+              key={i}
+              className="admin-form-grid"
+              style={{
+                border: "1px solid #eaecf0",
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 12,
+                position: "relative",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => removeArrayItem("kontak", i)}
+                style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#dc2626",
+                  fontSize: 13,
+                }}
+              >
+                Hapus
+              </button>
+              <label>
+                <span>Label</span>
+                <input
+                  value={item.label || ""}
+                  onChange={(e) =>
+                    updateTentangData(`kontak.${i}.label`, e.target.value)
+                  }
+                />
+              </label>
+              <label>
+                <span>Nilai</span>
+                <input
+                  value={item.value || ""}
+                  onChange={(e) =>
+                    updateTentangData(`kontak.${i}.value`, e.target.value)
+                  }
+                />
+              </label>
+              <label className="wide">
+                <span>Link (href)</span>
+                <input
+                  value={item.href || ""}
+                  onChange={(e) =>
+                    updateTentangData(`kontak.${i}.href`, e.target.value)
+                  }
+                />
+              </label>
             </div>
           ))}
-          <button type="button" onClick={() => addArrayItem("kontak")} style={{ background: "none", border: "1px dashed #d0d5dd", borderRadius: 8, padding: "10px 16px", cursor: "pointer", width: "100%", fontSize: 13, color: "#475467" }}>
+          <button
+            type="button"
+            onClick={() => addArrayItem("kontak")}
+            style={{
+              background: "none",
+              border: "1px dashed #d0d5dd",
+              borderRadius: 8,
+              padding: "10px 16px",
+              cursor: "pointer",
+              width: "100%",
+              fontSize: 13,
+              color: "#475467",
+            }}
+          >
             + Tambah Kontak
           </button>
 
@@ -2783,7 +5495,9 @@ function TentangAdmin() {
           </div>
 
           <div className="admin-actions" style={{ marginTop: 28 }}>
-            <button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button>
+            <button type="submit" disabled={saving}>
+              {saving ? "Menyimpan..." : "Simpan"}
+            </button>
           </div>
 
           {message && <p className="admin-message">{message}</p>}
@@ -2798,35 +5512,55 @@ function PricesAdmin() {
   const [commodities, setCommodities] = useState([]);
   const [selectedMarket, setSelectedMarket] = useState("");
   const [prices, setPrices] = useState({});
-  const [priceDate, setPriceDate] = useState(new Date().toISOString().slice(0, 10));
+  const [priceDate, setPriceDate] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
-  useEffect(() => { api("/api/admin/markets").then((d) => setMarkets((d.data || []).filter((m) => m.category === "Pasar Rakyat"))).catch(() => {}); }, []);
+  useEffect(() => {
+    api("/api/admin/markets")
+      .then((d) =>
+        setMarkets((d.data || []).filter((m) => m.category === "Pasar Rakyat")),
+      )
+      .catch(() => {});
+  }, []);
 
   const loadCommodities = async (marketId) => {
     if (!marketId) return;
-    setLoading(true); setMessage("");
+    setLoading(true);
+    setMessage("");
     try {
       const [comRes, priceRes] = await Promise.all([
         api("/api/admin/commodities"),
-        api(`/api/admin/prices?market_id=${marketId}&start_date=${priceDate}&end_date=${priceDate}&limit=200`),
+        api(
+          `/api/admin/prices?market_id=${marketId}&start_date=${priceDate}&end_date=${priceDate}&limit=200`,
+        ),
       ]);
       const allCom = comRes.data || [];
       const existingPrices = priceRes.data || [];
       const priceMap = {};
-      existingPrices.forEach((p) => { priceMap[p.komoditas_id] = p.price; });
+      existingPrices.forEach((p) => {
+        priceMap[p.komoditas_id] = p.price;
+      });
       setCommodities(allCom);
       setPrices(priceMap);
-    } catch { setMessage("Gagal memuat data."); } finally { setLoading(false); }
+    } catch {
+      setMessage("Gagal memuat data.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleMarketChange = (e) => {
     const val = e.target.value;
     setSelectedMarket(val);
     if (val) loadCommodities(val);
-    else { setCommodities([]); setPrices({}); }
+    else {
+      setCommodities([]);
+      setPrices({});
+    }
   };
 
   const updatePrice = (komoditasId, val) => {
@@ -2835,39 +5569,78 @@ function PricesAdmin() {
 
   const submit = async (e) => {
     e.preventDefault();
-    if (!selectedMarket) { setMessage("Pilih pasar terlebih dahulu."); return; }
-    setSaving(true); setMessage("");
-    const entries = Object.entries(prices).filter(([, v]) => v !== "" && v !== null);
-    if (entries.length === 0) { setMessage("Tidak ada harga yang diisi."); setSaving(false); return; }
+    if (!selectedMarket) {
+      setMessage("Pilih pasar terlebih dahulu.");
+      return;
+    }
+    setSaving(true);
+    setMessage("");
+    const entries = Object.entries(prices).filter(
+      ([, v]) => v !== "" && v !== null,
+    );
+    if (entries.length === 0) {
+      setMessage("Tidak ada harga yang diisi.");
+      setSaving(false);
+      return;
+    }
     const payload = {
       pasar_id: selectedMarket,
       price_date: priceDate,
-      prices: entries.map(([komoditasId, price]) => ({ komoditas_id: Number(komoditasId), price })),
+      prices: entries.map(([komoditasId, price]) => ({
+        komoditas_id: Number(komoditasId),
+        price,
+      })),
     };
     try {
-      const res = await api("/api/admin/prices/bulk", { method: "POST", body: JSON.stringify(payload) });
+      const res = await api("/api/admin/prices/bulk", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
       setMessage(`Berhasil menyimpan ${res.count || "semua"} data harga.`);
-    } catch (err) { setMessage("Gagal menyimpan: " + (err.message || "")); } finally { setSaving(false); }
+    } catch (err) {
+      setMessage("Gagal menyimpan: " + (err.message || ""));
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <>
-      <div className="admin-header"><div><p>Pengaturan</p><h1>Input Harga Komoditas</h1></div></div>
+      <div className="admin-header">
+        <div>
+          <p>Pengaturan</p>
+          <h1>Input Harga Komoditas</h1>
+        </div>
+      </div>
       <div className="admin-card">
         <form onSubmit={submit} className="admin-form">
           <div className="admin-form-grid">
-            <label><span>Pasar</span>
+            <label>
+              <span>Pasar</span>
               <select value={selectedMarket} onChange={handleMarketChange}>
                 <option value="">-- Pilih Pasar --</option>
-                {markets.map((m) => (<option key={m.id} value={m.id}>{m.name}</option>))}
+                {markets.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
+                  </option>
+                ))}
               </select>
             </label>
-            <label><span>Tanggal</span>
-              <input type="date" value={priceDate} onChange={(e) => setPriceDate(e.target.value)} />
+            <label>
+              <span>Tanggal</span>
+              <input
+                type="date"
+                value={priceDate}
+                onChange={(e) => setPriceDate(e.target.value)}
+              />
             </label>
           </div>
 
-          {loading && <p style={{ margin: "16px 0", color: "#64748b" }}>Memuat komoditas...</p>}
+          {loading && (
+            <p style={{ margin: "16px 0", color: "#64748b" }}>
+              Memuat komoditas...
+            </p>
+          )}
 
           {!loading && commodities.length > 0 && (
             <>
@@ -2877,16 +5650,36 @@ function PricesAdmin() {
                     <tr>
                       <th style={{ width: 50, textAlign: "center" }}>No</th>
                       <th style={{ textAlign: "left" }}>Komoditas</th>
-                      <th style={{ width: 160, textAlign: "right" }}>Harga (Rp)</th>
+                      <th style={{ width: 160, textAlign: "right" }}>
+                        Harga (Rp)
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {commodities.map((com, i) => (
                       <tr key={com.id}>
-                        <td style={{ textAlign: "center", color: "#64748b", fontSize: 13 }}>{i + 1}</td>
+                        <td
+                          style={{
+                            textAlign: "center",
+                            color: "#64748b",
+                            fontSize: 13,
+                          }}
+                        >
+                          {i + 1}
+                        </td>
                         <td>
                           <strong style={{ fontSize: 14 }}>{com.name}</strong>
-                          {com.unit && <span style={{ color: "#64748b", fontSize: 12, marginLeft: 6 }}>/ {com.unit}</span>}
+                          {com.unit && (
+                            <span
+                              style={{
+                                color: "#64748b",
+                                fontSize: 12,
+                                marginLeft: 6,
+                              }}
+                            >
+                              / {com.unit}
+                            </span>
+                          )}
                         </td>
                         <td style={{ textAlign: "right" }}>
                           <input
@@ -2895,7 +5688,9 @@ function PricesAdmin() {
                             style={{ width: 140, textAlign: "right" }}
                             placeholder="0"
                             value={prices[com.id] ?? ""}
-                            onChange={(e) => updatePrice(com.id, e.target.value)}
+                            onChange={(e) =>
+                              updatePrice(com.id, e.target.value)
+                            }
                           />
                         </td>
                       </tr>
@@ -2904,16 +5699,24 @@ function PricesAdmin() {
                 </table>
               </div>
               <div className="admin-actions" style={{ marginTop: 20 }}>
-                <button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan Semua Harga"}</button>
+                <button type="submit" disabled={saving}>
+                  {saving ? "Menyimpan..." : "Simpan Semua Harga"}
+                </button>
               </div>
             </>
           )}
 
           {!loading && selectedMarket && commodities.length === 0 && (
-            <p style={{ margin: "16px 0", color: "#64748b" }}>Tidak ada komoditas tersedia.</p>
+            <p style={{ margin: "16px 0", color: "#64748b" }}>
+              Tidak ada komoditas tersedia.
+            </p>
           )}
 
-          {message && <p className="admin-message" style={{ marginTop: 12 }}>{message}</p>}
+          {message && (
+            <p className="admin-message" style={{ marginTop: 12 }}>
+              {message}
+            </p>
+          )}
         </form>
       </div>
     </>
@@ -2930,6 +5733,13 @@ function VerificationPage() {
   const [page, setPage] = useState(1);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [editingRow, setEditingRow] = useState(null);
+  const [editForm, setEditForm] = useState({
+    price: "",
+    previous_price: "",
+    notes: "",
+  });
+  const [savingEdit, setSavingEdit] = useState(false);
   const perPage = 20;
 
   const load = async () => {
@@ -2942,35 +5752,77 @@ function VerificationPage() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const approveOne = async (row) => {
-    if (!confirm(`Setujui data harga ${row.komoditas_name} di ${row.pasar_name} tanggal ${row.price_date}?`)) return;
-    await api(`/api/admin/prices/verification/${row.id}/approve`, { method: "PATCH" });
+    if (
+      !confirm(
+        `Setujui data harga ${row.komoditas_name} di ${row.pasar_name} tanggal ${row.price_date}?`,
+      )
+    )
+      return;
+    await api(`/api/admin/prices/verification/${row.id}/approve`, {
+      method: "PATCH",
+    });
     setMessage(`Harga ${row.komoditas_name} berhasil divalidasi.`);
     setSelectedIds([]);
     setSelectAll(false);
     await load();
   };
 
-  const rejectOne = async (row) => {
-    if (!confirm(`Tolak data harga ${row.komoditas_name} di ${row.pasar_name} tanggal ${row.price_date}?`)) return;
-    await api(`/api/admin/prices/verification/${row.id}/reject`, { method: "PATCH" });
-    setMessage(`Harga ${row.komoditas_name} ditolak.`);
-    setSelectedIds([]);
-    setSelectAll(false);
-    await load();
+  const openEdit = (row) => {
+    setEditingRow(row);
+    setEditForm({
+      price: row.price ?? "",
+      previous_price: row.previous_price ?? "",
+      notes: row.notes ?? "",
+    });
+  };
+
+  const saveEdit = async (event) => {
+    event.preventDefault();
+    setSavingEdit(true);
+    try {
+      await api(`/api/admin/prices/${editingRow.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          price: Number(editForm.price),
+          previous_price:
+            editForm.previous_price === ""
+              ? null
+              : Number(editForm.previous_price),
+          notes: editForm.notes || null,
+        }),
+      });
+      setMessage(
+        `Harga ${editingRow.komoditas_name} berhasil direvisi dan masih menunggu persetujuan.`,
+      );
+      setEditingRow(null);
+      await load();
+    } finally {
+      setSavingEdit(false);
+    }
   };
 
   const approveSelected = async () => {
-    if (selectedIds.length === 0) { alert("Pilih data yang akan divalidasi terlebih dahulu."); return; }
-    if (!confirm(`Setujui ${selectedIds.length} data harga yang dipilih?`)) return;
+    if (selectedIds.length === 0) {
+      alert("Pilih data yang akan divalidasi terlebih dahulu.");
+      return;
+    }
+    if (!confirm(`Setujui ${selectedIds.length} data harga yang dipilih?`))
+      return;
     let count = 0;
     for (const id of selectedIds) {
       try {
-        await api(`/api/admin/prices/verification/${id}/approve`, { method: "PATCH" });
+        await api(`/api/admin/prices/verification/${id}/approve`, {
+          method: "PATCH",
+        });
         count++;
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
     setMessage(`${count} data berhasil divalidasi.`);
     setSelectedIds([]);
@@ -2979,9 +5831,18 @@ function VerificationPage() {
   };
 
   const approveAll = async () => {
-    if (!confirm(`Setujui SEMUA data harga yang belum divalidasi (${rows.length} data)?`)) return;
-    const res = await api("/api/admin/prices/verification/approve-all", { method: "POST" });
-    setMessage(`Semua data berhasil divalidasi (${res.data?.updated_count || 0} data).`);
+    if (
+      !confirm(
+        `Setujui SEMUA data harga yang belum divalidasi (${rows.length} data)?`,
+      )
+    )
+      return;
+    const res = await api("/api/admin/prices/verification/approve-all", {
+      method: "POST",
+    });
+    setMessage(
+      `Semua data berhasil divalidasi (${res.data?.updated_count || 0} data).`,
+    );
     setSelectedIds([]);
     setSelectAll(false);
     await load();
@@ -2989,7 +5850,7 @@ function VerificationPage() {
 
   const toggleSelect = (id) => {
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
@@ -3006,16 +5867,21 @@ function VerificationPage() {
     if (search) {
       const q = search.toLowerCase();
       data = rows.filter((r) =>
-        [r.pasar_name, r.komoditas_name, r.price_date]
-          .some((v) => v != null && String(v).toLowerCase().includes(q))
+        [r.pasar_name, r.komoditas_name, r.price_date].some(
+          (v) => v != null && String(v).toLowerCase().includes(q),
+        ),
       );
     }
     if (sortKey && sortDir) {
       data = [...data].sort((a, b) => {
         const va = a[sortKey];
         const vb = b[sortKey];
-        if (va == null) return 1; if (vb == null) return -1;
-        const cmp = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb));
+        if (va == null) return 1;
+        if (vb == null) return -1;
+        const cmp =
+          typeof va === "number"
+            ? va - vb
+            : String(va).localeCompare(String(vb));
         return sortDir === "asc" ? cmp : -cmp;
       });
     }
@@ -3024,14 +5890,25 @@ function VerificationPage() {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
   const safePage = Math.min(page, totalPages);
-  const paginated = filtered.slice((safePage - 1) * perPage, safePage * perPage);
+  const paginated = filtered.slice(
+    (safePage - 1) * perPage,
+    safePage * perPage,
+  );
 
   const toggleSort = (col) => {
     if (sortKey === col) {
       if (sortDir === "asc") setSortDir("desc");
-      else if (sortDir === "desc") { setSortKey(null); setSortDir(null); }
-      else { setSortDir("asc"); setSortKey(col); }
-    } else { setSortKey(col); setSortDir("asc"); }
+      else if (sortDir === "desc") {
+        setSortKey(null);
+        setSortDir(null);
+      } else {
+        setSortDir("asc");
+        setSortKey(col);
+      }
+    } else {
+      setSortKey(col);
+      setSortDir("asc");
+    }
   };
 
   return (
@@ -3048,13 +5925,19 @@ function VerificationPage() {
           <h2>Data Menunggu Verifikasi ({rows.length})</h2>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             {selectedIds.length > 0 && (
-              <button className="btn" onClick={approveSelected}
-                style={{ background: "#108879" }}>
+              <button
+                className="btn"
+                onClick={approveSelected}
+                style={{ background: "#108879" }}
+              >
                 Setujui Terpilih ({selectedIds.length})
               </button>
             )}
-            <button className="btn" onClick={approveAll}
-              style={{ background: "#076797" }}>
+            <button
+              className="btn"
+              onClick={approveAll}
+              style={{ background: "#076797" }}
+            >
               Setujui Semua
             </button>
           </div>
@@ -3062,39 +5945,87 @@ function VerificationPage() {
 
         {message && <p className="admin-message">{message}</p>}
         {loading && <p>Memuat data...</p>}
-        {!loading && paginated.length === 0 && <p>Semua data sudah divalidasi.</p>}
+        {!loading && paginated.length === 0 && (
+          <p>Semua data sudah divalidasi.</p>
+        )}
 
         {!loading && paginated.length > 0 && (
           <>
             <div className="tableToolbar">
-              <input className="searchInput" type="text" placeholder="Cari..." value={search}
-                onChange={(e) => setSearch(e.target.value)} />
-              <span className="recordCount">{filtered.length} / {rows.length} data</span>
+              <input
+                className="searchInput"
+                type="text"
+                placeholder="Cari..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <span className="recordCount">
+                {filtered.length} / {rows.length} data
+              </span>
             </div>
             <div className="admin-table-wrap">
               <table className="admin-table">
                 <thead>
                   <tr>
                     <th style={{ width: 40 }}>
-                      <input type="checkbox" checked={selectAll}
-                        onChange={() => setSelectAll(!selectAll)} />
+                      <input
+                        type="checkbox"
+                        checked={selectAll}
+                        onChange={() => setSelectAll(!selectAll)}
+                      />
                     </th>
                     <th>No</th>
-                    <th className={sortKey === "price_date" ? sortDir : ""}
-                      onClick={() => toggleSort("price_date")}>
-                      Tanggal <span className="sortIcon">{sortKey === "price_date" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span>
+                    <th
+                      className={sortKey === "price_date" ? sortDir : ""}
+                      onClick={() => toggleSort("price_date")}
+                    >
+                      Tanggal{" "}
+                      <span className="sortIcon">
+                        {sortKey === "price_date"
+                          ? sortDir === "asc"
+                            ? "▲"
+                            : "▼"
+                          : "⇅"}
+                      </span>
                     </th>
-                    <th className={sortKey === "pasar_name" ? sortDir : ""}
-                      onClick={() => toggleSort("pasar_name")}>
-                      Pasar <span className="sortIcon">{sortKey === "pasar_name" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span>
+                    <th
+                      className={sortKey === "pasar_name" ? sortDir : ""}
+                      onClick={() => toggleSort("pasar_name")}
+                    >
+                      Pasar{" "}
+                      <span className="sortIcon">
+                        {sortKey === "pasar_name"
+                          ? sortDir === "asc"
+                            ? "▲"
+                            : "▼"
+                          : "⇅"}
+                      </span>
                     </th>
-                    <th className={sortKey === "komoditas_name" ? sortDir : ""}
-                      onClick={() => toggleSort("komoditas_name")}>
-                      Komoditas <span className="sortIcon">{sortKey === "komoditas_name" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span>
+                    <th
+                      className={sortKey === "komoditas_name" ? sortDir : ""}
+                      onClick={() => toggleSort("komoditas_name")}
+                    >
+                      Komoditas{" "}
+                      <span className="sortIcon">
+                        {sortKey === "komoditas_name"
+                          ? sortDir === "asc"
+                            ? "▲"
+                            : "▼"
+                          : "⇅"}
+                      </span>
                     </th>
-                    <th className={sortKey === "price" ? sortDir : ""}
-                      onClick={() => toggleSort("price")}>
-                      Harga <span className="sortIcon">{sortKey === "price" ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}</span>
+                    <th
+                      className={sortKey === "price" ? sortDir : ""}
+                      onClick={() => toggleSort("price")}
+                    >
+                      Harga{" "}
+                      <span className="sortIcon">
+                        {sortKey === "price"
+                          ? sortDir === "asc"
+                            ? "▲"
+                            : "▼"
+                          : "⇅"}
+                      </span>
                     </th>
                     <th>Sebelumnya</th>
                     <th>Aksi</th>
@@ -3104,20 +6035,41 @@ function VerificationPage() {
                   {paginated.map((r, i) => (
                     <tr key={r.id}>
                       <td>
-                        <input type="checkbox" checked={selectedIds.includes(r.id)}
-                          onChange={() => toggleSelect(r.id)} />
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(r.id)}
+                          onChange={() => toggleSelect(r.id)}
+                        />
                       </td>
                       <td>{(safePage - 1) * perPage + i + 1}</td>
                       <td>{r.price_date}</td>
                       <td>{r.pasar_name}</td>
-                      <td><strong>{r.komoditas_name}</strong> {r.unit && <span style={{ fontSize: 12, color: "#64748b" }}>/ {r.unit}</span>}</td>
-                      <td style={{ fontWeight: 600 }}>Rp {Number(r.price).toLocaleString()}</td>
-                      <td style={{ color: "#64748b" }}>Rp {Number(r.previous_price).toLocaleString()}</td>
+                      <td>
+                        <strong>{r.komoditas_name}</strong>{" "}
+                        {r.unit && (
+                          <span style={{ fontSize: 12, color: "#64748b" }}>
+                            / {r.unit}
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ fontWeight: 600 }}>
+                        Rp {Number(r.price).toLocaleString()}
+                      </td>
+                      <td style={{ color: "#64748b" }}>
+                        Rp {Number(r.previous_price).toLocaleString()}
+                      </td>
                       <td>
                         <div className="table-actions">
-                          <button type="button" onClick={() => approveOne(r)}
-                            style={{ background: "#108879", color: "#fff" }}>Setujui</button>
-                          <button type="button" className="danger" onClick={() => rejectOne(r)}>Tolak</button>
+                          <button
+                            type="button"
+                            onClick={() => approveOne(r)}
+                            style={{ background: "#108879", color: "#fff" }}
+                          >
+                            Setujui
+                          </button>
+                          <button type="button" onClick={() => openEdit(r)}>
+                            Edit/Revisi
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -3127,16 +6079,101 @@ function VerificationPage() {
             </div>
             {totalPages > 1 && (
               <div className="pagination">
-                <button disabled={safePage <= 1} onClick={() => setPage(safePage - 1)}>‹ Prev</button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                  <button key={p} className={safePage === p ? "active" : ""} onClick={() => setPage(p)}>{p}</button>
-                ))}
-                <button disabled={safePage >= totalPages} onClick={() => setPage(safePage + 1)}>Next ›</button>
+                <button
+                  disabled={safePage <= 1}
+                  onClick={() => setPage(safePage - 1)}
+                >
+                  ‹ Prev
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (p) => (
+                    <button
+                      key={p}
+                      className={safePage === p ? "active" : ""}
+                      onClick={() => setPage(p)}
+                    >
+                      {p}
+                    </button>
+                  ),
+                )}
+                <button
+                  disabled={safePage >= totalPages}
+                  onClick={() => setPage(safePage + 1)}
+                >
+                  Next ›
+                </button>
               </div>
             )}
           </>
         )}
       </div>
+
+      {editingRow && (
+        <div className="modal-backdrop" onClick={() => setEditingRow(null)}>
+          <form
+            className="modal"
+            onSubmit={saveEdit}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2>Edit/Revisi Harga</h2>
+            <p style={{ marginTop: 0, color: "#64748b" }}>
+              {editingRow.komoditas_name} di {editingRow.pasar_name} pada{" "}
+              {editingRow.price_date}
+            </p>
+            <label className="form-field">
+              Harga
+              <input
+                type="number"
+                min="0"
+                required
+                value={editForm.price}
+                onChange={(event) =>
+                  setEditForm({ ...editForm, price: event.target.value })
+                }
+              />
+            </label>
+            <label className="form-field">
+              Harga Sebelumnya
+              <input
+                type="number"
+                min="0"
+                value={editForm.previous_price}
+                onChange={(event) =>
+                  setEditForm({
+                    ...editForm,
+                    previous_price: event.target.value,
+                  })
+                }
+              />
+            </label>
+            <label className="form-field">
+              Catatan Revisi
+              <textarea
+                rows="3"
+                value={editForm.notes}
+                onChange={(event) =>
+                  setEditForm({ ...editForm, notes: event.target.value })
+                }
+              />
+            </label>
+            <div
+              className="table-actions"
+              style={{ justifyContent: "flex-end" }}
+            >
+              <button type="button" onClick={() => setEditingRow(null)}>
+                Batal
+              </button>
+              <button
+                type="submit"
+                disabled={savingEdit}
+                style={{ background: "#076797", color: "#fff" }}
+              >
+                {savingEdit ? "Menyimpan..." : "Simpan Revisi"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
@@ -3159,7 +6196,9 @@ function AdminApp() {
   if (loading) {
     return (
       <AdminLayout menus={[]} groups={menuGroups}>
-        <div className="admin-header"><h1>Memuat...</h1></div>
+        <div className="admin-header">
+          <h1>Memuat...</h1>
+        </div>
       </AdminLayout>
     );
   }

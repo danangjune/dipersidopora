@@ -61,7 +61,7 @@ class AdminCrudController extends Controller
             ->whereDate('price_date', $today)
             ->where('price', '>', 0)
             ->orderByDesc('id')->limit(500)->get()
-            ->map(fn ($r) => [
+            ->map(fn($r) => [
                 'id' => $r->id,
                 'pasar' => $r->pasar?->name,
                 'komoditas' => $r->komoditas?->name,
@@ -149,10 +149,10 @@ class AdminCrudController extends Controller
         if ($request->isMethod('get')) {
             $rows = CommodityPriceRecord::query()
                 ->with(['pasar:id,name', 'komoditas:id,name,unit,image'])
-                ->when($request->integer('market_id'), fn ($q, $id) => $q->where('pasar_id', $id))
-                ->when($request->integer('commodity_id'), fn ($q, $id) => $q->where('komoditas_id', $id))
-                ->when($request->query('start_date'), fn ($q, $date) => $q->whereDate('price_date', '>=', $date))
-                ->when($request->query('end_date'), fn ($q, $date) => $q->whereDate('price_date', '<=', $date))
+                ->when($request->integer('market_id'), fn($q, $id) => $q->where('pasar_id', $id))
+                ->when($request->integer('commodity_id'), fn($q, $id) => $q->where('komoditas_id', $id))
+                ->when($request->query('start_date'), fn($q, $date) => $q->whereDate('price_date', '>=', $date))
+                ->when($request->query('end_date'), fn($q, $date) => $q->whereDate('price_date', '<=', $date))
                 ->orderByDesc('price_date')
                 ->limit((int) $request->query('limit', 200))
                 ->get()
@@ -198,11 +198,11 @@ class AdminCrudController extends Controller
             }
             $previous = $item['previous_price']
                 ?? CommodityPriceRecord::query()
-                    ->where('pasar_id', $data['pasar_id'])
-                    ->where('komoditas_id', $item['komoditas_id'])
-                    ->whereDate('price_date', '<', $data['price_date'])
-                    ->orderByDesc('price_date')
-                    ->value('price')
+                ->where('pasar_id', $data['pasar_id'])
+                ->where('komoditas_id', $item['komoditas_id'])
+                ->whereDate('price_date', '<', $data['price_date'])
+                ->orderByDesc('price_date')
+                ->value('price')
                 ?? 0;
             $record = CommodityPriceRecord::updateOrCreate(
                 ['pasar_id' => $data['pasar_id'], 'komoditas_id' => $item['komoditas_id'], 'price_date' => $data['price_date']],
@@ -1110,10 +1110,10 @@ class AdminCrudController extends Controller
         $rows = CommodityPriceRecord::query()
             ->with(['pasar:id,name', 'komoditas:id,name,unit,image'])
             ->where('status_validasi', 'false')
-            ->when($request->integer('market_id'), fn ($q, $id) => $q->where('pasar_id', $id))
-            ->when($request->integer('commodity_id'), fn ($q, $id) => $q->where('komoditas_id', $id))
-            ->when($request->query('start_date'), fn ($q, $date) => $q->whereDate('price_date', '>=', $date))
-            ->when($request->query('end_date'), fn ($q, $date) => $q->whereDate('price_date', '<=', $date))
+            ->when($request->integer('market_id'), fn($q, $id) => $q->where('pasar_id', $id))
+            ->when($request->integer('commodity_id'), fn($q, $id) => $q->where('komoditas_id', $id))
+            ->when($request->query('start_date'), fn($q, $date) => $q->whereDate('price_date', '>=', $date))
+            ->when($request->query('end_date'), fn($q, $date) => $q->whereDate('price_date', '<=', $date))
             ->orderByDesc('price_date')
             ->limit((int) $request->query('limit', 200))
             ->get()
@@ -1138,12 +1138,6 @@ class AdminCrudController extends Controller
         return response()->json(['status' => 'success', 'data' => $price->fresh()->load(['pasar:id,name', 'komoditas:id,name'])]);
     }
 
-    public function verificationReject(Request $request, CommodityPriceRecord $price)
-    {
-        $price->update(['status_validasi' => 'false']);
-        return response()->json(['status' => 'success', 'data' => $price->fresh()->load(['pasar:id,name', 'komoditas:id,name'])]);
-    }
-
     public function verificationApproveAll()
     {
         $count = CommodityPriceRecord::query()
@@ -1158,13 +1152,13 @@ class AdminCrudController extends Controller
             ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
             ->join('komoditas', 'komoditas.id', '=', 'commodity_price_records.komoditas_id')
             ->select('price_date', 'pasars.name as pasar', 'komoditas.name as komoditas', 'commodity_price_records.unit', 'price', 'previous_price', 'indicator_status', 'status_validasi')
-            ->when($request->integer('market_id'), fn ($q, $id) => $q->where('pasar_id', $id))
-            ->when($request->query('start_date'), fn ($q, $date) => $q->whereDate('price_date', '>=', $date))
-            ->when($request->query('end_date'), fn ($q, $date) => $q->whereDate('price_date', '<=', $date))
+            ->when($request->integer('market_id'), fn($q, $id) => $q->where('pasar_id', $id))
+            ->when($request->query('start_date'), fn($q, $date) => $q->whereDate('price_date', '>=', $date))
+            ->when($request->query('end_date'), fn($q, $date) => $q->whereDate('price_date', '<=', $date))
             ->orderByDesc('price_date')
             ->get();
 
-        $filename = 'harga-komoditas-'.now()->format('Ymd-His').'.xls';
+        $filename = 'harga-komoditas-' . now()->format('Ymd-His') . '.xls';
         $html = view('exports.prices', ['rows' => $rows])->render();
         return response($html, 200, [
             'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
@@ -1244,11 +1238,11 @@ class AdminCrudController extends Controller
         }
 
         // Sort by commodity name, then by date
-        usort($rows, fn ($a, $b) => $a->komoditas === $b->komoditas
+        usort($rows, fn($a, $b) => $a->komoditas === $b->komoditas
             ? strcmp($a->price_date, $b->price_date)
             : strcmp($a->komoditas, $b->komoditas));
 
-        $filename = 'harga-komoditas-rekap-'.now()->format('Ymd-His').'.xls';
+        $filename = 'harga-komoditas-rekap-' . now()->format('Ymd-His') . '.xls';
         $html = view('exports.prices-avg', [
             'rows' => $rows,
             'dateFrom' => $startDate,
