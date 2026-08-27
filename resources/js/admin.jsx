@@ -5725,6 +5725,8 @@ function PricesAdmin() {
 
 function VerificationPage() {
   const [rows, setRows] = useState([]);
+  const [markets, setMarkets] = useState([]);
+  const [selectedMarket, setSelectedMarket] = useState("");
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [search, setSearch] = useState("");
@@ -5745,7 +5747,10 @@ function VerificationPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await api("/api/admin/prices/verification");
+      const query = selectedMarket
+        ? `?market_id=${encodeURIComponent(selectedMarket)}`
+        : "";
+      const res = await api(`/api/admin/prices/verification${query}`);
       setRows(res.data || []);
     } finally {
       setLoading(false);
@@ -5754,7 +5759,19 @@ function VerificationPage() {
 
   useEffect(() => {
     load();
+  }, [selectedMarket]);
+
+  useEffect(() => {
+    api("/api/admin/markets")
+      .then((res) => setMarkets(res.data || []))
+      .catch(() => setMarkets([]));
   }, []);
+
+  useEffect(() => {
+    setPage(1);
+    setSelectedIds([]);
+    setSelectAll(false);
+  }, [selectedMarket]);
 
   const approveOne = async (row) => {
     if (
@@ -5922,7 +5939,17 @@ function VerificationPage() {
 
       <div className="admin-card">
         <div className="admin-table-header">
-          <h2>Data Menunggu Verifikasi ({rows.length})</h2>
+          <h2>
+            Data Menunggu Verifikasi ({rows.length})
+            {selectedMarket && (
+              <span style={{ marginLeft: 8, color: "#64748b", fontSize: 14 }}>
+                -{" "}
+                {markets.find(
+                  (market) => String(market.id) === String(selectedMarket),
+                )?.name || "Pasar terpilih"}
+              </span>
+            )}
+          </h2>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             {selectedIds.length > 0 && (
               <button
@@ -5944,6 +5971,38 @@ function VerificationPage() {
         </div>
 
         {message && <p className="admin-message">{message}</p>}
+        <div className="tableToolbar">
+          <select
+            value={selectedMarket}
+            onChange={(event) => setSelectedMarket(event.target.value)}
+            aria-label="Filter pasar"
+            style={{
+              minWidth: 220,
+              border: "1.5px solid #d0d5dd",
+              borderRadius: 10,
+              padding: "8px 12px",
+              font: "inherit",
+              background: "#fff",
+            }}
+          >
+            <option value="">Semua Pasar</option>
+            {markets.map((market) => (
+              <option key={market.id} value={market.id}>
+                {market.name}
+              </option>
+            ))}
+          </select>
+          <input
+            className="searchInput"
+            type="text"
+            placeholder="Cari..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <span className="recordCount">
+            {filtered.length} / {rows.length} data
+          </span>
+        </div>
         {loading && <p>Memuat data...</p>}
         {!loading && paginated.length === 0 && (
           <p>Semua data sudah divalidasi.</p>
@@ -5951,18 +6010,6 @@ function VerificationPage() {
 
         {!loading && paginated.length > 0 && (
           <>
-            <div className="tableToolbar">
-              <input
-                className="searchInput"
-                type="text"
-                placeholder="Cari..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <span className="recordCount">
-                {filtered.length} / {rows.length} data
-              </span>
-            </div>
             <div className="admin-table-wrap">
               <table className="admin-table">
                 <thead>
