@@ -56,6 +56,17 @@ Route::get('/prices/export-avg', [AdminCrudController::class, 'exportPricesAggre
 
 /*
 |--------------------------------------------------------------------------
+| Admin API - admin & verifikator (HET/HAP)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin,verifikator'])->prefix('api/admin')->group(function () {
+    Route::match(['get', 'post'], '/het-hap', [AdminCrudController::class, 'hetHap']);
+    Route::patch('/het-hap/{setting}', [AdminCrudController::class, 'updateHetHap']);
+    Route::delete('/het-hap/{setting}', [AdminCrudController::class, 'destroyHetHap']);
+});
+
+/*
+|--------------------------------------------------------------------------
 | Admin API - khusus admin (master data, CMS, dll)
 |--------------------------------------------------------------------------
 */
@@ -67,10 +78,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('api/admin')->group(function (
     Route::post('/commodities', [AdminCrudController::class, 'commodities']);
     Route::patch('/commodities/{commodity}', [AdminCrudController::class, 'updateCommodity']);
     Route::delete('/commodities/{commodity}', [AdminCrudController::class, 'destroyCommodity']);
-
-    Route::match(['get', 'post'], '/het-hap', [AdminCrudController::class, 'hetHap']);
-    Route::patch('/het-hap/{setting}', [AdminCrudController::class, 'updateHetHap']);
-    Route::delete('/het-hap/{setting}', [AdminCrudController::class, 'destroyHetHap']);
 
     Route::match(['get', 'post'], '/pages', [AdminCrudController::class, 'pages']);
     Route::patch('/pages/{page}', [AdminCrudController::class, 'updatePage']);

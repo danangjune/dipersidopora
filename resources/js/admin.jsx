@@ -256,7 +256,7 @@ const menuGroups = [
       { key: "prices-monitor", label: "Pemantauan Harga", href: "/admin/prices-monitor" },
     ],
     extra: [
-      { key: "het-hap", label: "HET / HAP", href: "/admin/het-hap", roles: ["admin"] },
+      { key: "het-hap", label: "HET / HAP", href: "/admin/het-hap", roles: ["admin", "verifikator"] },
       { key: "prices-verification", label: "Verifikasi Harga", href: "/admin/prices-verification", roles: ["verifikator", "admin"] },
     ],
   },
