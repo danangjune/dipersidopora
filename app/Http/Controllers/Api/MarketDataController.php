@@ -72,10 +72,10 @@ class MarketDataController extends Controller
         $rows = $query
             ->groupBy('komoditas.id', 'komoditas.name', 'komoditas.unit', 'komoditas.image')
             ->selectRaw('komoditas.id, komoditas.name, komoditas.unit, komoditas.image')
-            ->selectRaw('FLOOR(AVG(commodity_price_records.price)) AS harga_sekarang')
-            ->selectRaw('FLOOR(AVG(commodity_price_records.previous_price)) AS harga_sebelumnya')
+            ->selectRaw('FLOOR(AVG(CASE WHEN commodity_price_records.price > 0 THEN commodity_price_records.price ELSE NULL END)) AS harga_sekarang')
+            ->selectRaw('FLOOR(AVG(CASE WHEN commodity_price_records.previous_price > 0 THEN commodity_price_records.previous_price ELSE NULL END)) AS harga_sebelumnya')
             ->selectRaw('MAX(commodity_price_records.price_date) AS latest_date')
-            ->selectRaw('COUNT(DISTINCT commodity_price_records.pasar_id) AS market_count')
+            ->selectRaw('COUNT(DISTINCT CASE WHEN commodity_price_records.price > 0 THEN commodity_price_records.pasar_id END) AS market_count')
             ->selectRaw('MAX(het_hap_settings.price) AS reference_price')
             ->orderBy('komoditas.name')
             ->get()
@@ -91,7 +91,7 @@ class MarketDataController extends Controller
             ->when($marketId, fn($q) => $q->where('commodity_price_records.pasar_id', $marketId))
             ->when(!empty($commodityIds), fn($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
             ->groupBy('commodity_price_records.komoditas_id')
-            ->selectRaw('commodity_price_records.komoditas_id, FLOOR(AVG(commodity_price_records.price)) AS rata_rata')
+            ->selectRaw('commodity_price_records.komoditas_id, FLOOR(AVG(CASE WHEN commodity_price_records.price > 0 THEN commodity_price_records.price ELSE NULL END)) AS rata_rata')
             ->pluck('rata_rata', 'komoditas_id');
 
         $rows = $rows->map(fn($row) => array_merge($row, [
@@ -129,7 +129,7 @@ class MarketDataController extends Controller
             ->when($marketId, fn($q) => $q->where('commodity_price_records.pasar_id', $marketId))
             ->when(!empty($commodityIds), fn($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
             ->groupBy('commodity_price_records.price_date', 'komoditas.id', 'komoditas.name')
-            ->selectRaw('commodity_price_records.price_date, komoditas.id AS commodity_id, komoditas.name AS commodity_name, FLOOR(AVG(commodity_price_records.price)) AS average_price')
+            ->selectRaw('commodity_price_records.price_date, komoditas.id AS commodity_id, komoditas.name AS commodity_name, FLOOR(AVG(CASE WHEN commodity_price_records.price > 0 THEN commodity_price_records.price ELSE NULL END)) AS average_price')
             ->orderBy('commodity_price_records.price_date')
             ->limit(500)
             ->get();
