@@ -21,8 +21,8 @@ function PasarModal({ market, onClose }) {
 
   const hasCoords = market.latitude && market.longitude;
   const mapSrc = hasCoords
-    ? `https://www.google.com/maps/embed/v1/place?key=&q=${market.latitude},${market.longitude}&center=${market.latitude},${market.longitude}&zoom=15`
-    : `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3953.482145629552!2d112.0164!3d-7.8169!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e785b7e2e7b6c8d%3A0x8f0e5c5f5b5e5a5f!2sKota%20Kediri!5e0!3m2!1sid!2sid!4v1`;
+    ? `https://www.google.com/maps?q=${market.latitude},${market.longitude}&z=15&output=embed`
+    : `https://www.google.com/maps?q=Kota+Kediri&z=13&output=embed`;
 
   return (
     <div className="pasarModalOverlay" onClick={onClose}>
