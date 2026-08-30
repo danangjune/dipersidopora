@@ -154,6 +154,77 @@ class MarketDataController extends Controller
         ]);
     }
 
+    public function commodityChart(Request $request)
+    {
+        return $this->chart($request);
+    }
+
+    public function verifiedAverageLastDay(Request $request)
+    {
+        $marketId = $request->integer('market_id') ?: null;
+        $commodityIds = $request->query('commodity_ids');
+        if (is_string($commodityIds)) {
+            $commodityIds = array_values(array_filter(array_map('trim', explode(',', $commodityIds))));
+        } elseif (!is_array($commodityIds)) {
+            $commodityIds = [];
+        }
+
+        $singleCommodityId = $request->integer('commodity_id') ?: null;
+        if ($singleCommodityId) {
+            $commodityIds[] = $singleCommodityId;
+        }
+
+        $latestDate = CommodityPriceRecord::query()
+            ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
+            ->where('commodity_price_records.status_validasi', 'true')
+            ->where('pasars.category', 'Pasar Rakyat')
+            ->when($marketId, fn($q) => $q->where('commodity_price_records.pasar_id', $marketId))
+            ->when(!empty($commodityIds), fn($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
+            ->max('commodity_price_records.price_date');
+
+        if (!$latestDate) {
+            return response()->json([
+                'status' => 'success',
+                'data' => ['date' => null, 'rows' => []],
+            ]);
+        }
+
+        $rows = CommodityPriceRecord::query()
+            ->join('komoditas', 'komoditas.id', '=', 'commodity_price_records.komoditas_id')
+            ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
+            ->where('commodity_price_records.status_validasi', 'true')
+            ->where('pasars.category', 'Pasar Rakyat')
+            ->whereDate('commodity_price_records.price_date', $latestDate)
+            ->when($marketId, fn($q) => $q->where('commodity_price_records.pasar_id', $marketId))
+            ->when(!empty($commodityIds), fn($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
+            ->groupBy('komoditas.id', 'komoditas.name', 'komoditas.unit', 'komoditas.image')
+            ->selectRaw('komoditas.id AS commodity_id, komoditas.name AS nama_komoditas, komoditas.unit, komoditas.image')
+            ->selectRaw('ROUND(AVG(CASE WHEN commodity_price_records.price > 0 THEN commodity_price_records.price ELSE NULL END)) AS average_price')
+            ->selectRaw('COUNT(DISTINCT commodity_price_records.pasar_id) AS market_count')
+            ->orderBy('komoditas.name')
+            ->get()
+            ->map(function ($row) {
+                return [
+                    'commodity_id' => (int) $row->commodity_id,
+                    'nama_komoditas' => $row->nama_komoditas,
+                    'unit' => $row->unit,
+                    'image' => $row->image,
+                    'url_gambar' => asset('assets/images/komoditas/' . ($row->image ?: 'default.png')),
+                    'average_price' => (int) ($row->average_price ?? 0),
+                    'market_count' => (int) $row->market_count,
+                ];
+            });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'date' => Carbon::parse($latestDate)->toDateString(),
+                'rows' => $rows,
+                'total' => $rows->count(),
+            ],
+        ]);
+    }
+
     public function adminAverages(Request $request)
     {
         $marketId = $request->integer('market_id') ?: null;

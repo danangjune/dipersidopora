@@ -42,6 +42,8 @@ Route::get('/site/ikm', [SiteContentController::class, 'ikm']);
 Route::get('/market/filters', [MarketDataController::class, 'filters']);
 Route::get('/market/summary', [MarketDataController::class, 'publicSummary']);
 Route::get('/market/chart', [MarketDataController::class, 'chart']);
+Route::get('/market/commodity-chart', [MarketDataController::class, 'commodityChart']);
+Route::get('/market/verified-average-last-day', [MarketDataController::class, 'verifiedAverageLastDay']);
 Route::get('/market/admin-averages', [MarketDataController::class, 'adminAverages']);
 
 // Backward-compatible endpoints from the native PHP conversion.
