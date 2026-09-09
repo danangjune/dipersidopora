@@ -11,6 +11,7 @@
         "axios": "latest",
         "chart.js": "latest",
         "laravel-vite-plugin": "latest",
+        "qrcode": "^1.5.4",
         "react": "latest",
         "react-dom": "latest",
         "vite": "latest"

@@ -43,6 +43,39 @@ function getIcon(title = "") {
   return PuzzlePieceIcon;
 }
 
+function InstagramIcon(props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      aria-hidden="true"
+      {...props}
+    >
+      <rect x="2.8" y="2.8" width="18.4" height="18.4" rx="5.2" />
+      <circle cx="12" cy="12" r="4.1" />
+      <circle cx="17.1" cy="6.9" r="1.2" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function Lightwidget({ id }) {
+  useEffect(() => {
+    if (!id) return;
+    const src = `https://cdn.lightwidget.com/widgets/${id}.js`;
+    if (document.querySelector(`script[data-lightwidget="${id}"]`)) return;
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.dataset.lightwidget = id;
+    document.body.appendChild(script);
+  }, [id]);
+
+  return <div className="lightwidget-widget" style={{ width: "100%" }} />;
+}
+
 function HeroSlider({ banners }) {
   const [current, setCurrent] = useState(0);
   const timer = useRef(null);
@@ -91,11 +124,7 @@ function HeroSlider({ banners }) {
                 <img src={asset(b.image)} alt={b.title || "Banner"} />
               )}
             </div>
-            {b.title && (
-              <div className="heroCaption">
-                <h2>{b.title}</h2>
-              </div>
-            )}
+           
           </div>
         ))}
       </div>
@@ -117,6 +146,9 @@ function HeroSlider({ banners }) {
 export default function Home() {
   const [services, setServices] = useState([]);
   const [banners, setBanners] = useState([]);
+  const [instagramPosts, setInstagramPosts] = useState([]);
+  const [igFallback, setIgFallback] = useState({ provider: null, id: null });
+  const [currentPost, setCurrentPost] = useState(null);
 
   useEffect(() => {
     apiGet("/api/site/services")
@@ -125,7 +157,31 @@ export default function Home() {
     apiGet("/api/site/banners")
       .then((items) => setBanners(items || []))
       .catch(() => setBanners([]));
+    fetch("/api/site/instagram", { headers: { Accept: "application/json" } })
+      .then((r) => r.json())
+      .then((res) => {
+        setInstagramPosts(res.data || []);
+        setIgFallback({
+          provider: res.fallback_provider ?? null,
+          id: res.fallback_embed_id ?? null,
+        });
+      })
+      .catch(() => setInstagramPosts([]));
   }, []);
+
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key === "Escape") setCurrentPost(null);
+    }
+    if (currentPost) {
+      document.addEventListener("keydown", onKey);
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [currentPost]);
 
   return (
     <>
@@ -172,15 +228,152 @@ export default function Home() {
             <span>Survey Pelayanan</span>
             <h2>Bantu kami meningkatkan kualitas layanan</h2>
             <p>
-              Isi survey kepuasan masyarakat secara singkat. Hasilnya tersimpan
+              Isi survei kepuasan masyarakat secara singkat. Hasilnya tersimpan
               dan dapat ditampilkan real-time.
             </p>
           </div>
-          <a className="btnCta" href="/survey">
-            Isi Survey →
+          <a className="btnCta" href="https://skm.go.id/share/instansi/e3a2df95-2de3-4b11-993d-9e37053593bd/1" target="_blank" rel="noreferrer">
+            Isi Survei →
           </a>
         </div>
       </section>
+
+      <section className="section instagramSection">
+        <div className="sectionTitle">
+          <span>Media Sosial</span>
+          <h2>Follow kami di Instagram</h2>
+          <p>
+            Temukan info terbaru, kegiatan, dan pengumuman dari DISPERDAGIN Kota Kediri.
+          </p>
+        </div>
+
+        <div className="instagramFeed">
+          <div className="instagramGrid">
+            {instagramPosts.length > 0 ? (
+              instagramPosts.map((post) => (
+                <button
+                  type="button"
+                  className="instagramGridItem"
+                  key={post.id || post.shortcode}
+                  onClick={() => setCurrentPost(post)}
+                >
+                  <img
+                    src={post.thumbnail || post.image}
+                    alt={post.caption ? post.caption.slice(0, 80) : "Instagram Post"}
+                    loading="lazy"
+                    className="instagramGridImg"
+                  />
+                  <div className="instagramOverlay">
+                    <span className="instagramOverlayText">
+                      {post.is_video ? "Tonton Video →" : "Lihat →"}
+                    </span>
+                  </div>
+                </button>
+              ))
+            ) : igFallback.id ? (
+              <div className="instagramFallback">
+                {igFallback.provider === "snapwidget" ? (
+                  <iframe
+                    src={`https://snapwidget.com/embed/${igFallback.id}`}
+                    className="snapwidget-widget"
+                    title="Instagram DISPERDAGIN Kota Kediri"
+                    allowTransparency="true"
+                    frameBorder="0"
+                    scrolling="no"
+                    loading="lazy"
+                  />
+                ) : (
+                  <Lightwidget id={igFallback.id} />
+                )}
+              </div>
+            ) : (
+              <div className="instagramProfileCard">
+                <div className="instagramProfileAvatar">
+                  <InstagramIcon />
+                </div>
+                <h3>@disperdagin_kotakediri</h3>
+                <p>
+                  Feed Instagram sedang tidak dapat dimuat. Ikuti kami di
+                  Instagram untuk info terbaru, kegiatan, dan pengumuman
+                  DISPERDAGIN Kota Kediri.
+                </p>
+                <a
+                  className="instagramProfileBtn"
+                  href="https://www.instagram.com/disperdagin_kotakediri"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <InstagramIcon />
+                  Follow di Instagram
+                </a>
+              </div>
+            )}
+          </div>
+
+          <div className="instagramFooter">
+            <a
+              href="https://www.instagram.com/disperdagin_kotakediri"
+              target="_blank"
+              rel="noreferrer"
+              className="instagramLink"
+            >
+              <InstagramIcon />
+              <span>@disperdagin_kotakediri</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {currentPost && (
+        <div
+          className="igModalBackdrop"
+          onClick={() => setCurrentPost(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="igModal" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="igModalClose"
+              onClick={() => setCurrentPost(null)}
+              aria-label="Tutup"
+            >
+              &times;
+            </button>
+            <img
+              className="igModalImg"
+              src={currentPost.image || currentPost.thumbnail}
+              alt={currentPost.caption ? currentPost.caption.slice(0, 80) : "Instagram Post"}
+            />
+            <div className="igModalBody">
+              <a
+                className="igModalProfile"
+                href="https://www.instagram.com/disperdagin_kotakediri"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <InstagramIcon />
+                <span>@disperdagin_kotakediri</span>
+              </a>
+              {currentPost.caption && (
+                <p className="igModalCaption">{currentPost.caption}</p>
+              )}
+              <div className="igModalMeta">
+                <span>♥ {currentPost.likes ?? 0}</span>
+                <span>💬 {currentPost.comments ?? 0}</span>
+              </div>
+              <a
+                className="igModalLink"
+                href={currentPost.permalink || "https://www.instagram.com/disperdagin_kotakediri"}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Buka di Instagram →
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

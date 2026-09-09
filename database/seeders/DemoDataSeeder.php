@@ -456,7 +456,7 @@ class DemoDataSeeder extends Seeder
             DB::table('download_documents')->updateOrInsert(['title' => $title, 'category' => $category], ['file_path' => $filePath, 'is_published' => true, 'sort_order' => $idx + 1, 'created_at' => now(), 'updated_at' => now()]);
         }
 
-        DB::table('survey_settings')->updateOrInsert(['title' => 'Survey Kepuasan Masyarakat'], ['external_url' => null, 'qr_image' => 'images/IKM survey 1.png', 'description' => 'Survey mengacu pada SKM dari KemenPANRB. Link dan barcode dapat diganti melalui Admin Page.', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('survey_settings')->updateOrInsert(['title' => 'Survey Kepuasan Masyarakat'], ['external_url' => 'https://skm.go.id/share/instansi/e3a2df95-2de3-4b11-993d-9e37053593bd/1', 'qr_image' => 'images/IKM survey 1.png', 'description' => 'Survey mengacu pada SKM dari KemenPANRB. Link dan barcode dapat diganti melalui Admin Page.', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()]);
 
         $defaultMap = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3953.482145629552!2d112.0164!3d-7.8169!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e785b7e2e7b6c8d%3A0x8f0e5c5f5b5e5a5f!2sKota%20Kediri!5e0!3m2!1sid!2sid!4v1';
         $defaultContact = '081234567890';

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use App\Models\DownloadDocument;
 use App\Models\Komoditas;
 use App\Models\Pasar;
@@ -696,5 +698,96 @@ class SiteContentController extends Controller
     {
         $items = SiteSetting::query()->pluck('value', 'key');
         return response()->json(['status' => 'success', 'data' => $items]);
+    }
+
+    /**
+     * Public Instagram feed for the homepage.
+     *
+     * Fetches the latest posts from Instagram's public web endpoint
+     * (no login and no access token required) and caches the result
+     * server-side so the content always stays up to date.
+     */
+    public function instagram()
+    {
+        $username = config('instagram.username', 'disperdagin_kotakediri');
+        $limit = (int) config('instagram.limit', 8);
+        $ttl = (int) config('instagram.cache_ttl', 3600);
+
+        $cacheKey = "instagram_feed_{$username}";
+        $posts = Cache::get($cacheKey);
+
+        if (empty($posts)) {
+            $posts = $this->fetchInstagramPosts($username);
+            if (! empty($posts)) {
+                Cache::put($cacheKey, $posts, $ttl);
+            } else {
+                // Don't cache failures for the full TTL; retry sooner in case
+                // Instagram's block on this server IP is lifted.
+                Cache::put($cacheKey, [], 300);
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => array_slice($posts, 0, $limit),
+            'fallback_provider' => config('instagram.fallback_provider'),
+            'fallback_embed_id' => config('instagram.fallback_embed_id'),
+        ]);
+    }
+
+    private function fetchInstagramPosts(string $username): array
+    {
+        try {
+            $response = Http::timeout(12)
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'X-IG-App-ID' => '936619743392459',
+                    'X-Requested-With' => 'XMLHttpRequest',
+                    'Accept' => 'application/json',
+                ])
+                ->get("https://www.instagram.com/api/v1/users/web_profile_info/", [
+                    'username' => $username,
+                ]);
+
+            if (! $response->successful()) {
+                return [];
+            }
+
+            $user = $response->json('data.user');
+            if (empty($user)) {
+                return [];
+            }
+
+            $edges = data_get($user, 'edge_owner_to_timeline_media.edges', []);
+
+            return collect($edges)
+                ->map(function ($edge) {
+                    $node = $edge['node'] ?? [];
+                    if (empty($node)) {
+                        return null;
+                    }
+
+                    $captionEdges = data_get($node, 'edge_media_to_caption.edges', []);
+                    $caption = $captionEdges[0]['node']['text'] ?? '';
+
+                    return [
+                        'id' => $node['id'] ?? null,
+                        'shortcode' => $node['shortcode'] ?? null,
+                        'permalink' => $node['permalink'] ?? null,
+                        'image' => $node['display_url'] ?? ($node['thumbnail_src'] ?? null),
+                        'thumbnail' => $node['thumbnail_src'] ?? ($node['display_url'] ?? null),
+                        'caption' => $caption,
+                        'likes' => data_get($node, 'edge_liked_by.count', 0),
+                        'comments' => data_get($node, 'edge_media_to_comment.count', 0),
+                        'timestamp' => $node['taken_at_timestamp'] ?? null,
+                        'is_video' => (bool) ($node['is_video'] ?? false),
+                    ];
+                })
+                ->filter()
+                ->values()
+                ->toArray();
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 }

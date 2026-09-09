@@ -37,6 +37,7 @@ Route::get('/site/pasar', [SiteContentController::class, 'pasar']);
 Route::get('/site/pasar-modern', [SiteContentController::class, 'pasarModern']);
 Route::get('/site/mall', [SiteContentController::class, 'mall']);
 Route::get('/site/ikm', [SiteContentController::class, 'ikm']);
+Route::get('/site/instagram', [SiteContentController::class, 'instagram']);
 
 // New normalized, dynamic commodity price API.
 Route::get('/market/filters', [MarketDataController::class, 'filters']);
