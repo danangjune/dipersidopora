@@ -5031,15 +5031,7 @@ function TentangAdmin() {
         const parts = fieldName.split(".");
         if (parts.length === 1) {
           setForm((prev) => ({ ...prev, [parts[0]]: path }));
-        } else if (parts.length === 2) {
-          setForm((prev) => ({
-            ...prev,
-            tentang_data: {
-              ...prev.tentang_data,
-              [parts[1]]: path,
-            },
-          }));
-        } else if (parts.length === 3) {
+        } else if (parts.length === 2 || parts.length === 3) {
           setForm((prev) => ({
             ...prev,
             tentang_data: {
@@ -5133,12 +5125,13 @@ function TentangAdmin() {
   };
 
   const fileInput = (fieldName, label) => {
-    const value =
-      fieldName === "logo"
-        ? form.tentang_data.logo
-        : fieldName === "kadin.photo"
-          ? form.tentang_data.kadin?.photo || ""
-          : "";
+    const parts = fieldName.split(".");
+    let value = "";
+    if (parts.length === 1) {
+      value = form[parts[0]] ?? "";
+    } else if (parts.length === 2) {
+      value = form.tentang_data?.[parts[0]]?.[parts[1]] ?? "";
+    }
     const isImage = value && /\.(png|jpe?g|gif|webp|svg)$/i.test(value);
 
     return (
