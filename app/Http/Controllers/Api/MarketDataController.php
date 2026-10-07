@@ -120,6 +120,21 @@ class MarketDataController extends Controller
             $commodityIds = [];
         }
 
+        if (!$request->query('start_date') && !$request->query('end_date')) {
+            $latestDate = CommodityPriceRecord::query()
+                ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
+                ->where('commodity_price_records.status_validasi', 'true')
+                ->where('pasars.category', 'Pasar Rakyat')
+                ->when($marketId, fn($q) => $q->where('commodity_price_records.pasar_id', $marketId))
+                ->when(!empty($commodityIds), fn($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
+                ->max('commodity_price_records.price_date');
+
+            if ($latestDate) {
+                $end = Carbon::parse($latestDate)->startOfDay();
+                $start = $end->copy()->subDays(6);
+            }
+        }
+
         $query = CommodityPriceRecord::query()
             ->join('komoditas', 'komoditas.id', '=', 'commodity_price_records.komoditas_id')
             ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
@@ -129,7 +144,7 @@ class MarketDataController extends Controller
             ->when($marketId, fn($q) => $q->where('commodity_price_records.pasar_id', $marketId))
             ->when(!empty($commodityIds), fn($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
             ->groupBy('commodity_price_records.price_date', 'komoditas.id', 'komoditas.name')
-            ->selectRaw('commodity_price_records.price_date, komoditas.id AS commodity_id, komoditas.name AS commodity_name, FLOOR(AVG(CASE WHEN commodity_price_records.price > 0 THEN commodity_price_records.price ELSE NULL END)) AS average_price')
+            ->selectRaw('commodity_price_records.price_date, komoditas.id AS commodity_id, komoditas.name AS commodity_name, ROUND(AVG(CASE WHEN commodity_price_records.price > 0 THEN commodity_price_records.price ELSE NULL END)) AS average_price')
             ->orderBy('commodity_price_records.price_date')
             ->limit(500)
             ->get();
@@ -185,9 +200,41 @@ class MarketDataController extends Controller
         if (!$latestDate) {
             return response()->json([
                 'status' => 'success',
-                'data' => ['date' => null, 'rows' => []],
+                'data' => ['date' => null, 'previous_date' => null, 'rows' => []],
             ]);
         }
+
+        $previousDate = CommodityPriceRecord::query()
+            ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
+            ->where('commodity_price_records.status_validasi', 'true')
+            ->where('pasars.category', 'Pasar Rakyat')
+            ->whereDate('commodity_price_records.price_date', '<', $latestDate)
+            ->when($marketId, fn($q) => $q->where('commodity_price_records.pasar_id', $marketId))
+            ->when(!empty($commodityIds), fn($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
+            ->max('commodity_price_records.price_date');
+
+        $previousAverages = collect();
+        if ($previousDate) {
+            $previousAverages = CommodityPriceRecord::query()
+                ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
+                ->where('commodity_price_records.status_validasi', 'true')
+                ->where('pasars.category', 'Pasar Rakyat')
+                ->whereDate('commodity_price_records.price_date', $previousDate)
+                ->when($marketId, fn($q) => $q->where('commodity_price_records.pasar_id', $marketId))
+                ->when(!empty($commodityIds), fn($q) => $q->whereIn('commodity_price_records.komoditas_id', $commodityIds))
+                ->groupBy('commodity_price_records.komoditas_id')
+                ->selectRaw('commodity_price_records.komoditas_id, ROUND(AVG(CASE WHEN commodity_price_records.price > 0 THEN commodity_price_records.price ELSE NULL END)) AS average_price')
+                ->pluck('average_price', 'komoditas_id');
+        }
+
+        $referencePrices = HetHapSetting::query()
+            ->where('is_active', true)
+            ->when($marketId, fn($q) => $q->where(function ($query) use ($marketId) {
+                $query->whereNull('pasar_id')->orWhere('pasar_id', $marketId);
+            }))
+            ->groupBy('komoditas_id')
+            ->selectRaw('komoditas_id, MAX(price) AS reference_price')
+            ->pluck('reference_price', 'komoditas_id');
 
         $rows = CommodityPriceRecord::query()
             ->join('komoditas', 'komoditas.id', '=', 'commodity_price_records.komoditas_id')
@@ -203,15 +250,29 @@ class MarketDataController extends Controller
             ->selectRaw('COUNT(DISTINCT commodity_price_records.pasar_id) AS market_count')
             ->orderBy('komoditas.name')
             ->get()
-            ->map(function ($row) {
+            ->map(function ($row) use ($latestDate, $previousAverages, $referencePrices) {
+                $commodityId = (int) $row->commodity_id;
+                $currentPrice = (int) ($row->average_price ?? 0);
+                $previousPrice = (int) ($previousAverages[$commodityId] ?? 0);
+                $difference = $previousPrice > 0 ? $currentPrice - $previousPrice : 0;
+
                 return [
-                    'commodity_id' => (int) $row->commodity_id,
+                    'commodity_id' => $commodityId,
                     'nama_komoditas' => $row->nama_komoditas,
                     'unit' => $row->unit,
                     'image' => $row->image,
                     'url_gambar' => asset('assets/images/komoditas/' . ($row->image ?: 'default.png')),
-                    'average_price' => (int) ($row->average_price ?? 0),
+                    'average_price' => $currentPrice,
+                    'harga_sekarang' => $currentPrice,
+                    'harga_sebelumnya' => $previousPrice,
+                    'rata_rata' => $currentPrice,
+                    'selisih' => $difference,
+                    'tren' => $difference > 0 ? 'naik' : ($difference < 0 ? 'turun' : 'tetap'),
+                    'latest_date' => Carbon::parse($latestDate)->toDateString(),
                     'market_count' => (int) $row->market_count,
+                    'reference_price' => isset($referencePrices[$commodityId])
+                        ? (int) $referencePrices[$commodityId]
+                        : null,
                 ];
             });
 
@@ -219,6 +280,7 @@ class MarketDataController extends Controller
             'status' => 'success',
             'data' => [
                 'date' => Carbon::parse($latestDate)->toDateString(),
+                'previous_date' => $previousDate ? Carbon::parse($previousDate)->toDateString() : null,
                 'rows' => $rows,
                 'total' => $rows->count(),
             ],

@@ -6,6 +6,7 @@ import {
 import ChartBarIcon from "@heroicons/react/24/outline/ChartBarIcon";
 import AdjustmentsHorizontalIcon from "@heroicons/react/24/outline/AdjustmentsHorizontalIcon";
 import TableCellsIcon from "@heroicons/react/24/outline/TableCellsIcon";
+import CalendarDaysIcon from "@heroicons/react/24/outline/CalendarDaysIcon";
 import ArrowTrendingUpIcon from "@heroicons/react/24/solid/ArrowTrendingUpIcon";
 import ArrowTrendingDownIcon from "@heroicons/react/24/solid/ArrowTrendingDownIcon";
 import MinusIcon from "@heroicons/react/24/solid/MinusIcon";
@@ -14,6 +15,16 @@ Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryS
 
 const rupiah = (value) =>
   new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(value || 0);
+
+const shortDate = (value) =>
+  value
+    ? new Intl.DateTimeFormat("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "Asia/Jakarta",
+      }).format(new Date(`${value}T00:00:00+07:00`))
+    : null;
 
 const COLORS = ["#076797", "#108879", "#e2a200", "#dc2626", "#7c3aed", "#0891b2", "#84cc16", "#f97316", "#ec4899", "#6366f1"];
 
@@ -65,7 +76,7 @@ export default function MarketPage() {
   const load = () => {
     setLoading(true);
     Promise.all([
-      fetch(`/api/market/summary?${summaryQuery}`).then((r) => r.json()),
+      fetch(`/api/market/verified-average-last-day?${summaryQuery}`).then((r) => r.json()),
       fetch(`/api/market/chart?${chartQuery}`).then((r) => r.json()),
     ])
       .then(([summary, chartResult]) => {
@@ -218,6 +229,8 @@ export default function MarketPage() {
         {!loading &&
           rows.map((item) => {
             const tren = item.tren || "tetap";
+            const trendLabel =
+              tren === "naik" ? "Naik" : tren === "turun" ? "Turun" : "Tetap";
             return (
               <article className="commodityCard" key={item.commodity_id}>
                 <div className="commodityCardTop">
@@ -231,15 +244,30 @@ export default function MarketPage() {
                 <div className="commodityCardBody">
                   <div className="commodityCardPrice">
                     <strong>{rupiah(item.harga_sekarang)}</strong>
+                  </div>
+                  <div className="commodityCardChange">
                     <span className={`commodityTrendBadge ${tren}`}>
                       <TrendIconComponent tren={tren} />
+                      {trendLabel}
+                    </span>
+                    <span className="commodityTrendValue">
+                      {tren === "naik" ? "+" : tren === "turun" ? "−" : ""}
                       {rupiah(Math.abs(item.selisih || 0))}
                     </span>
                   </div>
                   <div className="commodityCardPrev">
-                    <span>Sebelumnya </span>
+                    <span>Harga sebelumnya</span>
                     {rupiah(item.harga_sebelumnya)}
                   </div>
+                  {item.latest_date && (
+                    <div
+                      className="commodityVerifiedDate"
+                      title={`Data terverifikasi terakhir ${shortDate(item.latest_date)}`}
+                    >
+                      <CalendarDaysIcon />
+                      <span>Verifikasi {shortDate(item.latest_date)}</span>
+                    </div>
+                  )}
                 </div>
               </article>
             );
@@ -258,9 +286,8 @@ export default function MarketPage() {
               <th>Komoditas</th>
               <th>Satuan</th>
               <th>HET/HAP</th>
-              <th>Harga Terkini</th>
-              <th>Harga Sebelumnya</th>
-              <th>Rata-rata</th>
+              <th>Rata-rata Terkini</th>
+              <th>Rata-rata Sebelumnya</th>
               <th>Selisih</th>
               <th>Jumlah Pasar</th>
             </tr>
@@ -274,7 +301,6 @@ export default function MarketPage() {
                 <td>{r.reference_price ? rupiah(r.reference_price) : "-"}</td>
                 <td><strong style={{color:"var(--primary)"}}>{rupiah(r.harga_sekarang)}</strong></td>
                 <td>{rupiah(r.harga_sebelumnya)}</td>
-                <td>{rupiah(r.rata_rata)}</td>
                 <td>
                   <span className={`indicatorTrend ${r.tren}`}>
                     <TrendIconComponent tren={r.tren} />
@@ -285,7 +311,7 @@ export default function MarketPage() {
               </tr>
             ))}
             {rows.length === 0 && !loading && (
-              <tr><td colSpan={9}><div className="emptyState"><TableCellsIcon style={{width:36,height:36}} /><p>Tidak ada data.</p></div></td></tr>
+              <tr><td colSpan={8}><div className="emptyState"><TableCellsIcon style={{width:36,height:36}} /><p>Tidak ada data.</p></div></td></tr>
             )}
           </tbody>
         </table>

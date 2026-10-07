@@ -3,6 +3,7 @@ import ChartBarIcon from "@heroicons/react/24/outline/ChartBarIcon";
 import ChevronDownIcon from "@heroicons/react/24/outline/ChevronDownIcon";
 import ChevronUpIcon from "@heroicons/react/24/outline/ChevronUpIcon";
 import ArrowRightIcon from "@heroicons/react/24/outline/ArrowRightIcon";
+import CalendarDaysIcon from "@heroicons/react/24/outline/CalendarDaysIcon";
 import ArrowTrendingUpIcon from "@heroicons/react/24/solid/ArrowTrendingUpIcon";
 import ArrowTrendingDownIcon from "@heroicons/react/24/solid/ArrowTrendingDownIcon";
 import MinusIcon from "@heroicons/react/24/solid/MinusIcon";
@@ -14,19 +15,42 @@ const rupiah = (value) =>
     maximumFractionDigits: 0,
   }).format(value || 0);
 
+const shortDate = (value) =>
+  value
+    ? new Intl.DateTimeFormat("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "Asia/Jakarta",
+      }).format(new Date(`${value}T00:00:00+07:00`))
+    : null;
+
 export default function PriceWidget() {
   const [items, setItems] = useState([]);
+  const [dataDate, setDataDate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
 
   const limit = 10;
 
   useEffect(() => {
-    fetch("/api/market/summary")
+    fetch("/api/market/verified-average-last-day")
       .then((r) => r.json())
-      .then((d) => setItems(d?.data?.rows || d?.data?.list_komoditas || []))
+      .then((d) => {
+        setItems(d?.data?.rows || []);
+        setDataDate(d?.data?.date || null);
+      })
       .finally(() => setLoading(false));
   }, []);
+
+  const formattedDataDate = dataDate
+    ? new Intl.DateTimeFormat("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "Asia/Jakarta",
+      }).format(new Date(`${dataDate}T00:00:00+07:00`))
+    : null;
 
   const displayed = showAll ? items : items.slice(0, limit);
   const hasMore = items.length > limit;
@@ -37,8 +61,11 @@ export default function PriceWidget() {
         <span>Harga Komoditas</span>
         <h2>Pantau Harga Komoditas Hari Ini</h2>
         <p>
-          Data harga kebutuhan pokok terkini dari berbagai pasar di Kota Kediri
-          diperbarui setiap hari.
+          Rata-rata harga kebutuhan pokok pada satu hari dari berbagai pasar di
+          Kota Kediri.
+          {formattedDataDate && (
+            <> Data terverifikasi terbaru: {formattedDataDate}.</>
+          )}
         </p>
       </div>
 
@@ -63,8 +90,11 @@ export default function PriceWidget() {
                   : tren === "turun"
                     ? ArrowTrendingDownIcon
                     : MinusIcon;
+              const trendLabel =
+                tren === "naik" ? "Naik" : tren === "turun" ? "Turun" : "Tetap";
+
               return (
-                <article className="commodityCard" key={item.nama_komoditas}>
+                <article className="commodityCard" key={item.commodity_id}>
                   <div className="commodityCardTop">
                     {item.url_gambar && (
                       <img
@@ -79,18 +109,31 @@ export default function PriceWidget() {
                   </div>
                   <div className="commodityCardBody">
                     <div className="commodityCardPrice">
-                      <strong>
-                        {rupiah(item.harga_sekarang)}
-                      </strong>
+                      <strong>{rupiah(item.average_price)}</strong>
+                    </div>
+                    <div className="commodityCardChange">
                       <span className={`commodityTrendBadge ${tren}`}>
-                        <TrendIcon style={{ width: 14, height: 14 }} />
+                        <TrendIcon />
+                        {trendLabel}
+                      </span>
+                      <span className="commodityTrendValue">
+                        {tren === "naik" ? "+" : tren === "turun" ? "−" : ""}
                         {rupiah(Math.abs(item.selisih || 0))}
                       </span>
                     </div>
                     <div className="commodityCardPrev">
-                      <span>Sebelumnya </span>
+                      <span>Harga sebelumnya</span>
                       {rupiah(item.harga_sebelumnya)}
                     </div>
+                    {item.latest_date && (
+                      <div
+                        className="commodityVerifiedDate"
+                        title={`Data terverifikasi terakhir ${shortDate(item.latest_date)}`}
+                      >
+                        <CalendarDaysIcon />
+                        <span>Verifikasi {shortDate(item.latest_date)}</span>
+                      </div>
+                    )}
                   </div>
                 </article>
               );

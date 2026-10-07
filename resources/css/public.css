@@ -105,21 +105,25 @@ p{line-height:1.7;margin:0 0 12px;color:var(--text-muted)}
 
 /* ─── PRICE WIDGET ─── */
 .commodityGridTen{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;max-width:var(--max-w);margin:0 auto}
-.commodityCard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);transition:all var(--transition);display:flex;flex-direction:column}
-.commodityCard:hover{transform:translateY(-8px);box-shadow:0 16px 48px rgba(0,0,0,.1);border-color:var(--accent)}
+.commodityCard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 2px 10px rgba(15,45,82,.05);transition:transform var(--transition),box-shadow var(--transition),border-color var(--transition);display:flex;flex-direction:column}
+.commodityCard:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(15,45,82,.1);border-color:rgba(7,103,151,.35)}
 .commodityCardTop{display:flex;align-items:center;gap:14px;padding:20px 20px 0}
 .commodityCardTop img{width:52px;height:52px;object-fit:cover;border-radius:var(--radius);background:var(--soft);flex-shrink:0;border:1px solid var(--border)}
 .commodityCardTop h3{font-size:15px;margin:0;color:var(--text);font-weight:700;line-height:1.3;flex:1}
-.commodityCardBody{padding:14px 20px 20px;display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--soft);margin-top:14px}
-.commodityCardPrice{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.commodityCardBody{padding:14px 20px 18px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--soft);margin-top:14px}
+.commodityCardPrice{display:flex;align-items:center;min-width:0}
 .commodityCardPrice strong{color:var(--primary);font-size:20px;font-weight:800;letter-spacing:-.02em}
-.commodityCardPrev{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:4px}
+.commodityCardChange{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;flex-wrap:wrap}
+.commodityCardPrev{font-size:11px;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .commodityCardPrev span{color:#94a3b8}
-.commodityTrendBadge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;border-radius:999px;padding:4px 10px;white-space:nowrap;line-height:1}
+.commodityVerifiedDate{display:flex;align-items:center;gap:6px;width:100%;margin-top:4px;padding-top:9px;border-top:1px solid var(--soft);color:#64748b;font-size:10px;font-weight:600;line-height:1.2}
+.commodityVerifiedDate svg{width:13px;height:13px;flex:0 0 auto;stroke-width:1.8}
+.commodityTrendBadge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;border-radius:999px;padding:4px 8px;white-space:nowrap;line-height:1}
+.commodityTrendValue{font-size:11px;font-weight:700;color:#475569;white-space:nowrap}
 .commodityTrendBadge.naik{background:#fef2f2;color:#dc2626}
 .commodityTrendBadge.turun{background:#f0fdf4;color:#16a34a}
 .commodityTrendBadge.tetap{background:#f1f5f9;color:#64748b}
-.commodityTrendBadge svg{flex-shrink:0}
+.commodityTrendBadge svg{width:14px;height:14px;flex-shrink:0}
 .blank{display:grid;place-items:center;padding:40px;color:var(--text-muted)}
 .center{text-align:center;margin-top:28px;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px}
 
