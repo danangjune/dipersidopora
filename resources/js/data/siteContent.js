@@ -120,6 +120,7 @@ export const routesIndex = [
       .map((item) => [item.label, item.href]),
   ),
   ["Survey Kepuasan", "/survey"],
+  ["Pameran Produk", "/pameran"],
   ["Admin Page", "/admin"],
   ["Dashboard PKL", "/pkl/dashboard"],
   ["Input PKL", "/pkl/input"],

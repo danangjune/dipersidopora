@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CommodityPriceRecord;
 use App\Models\DownloadCategory;
 use App\Models\DownloadDocument;
+use App\Models\ExhibitionProduct;
 use App\Models\HetHapSetting;
 use App\Models\Ikm;
 use App\Models\Komoditas;
@@ -24,6 +25,34 @@ use Illuminate\Validation\Rule;
 
 class AdminCrudController extends Controller
 {
+    public function exhibitionProducts(Request $request)
+    {
+        if ($request->isMethod('get')) {
+            return response()->json([
+                'status' => 'success',
+                'data' => ExhibitionProduct::query()->orderBy('sort_order')->orderBy('name')->get(),
+            ]);
+        }
+
+        $product = ExhibitionProduct::create($request->validate($this->exhibitionProductRules()));
+
+        return response()->json(['status' => 'success', 'data' => $product], 201);
+    }
+
+    public function updateExhibitionProduct(Request $request, ExhibitionProduct $exhibitionProduct)
+    {
+        $exhibitionProduct->update($request->validate($this->exhibitionProductRules(true)));
+
+        return response()->json(['status' => 'success', 'data' => $exhibitionProduct->fresh()]);
+    }
+
+    public function destroyExhibitionProduct(ExhibitionProduct $exhibitionProduct)
+    {
+        $exhibitionProduct->delete();
+
+        return response()->json(['status' => 'success']);
+    }
+
     public function me(Request $request)
     {
         $user = $request->user();
@@ -1198,6 +1227,30 @@ class AdminCrudController extends Controller
         $grouped = $dailyAvgs->groupBy('komoditas_id');
         $rows = [];
 
+        // Harga sebelumnya untuk baris pertama di periode export harus tetap
+        // mengacu pada price_date terakhir sebelum start_date, bukan angka 0.
+        $previousPeriodAverages = collect();
+        if ($startDate) {
+            $previousDates = CommodityPriceRecord::query()
+                ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
+                ->where('pasars.category', 'Pasar Rakyat')
+                ->whereDate('commodity_price_records.price_date', '<', $startDate)
+                ->whereIn('commodity_price_records.komoditas_id', $grouped->keys())
+                ->groupBy('commodity_price_records.komoditas_id')
+                ->selectRaw('commodity_price_records.komoditas_id, MAX(commodity_price_records.price_date) AS previous_date');
+
+            $previousPeriodAverages = CommodityPriceRecord::query()
+                ->join('pasars', 'pasars.id', '=', 'commodity_price_records.pasar_id')
+                ->joinSub($previousDates, 'previous_dates', function ($join) {
+                    $join->on('previous_dates.komoditas_id', '=', 'commodity_price_records.komoditas_id')
+                        ->on('previous_dates.previous_date', '=', 'commodity_price_records.price_date');
+                })
+                ->where('pasars.category', 'Pasar Rakyat')
+                ->groupBy('commodity_price_records.komoditas_id')
+                ->selectRaw('commodity_price_records.komoditas_id, ROUND(AVG(commodity_price_records.price)) AS avg_price')
+                ->pluck('avg_price', 'commodity_price_records.komoditas_id');
+        }
+
         foreach ($grouped as $komoditasId => $items) {
             $sortedItems = $items->sortBy('price_date')->values();
             $rataRataPeriode = (int) round($items->avg('avg_price'));
@@ -1207,7 +1260,9 @@ class AdminCrudController extends Controller
             foreach ($sortedItems as $idx => $item) {
                 $hargaSekarang = (int) $item->avg_price;
                 // Previous price: use the previous day's avg for this commodity
-                $prev = ($idx > 0) ? (int) $sortedItems[$idx - 1]->avg_price : 0;
+                $prev = ($idx > 0)
+                    ? (int) $sortedItems[$idx - 1]->avg_price
+                    : (int) ($previousPeriodAverages[$komoditasId] ?? 0);
                 $selisih = $hargaSekarang - $prev;
 
                 // Indicator: compare current average price to HET/HAP reference
@@ -1265,6 +1320,26 @@ class AdminCrudController extends Controller
             'image' => ['nullable', 'string', 'max:255'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'is_active' => ['nullable', 'boolean'],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
+        ];
+    }
+
+    private function exhibitionProductRules(bool $partial = false): array
+    {
+        $req = $partial ? 'sometimes' : 'required';
+
+        return [
+            'name' => [$req, 'string', 'max:180'],
+            'product_image' => ['nullable', 'string', 'max:255'],
+            'images' => ['nullable', 'array', 'max:5'],
+            'images.*' => ['string', 'max:255'],
+            'logo' => ['nullable', 'string', 'max:255'],
+            'company' => [$req, 'string', 'max:180'],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'website' => ['nullable', 'url:http,https', 'max:255'],
+            'address' => ['nullable', 'string'],
+            'detail_pdf' => ['nullable', 'string', 'max:255', 'regex:/\.pdf$/i'],
             'is_active' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ];

@@ -588,6 +588,68 @@ tr:hover td{background:#f8fafc}
 .ziBtn:hover .ziBtnLabel{color:var(--primary-dark)}
 @media(max-width:768px){.ziGrid{grid-template-columns:repeat(2,1fr);gap:24px}}
 @media(max-width:480px){.ziAbout{grid-template-columns:1fr;justify-items:center;text-align:center}.ziGrid{grid-template-columns:repeat(2,1fr);gap:16px}}
+
+/* PAMERAN PRODUK */
+.pameranPage{background:#f7f9fc;min-height:70vh;color:#122238}
+.pameranHero{position:relative;isolation:isolate;overflow:hidden;padding:clamp(38px,5vw,64px) clamp(20px,7vw,100px);background:linear-gradient(122deg,#052f4b 0%,#076797 54%,#0b8b84 130%)}
+.pameranHero::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.18;background-image:linear-gradient(rgba(255,255,255,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.1) 1px,transparent 1px);background-size:52px 52px;mask-image:linear-gradient(to right,#000,transparent 80%)}
+.pameranHeroContent{position:relative;max-width:1180px;margin:auto;color:#fff}
+.pameranEyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid rgba(255,255,255,.22);border-radius:100px;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.pameranEyebrow svg{width:16px}
+.pameranHero h1{max-width:760px;margin:14px 0 11px;font-size:clamp(32px,4.5vw,54px);line-height:1.04;letter-spacing:-.045em;font-weight:800}
+.pameranHero h1 em{font-style:normal;color:#fee263}
+.pameranHero p{max-width:620px;margin:0;color:rgba(255,255,255,.78);font-size:clamp(15px,1.6vw,19px);line-height:1.7}
+.pameranOrb{position:absolute;z-index:-1;border-radius:50%;filter:blur(1px);opacity:.4;animation:pameranFloat 8s ease-in-out infinite}
+.pameranOrbOne{right:8%;top:12%;width:260px;height:260px;border:1px solid rgba(255,255,255,.32);box-shadow:inset 0 0 70px rgba(255,255,255,.08)}
+.pameranOrbTwo{right:26%;bottom:-120px;width:210px;height:210px;background:rgba(254,226,99,.15);animation-delay:-3s}
+@keyframes pameranFloat{50%{transform:translateY(-14px) rotate(8deg)}}
+.pameranCatalog{max-width:1240px;margin:auto;padding:clamp(42px,6vw,82px) clamp(16px,3vw,30px) clamp(68px,8vw,110px)}
+.pameranCatalogHead{display:flex;justify-content:space-between;align-items:flex-end;gap:28px;margin-bottom:30px}
+.pameranCatalogHead>div>span{color:#0b8b84;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.pameranCatalogHead h2{margin:5px 0 6px;font-size:clamp(25px,3vw,38px);letter-spacing:-.03em;color:#092f4a}
+.pameranCatalogHead p{margin:0;color:#748094;font-size:14px}
+.pameranSearch{width:min(390px,100%);display:flex;align-items:center;gap:10px;padding:0 15px;border:1px solid #dae2eb;border-radius:14px;background:#fff;box-shadow:0 5px 18px rgba(15,45,82,.05);transition:.2s}
+.pameranSearch:focus-within{border-color:#0b8b84;box-shadow:0 0 0 4px rgba(11,139,132,.1)}
+.pameranSearch svg{width:20px;color:#8190a5}.pameranSearch input{width:100%;padding:13px 0;border:0;outline:0;background:transparent;font:inherit;font-size:14px;color:#172033}
+.pameranGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
+.pameranCard{display:block;min-width:0;padding:0;overflow:hidden;border:1px solid #e4eaf0;border-radius:20px;background:#fff;text-align:left;color:inherit;box-shadow:0 7px 24px rgba(19,48,74,.06);cursor:pointer;transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease}
+.pameranCard:hover{transform:translateY(-7px);border-color:rgba(11,139,132,.25);box-shadow:0 20px 45px rgba(19,48,74,.14)}
+.pameranCardMedia{position:relative;aspect-ratio:1.18;overflow:hidden;background:linear-gradient(135deg,#e9f0f4,#dbe9ec)}
+.pameranProductImage{width:100%;height:100%;display:block;object-fit:cover;transition:transform .55s cubic-bezier(.2,.7,.2,1)}
+.pameranCard:hover .pameranProductImage{transform:scale(1.065)}
+.pameranCard:focus-visible{outline:3px solid rgba(11,139,132,.35);outline-offset:3px}
+.pameranSlideArrow{position:absolute;z-index:3;top:50%;width:32px;height:32px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:rgba(5,47,75,.76);color:#fff;opacity:0;cursor:pointer;transform:translateY(-50%);transition:.2s}.pameranSlideArrow:hover{background:#0b8b84}.pameranSlideArrow.prev{left:10px}.pameranSlideArrow.next{right:10px}.pameranSlideArrow svg{width:17px}.pameranCardMedia:hover .pameranSlideArrow,.pameranModalHero .pameranSlideArrow{opacity:1}
+.pameranSlideDots{position:absolute;z-index:3;left:50%;bottom:10px;display:flex;gap:5px;transform:translateX(-50%)}.pameranSlideDots button{width:6px;height:6px;padding:0;border:0;border-radius:10px;background:rgba(255,255,255,.62);box-shadow:0 1px 3px rgba(0,0,0,.25);cursor:pointer;transition:.2s}.pameranSlideDots button.active{width:18px;background:#fee263}
+.pameranCardShine{position:absolute;inset:0;background:linear-gradient(130deg,transparent 45%,rgba(255,255,255,.26) 51%,transparent 58%);transform:translateX(-110%);transition:transform .7s ease}
+.pameranCard:hover .pameranCardShine{transform:translateX(110%)}
+.pameranViewLabel{position:absolute;right:12px;bottom:12px;display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:100px;background:rgba(5,47,75,.86);backdrop-filter:blur(8px);color:#fff;font-size:11px;font-weight:700;opacity:0;transform:translateY(8px);transition:.25s}
+.pameranCard:hover .pameranViewLabel{opacity:1;transform:none}
+.pameranCardBody{padding:17px 17px 16px}
+.pameranCompanyLine{display:flex;align-items:center;gap:8px;color:#0b8b84;font-size:11px;font-weight:750;letter-spacing:.025em;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.pameranCompanyLine span{overflow:hidden;text-overflow:ellipsis}
+.pameranLogo{width:28px;height:28px;flex:0 0 auto;border:1px solid #e5eaf0;border-radius:8px;object-fit:contain;background:#fff}
+.pameranCard h2{margin:11px 0 13px;font-size:17px;line-height:1.35;color:#10233f;letter-spacing:-.01em}
+.pameranCardFooter{display:flex;align-items:flex-start;gap:6px;padding-top:12px;border-top:1px solid #edf0f3;color:#7d8795;font-size:11px;line-height:1.4}
+.pameranCardFooter svg{width:15px;flex:0 0 auto}.pameranCardFooter span{display:-webkit-box;overflow:hidden;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.pameranImageFallback{display:grid;place-items:center;color:#82a2ae;background:linear-gradient(135deg,#e9f2f3,#dce9ed)}.pameranImageFallback svg{width:27%;max-width:56px}
+.pameranState,.pameranEmpty{min-height:230px;display:flex;align-items:center;justify-content:center;gap:12px;border:1px dashed #ced8e2;border-radius:20px;color:#617085;background:#fff}.pameranState.error{color:#b42318}
+.pameranLoader{width:22px;height:22px;border:3px solid #dce7eb;border-top-color:#0b8b84;border-radius:50%;animation:pameranSpin .7s linear infinite}@keyframes pameranSpin{to{transform:rotate(360deg)}}
+.pameranEmpty{flex-direction:column;text-align:center}.pameranEmpty svg{width:42px;color:#91a1b4}.pameranEmpty h3,.pameranEmpty p{margin:0}.pameranEmpty p{color:#8190a5;font-size:14px}
+.pameranModalBackdrop{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:24px;background:rgba(4,21,34,.73);backdrop-filter:blur(9px);animation:pameranFade .2s ease}
+.pameranModal{position:relative;display:grid;grid-template-columns:minmax(300px,.87fr) minmax(400px,1.13fr);width:min(1040px,100%);max-height:90vh;overflow:auto;border:1px solid rgba(255,255,255,.35);border-radius:26px;background:#fff;box-shadow:0 30px 90px rgba(0,0,0,.35);animation:pameranPop .3s cubic-bezier(.2,.75,.25,1)}
+@keyframes pameranFade{from{opacity:0}}@keyframes pameranPop{from{opacity:0;transform:translateY(20px) scale(.975)}}
+.pameranModalClose{position:absolute;z-index:3;right:15px;top:15px;width:40px;height:40px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:rgba(5,47,75,.86);color:#fff;cursor:pointer;transition:.2s}.pameranModalClose:hover{background:#0b8b84;transform:rotate(90deg)}.pameranModalClose svg{width:22px}
+.pameranModalHero{position:sticky;top:0;min-height:580px;background:#e6eef1}.pameranModalImage{width:100%;height:100%;position:absolute;inset:0;object-fit:cover}
+.pameranModalContent{padding:clamp(30px,4vw,54px)}
+.pameranModalCompany{display:flex;align-items:center;gap:13px}.pameranModalLogo{width:54px;height:54px;object-fit:contain;border:1px solid #e2e8ee;border-radius:14px;background:#fff}.pameranModalCompany div{display:grid;gap:3px}.pameranModalCompany span{color:#8a95a5;font-size:11px;text-transform:uppercase;letter-spacing:.08em}.pameranModalCompany strong{color:#0b8b84;font-size:14px}
+.pameranModalContent>h2{margin:24px 0 22px;color:#0b2f49;font-size:clamp(27px,3.2vw,43px);line-height:1.1;letter-spacing:-.035em}
+.pameranDetails{display:grid;gap:8px}.pameranDetails>a,.pameranDetails>div{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:13px;background:#f5f8fa;color:#324256;text-decoration:none;transition:.2s}.pameranDetails>a:hover{background:#e9f5f4;color:#087b75}.pameranDetails svg{width:20px;flex:0 0 auto;margin-top:2px;color:#0b8b84}.pameranDetails span{min-width:0;font-size:13px;line-height:1.45;word-break:break-word}.pameranDetails small{display:block;margin-bottom:2px;color:#8a95a5;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+.pameranDocument{margin-top:10px}.pameranDocument>button{width:100%;display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #cfe5e3;border-radius:13px;background:#edf8f7;color:#087b75;text-align:left;cursor:pointer;transition:.2s}.pameranDocument>button:hover{border-color:#0b8b84;background:#e3f4f2}.pameranDocument>button>svg{width:21px;flex:0 0 auto}.pameranDocument>button>svg:last-child{margin-left:auto}.pameranDocument>button span{display:grid;gap:2px}.pameranDocument>button small{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#668985}.pameranDocument>button strong{font-size:13px}.pameranPdfViewer{height:430px;margin-top:10px;overflow:hidden;border:1px solid #dbe3e9;border-radius:13px;background:#eef2f5}.pameranPdfViewer iframe{width:100%;height:100%;border:0;background:#fff}
+.pameranRelated{margin-top:28px;padding-top:23px;border-top:1px solid #e7ecf0}.pameranRelatedHead{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:14px}.pameranRelatedHead span{font-size:16px;font-weight:800;color:#0b2f49}.pameranRelatedHead small{color:#8a95a5;font-size:10px}.pameranRelatedGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.pameranCard.compact{border-radius:14px;box-shadow:none}.pameranCard.compact .pameranCardMedia{aspect-ratio:1.6}.pameranCard.compact .pameranCardBody{padding:11px}.pameranCard.compact .pameranCompanyLine{display:none}.pameranCard.compact h2{margin:0;font-size:13px}.pameranCard.compact .pameranViewLabel{display:none}
+@media(max-width:1000px){.pameranGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){.pameranCatalogHead{align-items:stretch;flex-direction:column}.pameranSearch{width:100%}.pameranGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.pameranModalBackdrop{padding:12px}.pameranModal{display:block;border-radius:20px}.pameranModalHero{position:relative;min-height:0;aspect-ratio:1.5}.pameranModalContent{padding:26px 20px}.pameranModalClose{right:10px;top:10px}.pameranHero br{display:none}}
+@media(max-width:460px){.pameranGrid{grid-template-columns:1fr}.pameranHero{padding-top:36px;padding-bottom:40px}.pameranCardMedia{aspect-ratio:1.45}.pameranRelatedGrid{grid-template-columns:1fr 1fr}.pameranRelatedHead{align-items:flex-start;flex-direction:column}.pameranSlideArrow{opacity:1}}
+@media(max-width:760px){.pameranPdfViewer{height:360px}}
 .ziSubHero{position:relative;overflow:hidden;padding:clamp(32px,5vw,60px) 20px clamp(28px,4vw,48px);text-align:center;background:linear-gradient(135deg,#043953 0%,#065e89 100%)}
 .ziSubHeroBg{position:absolute;inset:0;opacity:.1;background:radial-gradient(circle at 30% 70%,rgba(255,255,255,.5)0%,transparent 50%),radial-gradient(circle at 70% 30%,rgba(255,255,255,.3)0%,transparent 50%);pointer-events:none}
 .ziSubHeroContent{position:relative;z-index:1}

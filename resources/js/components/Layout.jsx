@@ -1,6 +1,6 @@
 import { menu as staticMenu, asset, routesIndex } from '../data/siteContent';
 import { useEffect, useState } from 'react';
-import { InformationCircleIcon, ChartBarIcon, Cog6ToothIcon, ArrowDownTrayIcon, ShieldCheckIcon, ClipboardDocumentCheckIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { InformationCircleIcon, ChartBarIcon, Cog6ToothIcon, ArrowDownTrayIcon, ShieldCheckIcon, ClipboardDocumentCheckIcon, MagnifyingGlassIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 
 const groupIcons = {
   Tentang: InformationCircleIcon,
@@ -63,6 +63,7 @@ export function Header() {
         })}
         <a href="/zona-integritas"><ShieldCheckIcon className="nav-icon" />Zona Integritas</a>
         <a href="/survey"><ClipboardDocumentCheckIcon className="nav-icon" />Survey</a>
+        <a href="/pameran"><Squares2X2Icon className="nav-icon" />Pameran</a>
       </div>
     </nav>
   </>;

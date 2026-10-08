@@ -323,6 +323,27 @@ const resources = {
       is_active: true,
     },
   },
+  pameran: {
+    title: "Katalog Pameran",
+    endpoint: "/api/admin/pameran",
+    fields: [
+      { name: "name", label: "Nama Produk", required: true },
+      { name: "images", label: "Foto Produk (maksimal 5)", type: "multi-file" },
+      { name: "logo", label: "Logo Perusahaan", type: "file" },
+      { name: "company", label: "Perusahaan", required: true },
+      { name: "phone", label: "No. HP", type: "tel" },
+      { name: "website", label: "Website", type: "url" },
+      { name: "address", label: "Alamat", type: "textarea" },
+      { name: "detail_pdf", label: "PDF Detail Produk", type: "file", accept: ".pdf,application/pdf" },
+      { name: "sort_order", label: "Urutan", type: "number" },
+      { name: "is_active", label: "Tampilkan", type: "checkbox" },
+    ],
+    columns: ["name", "company", "phone", "website", "is_active"],
+    defaults: {
+      name: "", images: [], logo: "", company: "", phone: "",
+      website: "", address: "", detail_pdf: "", sort_order: 0, is_active: true,
+    },
+  },
 };
 
 const menuGroups = [
@@ -390,6 +411,7 @@ const menuGroups = [
       },
       { key: "banners", label: "Banner Slider", href: "/admin/banners" },
       { key: "ikm", label: "Data IKM", href: "/admin/ikm" },
+      { key: "pameran", label: "Katalog Pameran", href: "/admin/pameran" },
       {
         key: "zona-integritas",
         label: "Zona Integritas",
@@ -1041,6 +1063,67 @@ function CrudPage({ config }) {
       );
     }
 
+    if (field.type === "multi-file") {
+      const images = Array.isArray(value) ? value : [];
+
+      const uploadImages = async (files) => {
+        const selected = Array.from(files || []).slice(0, Math.max(0, 5 - images.length));
+        if (selected.length === 0) return;
+
+        setUploading((prev) => ({ ...prev, [field.name]: true }));
+        try {
+          const uploaded = [];
+          for (const file of selected) {
+            const body = new FormData();
+            body.append("file", file);
+            const result = await fetch("/api/admin/upload", {
+              method: "POST",
+              headers: { Accept: "application/json", "X-CSRF-TOKEN": csrf },
+              credentials: "same-origin",
+              body,
+            });
+            const data = await result.json();
+            if (data?.data?.path) uploaded.push(data.data.path);
+          }
+          setForm((prev) => ({
+            ...prev,
+            [field.name]: [...(prev[field.name] || []), ...uploaded].slice(0, 5),
+          }));
+        } finally {
+          setUploading((prev) => ({ ...prev, [field.name]: false }));
+        }
+      };
+
+      return (
+        <div className="admin-multi-upload">
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            disabled={images.length >= 5 || uploading[field.name]}
+            onChange={(event) => {
+              uploadImages(event.target.files);
+              event.target.value = "";
+            }}
+          />
+          <small>{images.length}/5 foto {uploading[field.name] ? "• Mengunggah..." : ""}</small>
+          {images.length > 0 && <div className="admin-multi-preview">
+            {images.map((path, index) => <div key={`${path}-${index}`}>
+              <img src={`/assets/${path}`} alt={`Foto ${index + 1}`} />
+              <button
+                type="button"
+                aria-label={`Hapus foto ${index + 1}`}
+                onClick={() => setForm((prev) => ({
+                  ...prev,
+                  [field.name]: prev[field.name].filter((_, itemIndex) => itemIndex !== index),
+                }))}
+              >×</button>
+            </div>)}
+          </div>}
+        </div>
+      );
+    }
+
     if (field.type === "select") {
       const options = field.options || [];
       const loaded = fieldOptions[field.optionsUrl] || [];
@@ -1163,7 +1246,7 @@ function CrudPage({ config }) {
                 <label
                   key={field.name}
                   className={
-                    field.type === "textarea" || field.type === "select"
+                    field.type === "textarea" || field.type === "select" || field.type === "multi-file"
                       ? "wide"
                       : ""
                   }

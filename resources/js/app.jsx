@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import MarketPage from './pages/MarketPage';
 import SurveyPage from './pages/SurveyPage';
+import PameranPage from './pages/PameranPage';
 import AdminPage from './pages/AdminPage';
 import TentangPage from './pages/TentangPage';
 import StrukturPage from './pages/StrukturPage';
@@ -34,6 +35,7 @@ function App() {
   if (path === '/') page = <Home />;
   else if (['/informasi-pasar'].includes(path)) page = <MarketPage />;
   else if (['/survey'].includes(path)) page = <SurveyPage />;
+  else if (['/pameran'].includes(path)) page = <PameranPage />;
   else if (['/tentang'].includes(path)) page = <TentangPage />;
   else if (['/struktur'].includes(path)) page = <StrukturPage />;
   else if (['/program-kegiatan'].includes(path)) page = <ProgramKegiatanPage />;

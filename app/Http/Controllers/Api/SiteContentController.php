@@ -13,9 +13,21 @@ use App\Models\SiteBanner;
 use App\Models\SitePage;
 use App\Models\SiteSetting;
 use App\Models\SurveySetting;
+use App\Models\ExhibitionProduct;
 
 class SiteContentController extends Controller
 {
+    public function exhibitionProducts()
+    {
+        $products = ExhibitionProduct::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get(['id', 'name', 'product_image', 'images', 'logo', 'company', 'phone', 'website', 'address', 'detail_pdf']);
+
+        return response()->json(['status' => 'success', 'data' => $products]);
+    }
+
     public function page(string $slug)
     {
         $slug = trim($slug, '/');

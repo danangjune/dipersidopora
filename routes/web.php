@@ -132,6 +132,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('api/admin')->group(function (
     Route::match(['get', 'post'], '/ikm', [AdminCrudController::class, 'ikm']);
     Route::patch('/ikm/{ikm}', [AdminCrudController::class, 'updateIkm']);
     Route::delete('/ikm/{ikm}', [AdminCrudController::class, 'destroyIkm']);
+
+    Route::match(['get', 'post'], '/pameran', [AdminCrudController::class, 'exhibitionProducts']);
+    Route::patch('/pameran/{exhibitionProduct}', [AdminCrudController::class, 'updateExhibitionProduct']);
+    Route::delete('/pameran/{exhibitionProduct}', [AdminCrudController::class, 'destroyExhibitionProduct']);
 });
 
 /*
